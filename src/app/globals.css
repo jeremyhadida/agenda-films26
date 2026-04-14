@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  /* Surfaces */
+  --color-surface: #021232;
+  --color-surface-low: #0a1a3a;
+  --color-surface-card: #263455;
+
+  /* Gold */
+  --color-gold: #ffd700;
+  --color-gold-dim: #e9c400;
+  --color-gold-light: #ffe16d;
+
+  /* Text */
+  --color-text: #fff6df;
+  --color-muted: #d0c6ab;
+
+  /* Chips genre */
+  --color-chip-bg: #544601;
+  --color-chip-text: #c9b468;
+
+  /* Tags techniques */
+  --color-cyan: #defcff;
+
+  /* Fonts */
+  --font-display: var(--font-manrope);
+  --font-body: var(--font-inter);
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body), sans-serif;
+}
