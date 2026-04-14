@@ -1,0 +1,72 @@
+import type { Film, WeekGroup } from './types'
+
+/**
+ * Returns the ISO week number (1–53) for an ISO date string.
+ */
+export function getIsoWeek(dateStr: string): number {
+  const date = new Date(dateStr)
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+}
+
+/**
+ * Returns the ISO date of the Monday of a given ISO week.
+ */
+export function getWeekMonday(year: number, isoWeek: number): string {
+  const jan4 = new Date(Date.UTC(year, 0, 4))
+  const dayOfWeek = jan4.getUTCDay() || 7
+  const monday = new Date(jan4)
+  monday.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (isoWeek - 1) * 7)
+  return monday.toISOString().split('T')[0]
+}
+
+const FR_MONTHS = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc']
+
+/**
+ * Formats a week label: "SEMAINE 16 — 13 avr 2026"
+ */
+export function formatWeekLabel(isoWeek: number, mondayDate: string): string {
+  const d = new Date(mondayDate + 'T00:00:00Z')
+  const day = d.getUTCDate()
+  const month = FR_MONTHS[d.getUTCMonth()]
+  const year = d.getUTCFullYear()
+  return `SEMAINE ${isoWeek} — ${day} ${month} ${year}`
+}
+
+/**
+ * Formats an ISO date string as "14 avr 2026"
+ */
+export function formatDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z')
+  return `${d.getUTCDate()} ${FR_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+/**
+ * Groups a list of films (with release_date) by ISO week, sorted chronologically.
+ */
+export function groupFilmsByWeek(
+  films: (Film & { release_date: string })[]
+): WeekGroup[] {
+  if (films.length === 0) return []
+
+  const weekMap = new Map<number, WeekGroup>()
+
+  for (const film of films) {
+    const week = getIsoWeek(film.release_date)
+    if (!weekMap.has(week)) {
+      const year = new Date(film.release_date).getFullYear()
+      const monday = getWeekMonday(year, week)
+      weekMap.set(week, {
+        isoWeek: week,
+        label: formatWeekLabel(week, monday),
+        startDate: monday,
+        films: [],
+      })
+    }
+    weekMap.get(week)!.films.push(film)
+  }
+
+  return Array.from(weekMap.values()).sort((a, b) => a.isoWeek - b.isoWeek)
+}
