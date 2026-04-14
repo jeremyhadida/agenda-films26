@@ -12,6 +12,17 @@ export function getIsoWeek(dateStr: string): number {
 }
 
 /**
+ * Returns the ISO year for a date — may differ from calendar year at year boundaries.
+ * (e.g., 2025-12-29 is in ISO year 2026)
+ */
+function getIsoYear(dateStr: string): number {
+  const date = new Date(dateStr)
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+  return d.getUTCFullYear()
+}
+
+/**
  * Returns the ISO date of the Monday of a given ISO week.
  */
 export function getWeekMonday(year: number, isoWeek: number): string {
@@ -51,22 +62,23 @@ export function groupFilmsByWeek(
 ): WeekGroup[] {
   if (films.length === 0) return []
 
-  const weekMap = new Map<number, WeekGroup>()
+  const weekMap = new Map<string, WeekGroup>()
 
   for (const film of films) {
     const week = getIsoWeek(film.release_date)
-    if (!weekMap.has(week)) {
-      const year = new Date(film.release_date).getFullYear()
-      const monday = getWeekMonday(year, week)
-      weekMap.set(week, {
+    const isoYear = getIsoYear(film.release_date)
+    const mapKey = `${isoYear}-${week}`
+    if (!weekMap.has(mapKey)) {
+      const monday = getWeekMonday(isoYear, week)
+      weekMap.set(mapKey, {
         isoWeek: week,
         label: formatWeekLabel(week, monday),
         startDate: monday,
         films: [],
       })
     }
-    weekMap.get(week)!.films.push(film)
+    weekMap.get(mapKey)!.films.push(film)
   }
 
-  return Array.from(weekMap.values()).sort((a, b) => a.isoWeek - b.isoWeek)
+  return Array.from(weekMap.values()).sort((a, b) => a.startDate.localeCompare(b.startDate))
 }

@@ -10,11 +10,17 @@ describe('getIsoWeek', () => {
     // 2026-01-05 is in week 2
     expect(getIsoWeek('2026-01-05')).toBe(2)
   })
+  it('handles late-December date in ISO week 1 of next year', () => {
+    expect(getIsoWeek('2025-12-29')).toBe(1)
+  })
 })
 
 describe('getWeekMonday', () => {
   it('returns the monday of a given ISO week', () => {
     expect(getWeekMonday(2026, 16)).toBe('2026-04-13')
+  })
+  it('returns a date in prior December for week 1 when applicable', () => {
+    expect(getWeekMonday(2026, 1)).toBe('2025-12-29')
   })
 })
 
@@ -47,5 +53,12 @@ describe('groupFilmsByWeek', () => {
 
   it('returns empty array for empty input', () => {
     expect(groupFilmsByWeek([])).toEqual([])
+  })
+  it('assigns correct startDate for late-December film in next ISO year', () => {
+    const films = [
+      { id: 'x', title: 'X', release_date: '2025-12-29' },
+    ] as any[]
+    const groups = groupFilmsByWeek(films)
+    expect(groups[0].startDate).toBe('2025-12-29')
   })
 })
