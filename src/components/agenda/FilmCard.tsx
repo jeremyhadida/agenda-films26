@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Film } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatDuration } from '@/lib/utils'
 
 interface FilmCardProps {
   film: Film & { release_date: string }
@@ -41,7 +41,7 @@ export function FilmCard({ film, paysId, variant = 'desktop' }: FilmCardProps) {
             )}
             {film.duration_min && (
               <span className="bg-surface-low text-muted rounded-md text-xs px-2 py-0.5 font-body">
-                {Math.floor(film.duration_min / 60)}h{String(film.duration_min % 60).padStart(2, '0')}
+                {formatDuration(film.duration_min)}
               </span>
             )}
             {techTags.map(tag => (
@@ -83,7 +83,7 @@ export function FilmCard({ film, paysId, variant = 'desktop' }: FilmCardProps) {
           )}
           {film.duration_min && (
             <span className="bg-surface-low text-muted rounded-md text-xs px-2 py-0.5 font-body">
-              {Math.floor(film.duration_min / 60)}h{String(film.duration_min % 60).padStart(2, '0')}
+              {formatDuration(film.duration_min)}
             </span>
           )}
         </div>

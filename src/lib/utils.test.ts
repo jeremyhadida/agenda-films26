@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getIsoWeek, getWeekMonday, formatWeekLabel, formatDate, groupFilmsByWeek } from './utils'
+import { getIsoWeek, getWeekMonday, formatWeekLabel, formatDate, formatDuration, groupFilmsByWeek } from './utils'
 
 describe('getIsoWeek', () => {
   it('returns ISO week number for a known date', () => {
@@ -33,6 +33,13 @@ describe('formatWeekLabel', () => {
 describe('formatDate', () => {
   it('formats date in French short format', () => {
     expect(formatDate('2026-04-14')).toBe('14 avr 2026')
+  })
+})
+
+describe('formatDuration', () => {
+  it('formats minutes as hours and minutes', () => {
+    expect(formatDuration(105)).toBe('1h45')
+    expect(formatDuration(30)).toBe('0h30')
   })
 })
 

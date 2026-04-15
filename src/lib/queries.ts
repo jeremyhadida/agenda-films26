@@ -35,7 +35,7 @@ export const getAgendaByCountry = unstable_cache(
       release_date: r.release_date,
     }))
   },
-  ['agenda'],
+  ['agenda-by-country'],
   { revalidate: 3600, tags: ['agenda'] }
 )
 
@@ -58,7 +58,7 @@ export const getFilmBySlug = unstable_cache(
     if (!data) return null
     return { ...(data as any).films, release_date: (data as any).release_date }
   },
-  ['film'],
+  ['film-by-slug'],
   { revalidate: 3600, tags: ['films'] }
 )
 
@@ -80,6 +80,6 @@ export const getMovementsByCountry = unstable_cache(
       film: e.films,
     }))
   },
-  ['mouvements'],
+  ['mouvements-by-country'],
   { revalidate: 1800, tags: ['mouvements'] }
 )

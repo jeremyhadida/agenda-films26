@@ -8,7 +8,7 @@ interface WeekSectionProps {
 
 export function WeekSection({ group, paysId }: WeekSectionProps) {
   return (
-    <section id={`week-${group.isoWeek}`} className="scroll-mt-28">
+    <section id={`week-${group.startDate}`} className="scroll-mt-28">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-bold text-gold text-sm tracking-wide">
           {group.label}

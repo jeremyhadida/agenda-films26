@@ -47,6 +47,13 @@ export function formatWeekLabel(isoWeek: number, mondayDate: string): string {
 }
 
 /**
+ * Formats duration in minutes as "1h45" or "0h30"
+ */
+export function formatDuration(minutes: number): string {
+  return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, '0')}`
+}
+
+/**
  * Formats an ISO date string as "14 avr 2026"
  */
 export function formatDate(dateStr: string): string {

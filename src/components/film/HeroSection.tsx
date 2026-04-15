@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import type { Film } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatDuration } from '@/lib/utils'
 
 interface HeroSectionProps {
   film: Film & { release_date: string }
@@ -48,7 +48,7 @@ export function HeroSection({ film }: HeroSectionProps) {
         <div className="flex flex-wrap items-center gap-3 text-muted text-sm font-body">
           {film.release_date && <span>Au cinéma à partir du {formatDate(film.release_date)}</span>}
           {film.duration_min && (
-            <span>{Math.floor(film.duration_min / 60)}h{String(film.duration_min % 60).padStart(2, '0')}</span>
+            <span>{formatDuration(film.duration_min)}</span>
           )}
           {film.nationality && <span>{film.nationality}</span>}
         </div>

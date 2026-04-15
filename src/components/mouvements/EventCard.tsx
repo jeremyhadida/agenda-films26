@@ -48,7 +48,7 @@ export function EventCard({ event, paysId }: EventCardProps) {
           {event.event_type === 'removed' && event.old_date && (
             <span>Était prévu le {formatDate(event.old_date)}</span>
           )}
-          <span className="text-surface-card">{formatDate(event.occurred_at.split('T')[0])}</span>
+          <span className="text-muted">{formatDate(event.occurred_at.split('T')[0])}</span>
         </div>
       </div>
     </Link>
