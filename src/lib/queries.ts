@@ -2,6 +2,9 @@ import { unstable_cache } from 'next/cache'
 import { supabase } from './supabase'
 import type { Country, Film, FilmReleaseEvent } from './types'
 
+const REVALIDATE = process.env.NODE_ENV === 'development' ? false : 3600
+const REVALIDATE_MOUVEMENTS = process.env.NODE_ENV === 'development' ? false : 1800
+
 export const getActiveCountries = unstable_cache(
   async (): Promise<Country[]> => {
     const { data, error } = await supabase
@@ -12,7 +15,7 @@ export const getActiveCountries = unstable_cache(
     return (data ?? []).map(({ film_releases: _, ...c }) => c) as Country[]
   },
   ['active-countries'],
-  { revalidate: 3600 }
+  { revalidate: REVALIDATE }
 )
 
 export const getAgendaByCountry = unstable_cache(
@@ -36,7 +39,7 @@ export const getAgendaByCountry = unstable_cache(
     }))
   },
   ['agenda-by-country'],
-  { revalidate: 3600, tags: ['agenda'] }
+  { revalidate: REVALIDATE, tags: ['agenda'] }
 )
 
 export const getFilmBySlug = unstable_cache(
@@ -59,7 +62,7 @@ export const getFilmBySlug = unstable_cache(
     return { ...(data as any).films, release_date: (data as any).release_date }
   },
   ['film-by-slug'],
-  { revalidate: 3600, tags: ['films'] }
+  { revalidate: REVALIDATE, tags: ['films'] }
 )
 
 export const getMovementsByCountry = unstable_cache(
@@ -81,5 +84,5 @@ export const getMovementsByCountry = unstable_cache(
     }))
   },
   ['mouvements-by-country'],
-  { revalidate: 1800, tags: ['mouvements'] }
+  { revalidate: REVALIDATE_MOUVEMENTS, tags: ['mouvements'] }
 )
