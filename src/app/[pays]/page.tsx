@@ -1,14 +1,29 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getActiveCountries, getAgendaByCountry } from '@/lib/queries'
+import { getActiveCountries, getAgendaByCountry, getMovementsByCountry } from '@/lib/queries'
 import { groupFilmsByWeek } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { BottomNav } from '@/components/layout/BottomNav'
+import { MobileNav } from '@/components/layout/MobileNav'
 import { MonthTabs } from '@/components/agenda/MonthTabs'
 import { WeekSection } from '@/components/agenda/WeekSection'
 
 export const revalidate = 3600
+
+const FR_MONTHS_FULL = [
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+]
+
+function getMonthKey(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z')
+  return `${d.getUTCFullYear()}-${d.getUTCMonth()}`
+}
+
+function getMonthLabel(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z')
+  return FR_MONTHS_FULL[d.getUTCMonth()]
+}
 
 export async function generateStaticParams() {
   const countries = await getActiveCountries()
@@ -34,9 +49,10 @@ export default async function AgendaPage({
   params: Promise<{ pays: string }>
 }) {
   const { pays } = await params
-  const [countries, films] = await Promise.all([
+  const [countries, films, events] = await Promise.all([
     getActiveCountries(),
     getAgendaByCountry(pays),
+    getMovementsByCountry(pays),
   ])
 
   const country = countries.find(c => c.id === pays)
@@ -52,9 +68,24 @@ export default async function AgendaPage({
           <>
             <MonthTabs groups={groups} />
             <div className="mt-6 space-y-12">
-              {groups.map(group => (
-                <WeekSection key={group.isoWeek} group={group} paysId={pays} />
-              ))}
+              {groups.map((group, i) => {
+                const showMonth =
+                  i === 0 || getMonthKey(groups[i - 1].startDate) !== getMonthKey(group.startDate)
+
+                return (
+                  <div key={group.isoWeek}>
+                    {showMonth && (
+                      <div className="mb-8">
+                        <h2 className="font-display font-bold text-text text-2xl md:text-3xl tracking-wide">
+                          {getMonthLabel(group.startDate)}
+                        </h2>
+                        <div className="mt-1.5 h-px bg-gold/20 w-20" />
+                      </div>
+                    )}
+                    <WeekSection group={group} paysId={pays} />
+                  </div>
+                )
+              })}
             </div>
           </>
         ) : (
@@ -66,7 +97,7 @@ export default async function AgendaPage({
         )}
       </main>
       <Footer />
-      <BottomNav paysId={pays} />
+      <MobileNav paysId={pays} events={events.slice(0, 15)} />
     </>
   )
 }

@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation'
 
 interface BottomNavProps {
   paysId: string
+  onMouvements?: () => void
 }
 
-export function BottomNav({ paysId }: BottomNavProps) {
+export function BottomNav({ paysId, onMouvements }: BottomNavProps) {
   const pathname = usePathname()
   const isAgenda = !pathname.includes('/mouvements')
   const isMouvements = pathname.includes('/mouvements')
@@ -26,16 +27,26 @@ export function BottomNav({ paysId }: BottomNavProps) {
           {isAgenda && <span className="w-1 h-1 bg-gold rounded-full" />}
         </Link>
 
-        <Link
-          href={`/${paysId}/mouvements`}
-          className={`flex-1 flex flex-col items-center py-3 gap-1 text-xs font-body transition-colors ${
-            isMouvements ? 'text-text' : 'text-muted'
-          }`}
-        >
-          <span className="text-lg">📰</span>
-          <span>Mouvements</span>
-          {isMouvements && <span className="w-1 h-1 bg-gold rounded-full" />}
-        </Link>
+        {onMouvements ? (
+          <button
+            onClick={onMouvements}
+            className="flex-1 flex flex-col items-center py-3 gap-1 text-xs font-body transition-colors text-muted"
+          >
+            <span className="text-lg">📰</span>
+            <span>Mouvements</span>
+          </button>
+        ) : (
+          <Link
+            href={`/${paysId}/mouvements`}
+            className={`flex-1 flex flex-col items-center py-3 gap-1 text-xs font-body transition-colors ${
+              isMouvements ? 'text-text' : 'text-muted'
+            }`}
+          >
+            <span className="text-lg">📰</span>
+            <span>Mouvements</span>
+            {isMouvements && <span className="w-1 h-1 bg-gold rounded-full" />}
+          </Link>
+        )}
       </div>
     </nav>
   )

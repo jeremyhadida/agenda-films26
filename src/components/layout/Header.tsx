@@ -16,17 +16,29 @@ export function Header({ countries, currentCountryId }: HeaderProps) {
           FILMS 26
         </Link>
 
-        {current && (
-          <div className="flex items-center gap-3">
-            <span className="text-muted text-sm font-body">{current.name}</span>
+        <div className="flex items-center gap-6">
+          {/* Lien Mouvements — desktop uniquement */}
+          {currentCountryId && (
             <Link
-              href="/"
-              className="text-xs text-gold-dim hover:text-gold font-body transition-colors"
+              href={`/${currentCountryId}/mouvements`}
+              className="hidden md:block text-sm font-body text-muted hover:text-text transition-colors"
             >
-              Changer ▾
+              Mouvements
             </Link>
-          </div>
-        )}
+          )}
+
+          {current && (
+            <div className="flex items-center gap-3">
+              <span className="text-muted text-sm font-body">{current.name}</span>
+              <Link
+                href="/"
+                className="text-xs text-gold-dim hover:text-gold font-body transition-colors"
+              >
+                Changer ▾
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )

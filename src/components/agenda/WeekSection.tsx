@@ -1,4 +1,5 @@
 import type { WeekGroup } from '@/lib/types'
+import { formatWeekDateRange } from '@/lib/utils'
 import { FilmCard } from './FilmCard'
 
 interface WeekSectionProps {
@@ -10,10 +11,17 @@ export function WeekSection({ group, paysId }: WeekSectionProps) {
   return (
     <section id={`week-${group.startDate}`} className="scroll-mt-28">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-bold text-gold text-sm tracking-wide">
-          {group.label}
-        </h2>
-        <span className="bg-surface-card text-muted text-xs font-body px-3 py-1 rounded-full">
+        <div className="flex flex-col gap-0.5">
+          {/* Numéro de semaine — petit, muted */}
+          <span className="font-body text-muted text-[10px] tracking-widest uppercase">
+            Semaine {group.isoWeek}
+          </span>
+          {/* Plage de dates — bold, gold */}
+          <h2 className="font-display font-bold text-gold text-base leading-tight">
+            {formatWeekDateRange(group.startDate)}
+          </h2>
+        </div>
+        <span className="bg-surface-card text-muted text-xs font-body px-3 py-1 rounded-full shrink-0">
           {group.films.length} {group.films.length > 1 ? 'SORTIES' : 'SORTIE'}
         </span>
       </div>

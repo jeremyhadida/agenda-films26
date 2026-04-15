@@ -62,6 +62,29 @@ export function formatDate(dateStr: string): string {
 }
 
 /**
+ * Returns a formatted week date range (Monday → Sunday) in French.
+ * Same month:  "08 — 14 avr 2026"
+ * Cross-month: "28 avr — 04 mai 2026"
+ */
+export function formatWeekDateRange(startDate: string): string {
+  const start = new Date(startDate + 'T00:00:00Z')
+  const end = new Date(startDate + 'T00:00:00Z')
+  end.setUTCDate(end.getUTCDate() + 6) // dimanche
+
+  const startDay   = start.getUTCDate()
+  const endDay     = end.getUTCDate()
+  const startMonth = FR_MONTHS[start.getUTCMonth()]
+  const endMonth   = FR_MONTHS[end.getUTCMonth()]
+  const endYear    = end.getUTCFullYear()
+
+  if (start.getUTCMonth() === end.getUTCMonth()) {
+    return `${startDay} — ${endDay} ${endMonth} ${endYear}`
+  } else {
+    return `${startDay} ${startMonth} — ${endDay} ${endMonth} ${endYear}`
+  }
+}
+
+/**
  * Groups a list of films (with release_date) by ISO week, sorted chronologically.
  */
 export function groupFilmsByWeek(
