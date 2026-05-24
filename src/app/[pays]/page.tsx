@@ -82,7 +82,7 @@ export default async function AgendaPage({
                         <div className="mt-1.5 h-px bg-gold/20 w-20" />
                       </div>
                     )}
-                    <WeekSection group={group} paysId={pays} />
+                    <WeekSection group={group} />
                   </div>
                 )
               })}

@@ -4,19 +4,16 @@ import { FilmCard } from './FilmCard'
 
 interface WeekSectionProps {
   group: WeekGroup
-  paysId: string
 }
 
-export function WeekSection({ group, paysId }: WeekSectionProps) {
+export function WeekSection({ group }: WeekSectionProps) {
   return (
     <section id={`week-${group.startDate}`} className="scroll-mt-28">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex flex-col gap-0.5">
-          {/* Numéro de semaine — petit, muted */}
           <span className="font-body text-muted text-[10px] tracking-widest uppercase">
             Semaine {group.isoWeek}
           </span>
-          {/* Plage de dates — bold, gold */}
           <h2 className="font-display font-bold text-gold text-base leading-tight">
             {formatWeekDateRange(group.startDate)}
           </h2>
@@ -26,17 +23,9 @@ export function WeekSection({ group, paysId }: WeekSectionProps) {
         </span>
       </div>
 
-      {/* Desktop: grille */}
-      <div className="hidden md:grid grid-cols-5 lg:grid-cols-5 gap-4">
+      <div className="flex flex-col gap-2">
         {group.films.map(film => (
-          <FilmCard key={film.id} film={film} paysId={paysId} variant="desktop" />
-        ))}
-      </div>
-
-      {/* Mobile: liste */}
-      <div className="md:hidden flex flex-col gap-2">
-        {group.films.map(film => (
-          <FilmCard key={film.id} film={film} paysId={paysId} variant="mobile" />
+          <FilmCard key={film.id} film={film} />
         ))}
       </div>
     </section>
