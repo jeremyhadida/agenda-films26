@@ -37,7 +37,7 @@ export function FilmCard({ film }: FilmCardProps) {
           {genres.map(g => (
             <span
               key={g}
-              className={`text-[8px] font-body font-bold px-[5px] py-px rounded-full leading-[1.4] ${genreClass(g)}`}
+              className={`text-[9px] font-body font-semibold px-1.5 py-0.5 rounded-full ${genreClass(g)}`}
             >
               {g}
             </span>
