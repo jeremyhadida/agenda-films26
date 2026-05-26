@@ -1,5 +1,6 @@
 import type { Film } from '@/lib/types'
 import { formatDuration } from '@/lib/utils'
+import { StudioBadge } from './StudioBadge'
 
 interface FilmCardProps {
   film: Film & { release_date: string }
@@ -25,36 +26,53 @@ function genreClass(genre: string): string {
 }
 
 export function FilmCard({ film }: FilmCardProps) {
-  const hasMeta = film.director || film.studio
+  const genres = film.genre
+    ? film.genre.split(',').map(g => g.trim()).filter(Boolean)
+    : []
 
   return (
-    <div className="flex items-start gap-3 px-3 py-3 bg-surface-card rounded-sm">
-      {film.genre && (
-        <span className={`shrink-0 mt-0.5 text-[10px] font-body font-semibold px-2 py-0.5 rounded-full leading-tight ${genreClass(film.genre)}`}>
-          {film.genre}
-        </span>
+    <div className="flex flex-col bg-surface-card rounded-xl p-4 h-full gap-2.5">
+      {genres.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {genres.map(g => (
+            <span
+              key={g}
+              className={`text-[10px] font-body font-semibold px-2 py-0.5 rounded-full leading-tight ${genreClass(g)}`}
+            >
+              {g}
+            </span>
+          ))}
+        </div>
       )}
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="font-display font-semibold text-text text-sm leading-tight truncate">
-            {film.title}
-          </p>
-          <div className="flex items-center gap-1.5 shrink-0 text-[11px] font-body text-muted">
-            {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
-            {film.projection_fmt && (
-              <span className="text-cyan">{film.projection_fmt}</span>
-            )}
-          </div>
-        </div>
+      <p className="font-display font-bold text-text text-sm leading-tight">
+        {film.title}
+      </p>
 
-        {hasMeta && (
-          <p className="mt-0.5 text-[11px] font-body text-muted/80 truncate">
-            {film.director && `Dir. ${film.director}`}
-            {film.director && film.studio && ' · '}
-            {film.studio}
-          </p>
+      {film.director && (
+        <p className="text-[11px] font-body text-muted leading-snug">
+          Dir. {film.director}
+        </p>
+      )}
+
+      {film.cast_main && (
+        <p className="text-[10px] font-body text-muted/70 leading-snug line-clamp-2">
+          {film.cast_main}
+        </p>
+      )}
+
+      <div className="mt-auto pt-3 border-t border-surface/40 flex items-end justify-between gap-2">
+        {film.studio ? (
+          <StudioBadge studio={film.studio} size="md" />
+        ) : (
+          <span />
         )}
+        <div className="flex items-center gap-1.5 shrink-0 text-[11px] font-body text-muted">
+          {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
+          {film.projection_fmt && (
+            <span className="text-cyan">{film.projection_fmt}</span>
+          )}
+        </div>
       </div>
     </div>
   )

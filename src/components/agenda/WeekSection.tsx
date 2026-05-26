@@ -23,7 +23,7 @@ export function WeekSection({ group }: WeekSectionProps) {
         </span>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 items-stretch">
         {group.films.map(film => (
           <FilmCard key={film.id} film={film} />
         ))}
