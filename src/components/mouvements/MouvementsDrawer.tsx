@@ -32,6 +32,10 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
 
       {/* Sheet */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mouvements-drawer-title"
+        onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}
         className={`fixed bottom-0 left-0 right-0 z-50 md:hidden bg-surface-low rounded-t-2xl transition-transform duration-300 ease-out ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
@@ -41,7 +45,7 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
         <div className="px-4 pt-3 pb-2 border-b border-surface-card">
           <div className="w-10 h-1 bg-surface-card rounded-full mx-auto mb-3" />
           <div className="flex items-center justify-between">
-            <h2 className="font-display font-bold text-text text-base">Mouvements récents</h2>
+            <h2 id="mouvements-drawer-title" className="font-display font-bold text-text text-base">Mouvements récents</h2>
             <button
               onClick={onClose}
               className="text-muted hover:text-text transition-colors p-1"

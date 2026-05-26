@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-26T00:00:00Z",
+  "title": "Design System: Agenda Films26",
+  "extensions": {
+    "colorMeta": {
+      "surface":       { "role": "neutral",   "displayName": "Minuit Profond",    "canonical": "#021232", "tonalRamp": ["#010a1c", "#021232", "#041c4a", "#062462", "#082c7a", "#0a3492", "#0c3caa", "#0e44c2"] },
+      "surface-low":   { "role": "neutral",   "displayName": "Fond de Cabine",    "canonical": "#0a1a3a", "tonalRamp": ["#050d1d", "#0a1a3a", "#0f2757", "#143474", "#194191", "#1e4eae", "#235bcb", "#2868e8"] },
+      "surface-card":  { "role": "neutral",   "displayName": "Ardoise Bleue",     "canonical": "#263455", "tonalRamp": ["#131a2b", "#263455", "#394e7f", "#4c68a9", "#6f8bc0", "#92aed7", "#b5d1ee", "#d8f4ff"] },
+      "gold":          { "role": "primary",   "displayName": "Or Marquee",        "canonical": "#ffd700", "tonalRamp": ["#332b00", "#665600", "#998100", "#ccac00", "#ffd700", "#ffdf33", "#ffe766", "#ffef99"] },
+      "gold-dim":      { "role": "primary",   "displayName": "Or Marquee Sombre", "canonical": "#e9c400", "tonalRamp": ["#2e2700", "#5c4f00", "#8a7600", "#b89e00", "#e9c400", "#edcf33", "#f1da66", "#f5e599"] },
+      "gold-light":    { "role": "primary",   "displayName": "Or Marquee Clair",  "canonical": "#ffe16d", "tonalRamp": ["#332d00", "#665a00", "#998700", "#ccb400", "#ffe16d", "#ffe787", "#ffeda1", "#fff3bb"] },
+      "text":          { "role": "neutral",   "displayName": "Ivoire Chaud",      "canonical": "#fff6df", "tonalRamp": ["#332e1b", "#665c36", "#998a51", "#ccb86c", "#fff6df", "#fff8e5", "#fffaeb", "#fffcf1"] },
+      "muted":         { "role": "neutral",   "displayName": "Parchemin",         "canonical": "#d0c6ab", "tonalRamp": ["#2a2722", "#544e44", "#7e7566", "#a89c88", "#d0c6ab", "#d9d0b9", "#e2dac7", "#ebe4d5"] },
+      "chip-bg":       { "role": "tertiary",  "displayName": "Ambre Pellicule",   "canonical": "#544601", "tonalRamp": ["#2a2301", "#544601", "#7e6901", "#a88c01", "#d2af01", "#e9c400", "#f0d033", "#f7dc66"] },
+      "chip-text":     { "role": "tertiary",  "displayName": "Doré Atténué",      "canonical": "#c9b468", "tonalRamp": ["#29240d", "#52481a", "#7b6c27", "#a49034", "#c9b468", "#d4c287", "#dfd0a6", "#ead4c5"] },
+      "cyan":          { "role": "secondary", "displayName": "Lumière Écran",     "canonical": "#defcff", "tonalRamp": ["#1c3233", "#386566", "#549898", "#70cbcb", "#defcff", "#e5fdff", "#ecfeff", "#f3ffff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display",  "purpose": "Titres de mois, noms de film en hero. Toujours sur fond sombre." },
+      "title":   { "displayName": "Title",    "purpose": "Plages de dates hebdomadaires (or), titres de film dans les lignes compactes." },
+      "body":    { "displayName": "Body",     "purpose": "Réalisateur, métadonnées film, compteur de sorties." },
+      "label":   { "displayName": "Label",    "purpose": "Numéros de semaine, labels de région. Toujours uppercase muted." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "transition-colors", "value": "150ms ease-out", "purpose": "Onglets mois actif/inactif uniquement." },
+      { "name": "transition-transform", "value": "200ms ease-out", "purpose": "Scale léger sur cartes cliquables (hover:scale-[1.02])." }
+    ],
+    "breakpoints": [
+      { "name": "sm",  "value": "640px"  },
+      { "name": "md",  "value": "768px"  },
+      { "name": "lg",  "value": "1024px" },
+      { "name": "xl",  "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ligne Film",
+      "kind": "custom",
+      "refersTo": "film-row",
+      "description": "Ligne compacte de l'agenda. Chip genre + titre + réalisateur + durée/format.",
+      "html": "<div class=\"ds-film-row\"><span class=\"ds-genre-chip\">ACTION</span><div class=\"ds-film-info\"><p class=\"ds-film-title\">The Accountant 2</p><p class=\"ds-film-studio\">Warner Bros.</p></div><span class=\"ds-film-director\">Dir. O'Russell</span><div class=\"ds-film-meta\"><span>1h55</span><span class=\"ds-film-format\">2D</span></div></div>",
+      "css": ".ds-film-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #263455; border-radius: 4px; } .ds-genre-chip { flex-shrink: 0; font-family: Inter, sans-serif; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #544601; color: #c9b468; white-space: nowrap; } .ds-film-info { flex: 1; min-width: 0; } .ds-film-title { font-family: Manrope, sans-serif; font-weight: 600; font-size: 14px; color: #fff6df; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-film-studio { font-family: Inter, sans-serif; font-size: 10px; color: #d0c6ab; margin: 2px 0 0; } .ds-film-director { font-family: Inter, sans-serif; font-size: 12px; color: #d0c6ab; flex-shrink: 0; white-space: nowrap; } .ds-film-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-family: Inter, sans-serif; font-size: 12px; color: #d0c6ab; } .ds-film-format { color: #defcff; }"
+    },
+    {
+      "name": "Onglet Mois Actif",
+      "kind": "nav",
+      "refersTo": "month-tab-active",
+      "description": "Onglet de navigation mois, état actif.",
+      "html": "<button class=\"ds-month-tab ds-month-tab--active\">Mai</button>",
+      "css": ".ds-month-tab { font-family: Inter, sans-serif; font-size: 14px; padding: 6px 16px; border-radius: 999px; border: none; cursor: pointer; transition: background 150ms ease-out, color 150ms ease-out; } .ds-month-tab--active { background: #ffd700; color: #021232; font-weight: 600; } .ds-month-tab--inactive { background: transparent; color: #d0c6ab; } .ds-month-tab--inactive:hover { color: #fff6df; }"
+    },
+    {
+      "name": "Onglet Mois Inactif",
+      "kind": "nav",
+      "refersTo": "month-tab-inactive",
+      "description": "Onglet de navigation mois, état inactif.",
+      "html": "<button class=\"ds-month-tab ds-month-tab--inactive\">Juin</button>",
+      "css": ".ds-month-tab { font-family: Inter, sans-serif; font-size: 14px; padding: 6px 16px; border-radius: 999px; border: none; cursor: pointer; transition: background 150ms ease-out, color 150ms ease-out; } .ds-month-tab--active { background: #ffd700; color: #021232; font-weight: 600; } .ds-month-tab--inactive { background: transparent; color: #d0c6ab; } .ds-month-tab--inactive:hover { color: #fff6df; }"
+    },
+    {
+      "name": "En-tête de Semaine",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Header de section hebdomadaire avec numéro de semaine, plage de dates et compteur.",
+      "html": "<div class=\"ds-week-header\"><div class=\"ds-week-labels\"><span class=\"ds-week-number\">SEMAINE 22</span><span class=\"ds-week-dates\">26 mai — 01 juin</span></div><span class=\"ds-week-count\">4 SORTIES</span></div>",
+      "css": ".ds-week-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; } .ds-week-labels { display: flex; flex-direction: column; gap: 2px; } .ds-week-number { font-family: Inter, sans-serif; font-size: 10px; font-weight: 400; color: #d0c6ab; text-transform: uppercase; letter-spacing: 0.1em; } .ds-week-dates { font-family: Manrope, sans-serif; font-weight: 700; font-size: 16px; color: #ffd700; line-height: 1.2; } .ds-week-count { font-family: Inter, sans-serif; font-size: 12px; color: #d0c6ab; background: #263455; padding: 4px 12px; border-radius: 999px; white-space: nowrap; }"
+    },
+    {
+      "name": "Chip Genre",
+      "kind": "chip",
+      "refersTo": "genre-chip",
+      "description": "Badge de genre film. Couleur variable par genre.",
+      "html": "<span class=\"ds-genre-chip\">DRAME</span>",
+      "css": ".ds-genre-chip { display: inline-block; font-family: Inter, sans-serif; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #1e3a8a; color: #bfdbfe; white-space: nowrap; line-height: 1.4; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Le Programme",
+    "overview": "Agenda Films26 est conçu comme un programme de cinéma imprimé haut de gamme : l'information est dense, typographiquement maîtrisée, chaque élément occupe exactement l'espace qu'il mérite. Le fond sombre n'est pas un effet de style — c'est la salle elle-même, avant que les lumières s'allument. L'or n'est pas décoratif — c'est l'accent de prestige discret d'une marquise de cinéma historique.\n\nLe registre est product : l'exploitant vient lire, pas être impressionné. L'interface s'efface derrière les données. Ce système rejette explicitement les dashboards SaaS génériques et les outils d'exploitation internes austères. Films26 est professionnel ET cinématographique.",
+    "keyCharacteristics": [
+      "Fond quasi-noir teinté bleu nuit, jamais neutre gris",
+      "Un seul accent chromatique : l'or, utilisé avec parcimonie",
+      "Deux polices complémentaires : Manrope (structure) + Inter (densité)",
+      "Élévation tonale pure — aucune ombre portée",
+      "Densité assumée, respiration maîtrisée par l'espacement"
+    ],
+    "rules": [
+      { "name": "La Règle de l'Or Rare",       "body": "L'or n'apparaît que sur les éléments porteurs d'information temporelle ou navigationnelle. Il ne sert jamais de décoration.",  "section": "colors" },
+      { "name": "La Règle du Fond Teinté",      "body": "Aucune surface n'est noir pur ou blanc pur. Chaque niveau de profondeur est teinté vers le bleu nuit (#021232).",              "section": "colors" },
+      { "name": "La Règle de la Hiérarchie Binaire", "body": "Manrope pour ce qui structure et oriente. Inter pour ce qui informe et décrit. Ne jamais croiser les rôles.",           "section": "typography" },
+      { "name": "La Règle du Tonal Pur",        "body": "Les ombres portées sont interdites. La hiérarchie spatiale s'exprime par la luminosité des surfaces.",                        "section": "elevation" }
+    ],
+    "dos": [
+      "Utiliser surface-card (#263455) comme fond de tout élément de liste ou carte",
+      "Réserver l'or (#ffd700) aux dates, titres de semaine, et onglets actifs",
+      "Utiliser cyan (#defcff) exclusivement pour les tags techniques",
+      "Appliquer rounded-sm (4px) aux lignes film, rounded-xl aux pills et chips",
+      "Afficher le réalisateur en Inter regular muted — jamais en Manrope"
+    ],
+    "donts": [
+      "N'introduisez pas de cards grises ou de surfaces bleu corporate générique",
+      "N'ajoutez pas d'ombres portées (box-shadow) — l'élévation est tonale",
+      "N'utilisez pas de blanc pur (#ffffff) ou noir pur (#000000)",
+      "N'utilisez pas l'or comme couleur de fond sur de grandes surfaces",
+      "N'utilisez pas border-left coloré comme accent décoratif",
+      "N'appliquez pas de background-clip: text avec gradient"
+    ]
+  }
+}

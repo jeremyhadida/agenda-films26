@@ -35,7 +35,7 @@ export function EventCard({ event, paysId }: EventCardProps) {
   return (
     <Link
       href={`/${paysId}/films/${event.film_id}`}
-      className={`flex gap-4 p-4 rounded-lg hover:scale-[1.01] transition-transform border-l-2 ${style.bar} ${style.bg}`}
+      className={`flex gap-4 p-4 rounded-lg hover:scale-[1.01] transition-transform ${style.bg}`}
     >
       <div className="w-10 h-14 rounded-md overflow-hidden shrink-0 bg-surface-low relative">
         {event.film?.poster_url ? (

@@ -59,7 +59,8 @@ export function MonthTabs({ groups }: MonthTabsProps) {
             <button
               key={`${year}-${month}`}
               onClick={() => scrollToWeek(firstWeekStartDate)}
-              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-body transition-colors ${
+              aria-pressed={activeMonthKey === `${year}-${month}`}
+              className={`flex-shrink-0 flex items-center min-h-[44px] px-4 rounded-full text-sm font-body transition-colors ${
                 activeMonthKey === `${year}-${month}`
                   ? 'bg-gold text-surface font-semibold'
                   : 'text-muted hover:text-text'

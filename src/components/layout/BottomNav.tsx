@@ -22,7 +22,7 @@ export function BottomNav({ paysId, onMouvements }: BottomNavProps) {
             isAgenda ? 'text-text' : 'text-muted'
           }`}
         >
-          <span className="text-lg">📅</span>
+          <span className="text-lg" aria-hidden="true">📅</span>
           <span>Agenda</span>
           {isAgenda && <span className="w-1 h-1 bg-gold rounded-full" />}
         </Link>
@@ -32,7 +32,7 @@ export function BottomNav({ paysId, onMouvements }: BottomNavProps) {
             onClick={onMouvements}
             className="flex-1 flex flex-col items-center py-3 gap-1 text-xs font-body transition-colors text-muted"
           >
-            <span className="text-lg">📰</span>
+            <span className="text-lg" aria-hidden="true">📰</span>
             <span>Mouvements</span>
           </button>
         ) : (
@@ -42,7 +42,7 @@ export function BottomNav({ paysId, onMouvements }: BottomNavProps) {
               isMouvements ? 'text-text' : 'text-muted'
             }`}
           >
-            <span className="text-lg">📰</span>
+            <span className="text-lg" aria-hidden="true">📰</span>
             <span>Mouvements</span>
             {isMouvements && <span className="w-1 h-1 bg-gold rounded-full" />}
           </Link>
