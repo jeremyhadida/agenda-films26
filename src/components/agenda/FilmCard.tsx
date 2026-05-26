@@ -31,7 +31,7 @@ export function FilmCard({ film }: FilmCardProps) {
     : []
 
   return (
-    <div className="flex flex-col bg-surface-card rounded-xl p-2 h-full gap-1">
+    <div className="flex flex-col bg-surface-card rounded-md p-2 h-full gap-1">
       {genres.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {genres.map(g => (

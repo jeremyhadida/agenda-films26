@@ -28,8 +28,8 @@ export function StudioBadge({ studio, size = 'sm' }: StudioBadgeProps) {
       />
       <span
         hidden
-        className={`font-body font-semibold tracking-wider text-muted/80 border border-muted/25 rounded-sm uppercase ${
-          size === 'md' ? 'text-[10px] px-2 py-0.5' : 'text-[9px] px-1.5 py-0.5'
+        className={`font-body font-semibold tracking-widest text-muted/60 uppercase ${
+          size === 'md' ? 'text-[10px]' : 'text-[8px]'
         }`}
       >
         {studio}
