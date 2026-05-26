@@ -31,13 +31,13 @@ export function FilmCard({ film }: FilmCardProps) {
     : []
 
   return (
-    <div className="flex flex-col bg-surface-card rounded-xl p-4 h-full gap-2.5">
+    <div className="flex flex-col bg-surface-card rounded-xl p-2 h-full gap-1">
       {genres.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {genres.map(g => (
             <span
               key={g}
-              className={`text-[10px] font-body font-semibold px-2 py-0.5 rounded-full leading-tight ${genreClass(g)}`}
+              className={`text-[8px] font-body font-bold px-[5px] py-px rounded-full leading-[1.4] ${genreClass(g)}`}
             >
               {g}
             </span>
@@ -45,29 +45,29 @@ export function FilmCard({ film }: FilmCardProps) {
         </div>
       )}
 
-      <p className="font-display font-bold text-text text-sm leading-tight">
+      <p className="font-display font-bold text-text text-[11px] leading-snug truncate">
         {film.title}
       </p>
 
       {film.director && (
-        <p className="text-[11px] font-body text-muted leading-snug">
+        <p className="text-[8.5px] font-body text-muted truncate">
           Dir. {film.director}
         </p>
       )}
 
       {film.cast_main && (
-        <p className="text-[10px] font-body text-muted/70 leading-snug line-clamp-2">
+        <p className="text-[8px] font-body text-muted/65 truncate">
           {film.cast_main}
         </p>
       )}
 
-      <div className="mt-auto pt-3 border-t border-surface/40 flex items-end justify-between gap-2">
+      <div className="mt-auto pt-1.5 border-t border-surface/40 flex items-center justify-between gap-2">
         {film.studio ? (
-          <StudioBadge studio={film.studio} size="md" />
+          <StudioBadge studio={film.studio} size="sm" />
         ) : (
           <span />
         )}
-        <div className="flex items-center gap-1.5 shrink-0 text-[11px] font-body text-muted">
+        <div className="flex items-center gap-1 shrink-0 text-[8.5px] font-body text-muted">
           {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
           {film.projection_fmt && (
             <span className="text-cyan">{film.projection_fmt}</span>

@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { MonthTabs } from '@/components/agenda/MonthTabs'
 import { WeekSection } from '@/components/agenda/WeekSection'
+import { ScrollToCurrentWeek } from '@/components/agenda/ScrollToCurrentWeek'
 
 export const revalidate = 3600
 
@@ -67,6 +68,7 @@ export default async function AgendaPage({
         {groups.length > 0 ? (
           <>
             <MonthTabs groups={groups} />
+            <ScrollToCurrentWeek startDates={groups.map(g => g.startDate)} />
             <div className="mt-6 space-y-12">
               {groups.map((group, i) => {
                 const showMonth =
