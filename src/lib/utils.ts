@@ -62,6 +62,14 @@ export function formatDate(dateStr: string): string {
 }
 
 /**
+ * Formats an ISO date string as "14 avr" (day + month, no year).
+ */
+export function formatDateShort(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z')
+  return `${d.getUTCDate()} ${FR_MONTHS[d.getUTCMonth()]}`
+}
+
+/**
  * Returns a formatted week date range (Monday → Sunday) in French.
  * Same month:  "08 — 14 avr 2026"
  * Cross-month: "28 avr — 04 mai 2026"
