@@ -8,6 +8,7 @@ import { MobileNav } from '@/components/layout/MobileNav'
 import { MonthTabs } from '@/components/agenda/MonthTabs'
 import { WeekSection } from '@/components/agenda/WeekSection'
 import { ScrollToCurrentWeek } from '@/components/agenda/ScrollToCurrentWeek'
+import { AgendaViewToggle } from '@/components/agenda/AgendaViewToggle'
 
 export const revalidate = 3600
 
@@ -66,30 +67,32 @@ export default async function AgendaPage({
       <Header countries={countries} currentCountryId={pays} />
       <main className="max-w-7xl mx-auto px-4 pb-24 md:pb-8">
         {groups.length > 0 ? (
-          <>
-            <MonthTabs groups={groups} />
-            <ScrollToCurrentWeek startDates={groups.map(g => g.startDate)} />
-            <div className="mt-6 space-y-12">
-              {groups.map((group, i) => {
-                const showMonth =
-                  i === 0 || getMonthKey(groups[i - 1].startDate) !== getMonthKey(group.startDate)
+          <AgendaViewToggle groups={groups} events={events}>
+            <>
+              <MonthTabs groups={groups} />
+              <ScrollToCurrentWeek startDates={groups.map(g => g.startDate)} />
+              <div className="mt-6 space-y-12">
+                {groups.map((group, i) => {
+                  const showMonth =
+                    i === 0 || getMonthKey(groups[i - 1].startDate) !== getMonthKey(group.startDate)
 
-                return (
-                  <div key={group.isoWeek}>
-                    {showMonth && (
-                      <div className="mb-8">
-                        <h2 className="font-display font-bold text-text text-2xl md:text-3xl tracking-wide">
-                          {getMonthLabel(group.startDate)}
-                        </h2>
-                        <div className="mt-1.5 h-px bg-gold/20 w-20" />
-                      </div>
-                    )}
-                    <WeekSection group={group} />
-                  </div>
-                )
-              })}
-            </div>
-          </>
+                  return (
+                    <div key={group.isoWeek}>
+                      {showMonth && (
+                        <div className="mb-8">
+                          <h2 className="font-display font-bold text-text text-2xl md:text-3xl tracking-wide">
+                            {getMonthLabel(group.startDate)}
+                          </h2>
+                          <div className="mt-1.5 h-px bg-gold/20 w-20" />
+                        </div>
+                      )}
+                      <WeekSection group={group} />
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          </AgendaViewToggle>
         ) : (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
             <p className="font-display text-muted text-lg">
