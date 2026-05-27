@@ -11,11 +11,11 @@ interface AgendaViewToggleProps {
 }
 
 export function AgendaViewToggle({ groups, events, children }: AgendaViewToggleProps) {
-  const [view, setView] = useState<'grid' | 'timeline'>('grid')
+  const [view, setView] = useState<'grid' | 'timeline'>('timeline')
 
   return (
     <>
-      <div className="md:hidden flex justify-end mb-3 mt-1">
+      <div className="flex justify-end mb-3 mt-1">
         <button
           onClick={() => setView(v => v === 'grid' ? 'timeline' : 'grid')}
           className="flex items-center gap-1.5 text-[10px] font-body font-semibold text-muted border border-[#2a3a5a] rounded-full px-3 py-1.5 transition-colors hover:border-muted/50 active:scale-95"
