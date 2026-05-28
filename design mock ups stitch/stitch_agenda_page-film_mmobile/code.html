@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Neon Phantoms - Movie Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#3a3000",
+                    "on-surface-variant": "#d0c6ab",
+                    "primary-fixed": "#ffe16d",
+                    "on-secondary-fixed-variant": "#544601",
+                    "inverse-primary": "#705d00",
+                    "surface-variant": "#263455",
+                    "on-secondary": "#3a3000",
+                    "inverse-on-surface": "#213050",
+                    "on-primary-container": "#705e00",
+                    "on-error": "#690005",
+                    "on-tertiary-container": "#006a70",
+                    "on-primary-fixed-variant": "#544600",
+                    "surface": "#021232",
+                    "surface-container-low": "#0a1a3a",
+                    "on-tertiary-fixed-variant": "#004f54",
+                    "surface-container-high": "#1b294a",
+                    "secondary-container": "#544601",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-highest": "#263455",
+                    "on-tertiary-fixed": "#002022",
+                    "tertiary-fixed-dim": "#00dbe8",
+                    "surface-container-lowest": "#000c2a",
+                    "on-secondary-fixed": "#221b00",
+                    "error-container": "#93000a",
+                    "tertiary-container": "#00f1ff",
+                    "primary-fixed-dim": "#e9c400",
+                    "tertiary-fixed": "#79f5ff",
+                    "on-surface": "#d9e2ff",
+                    "primary-container": "#ffd700",
+                    "outline": "#999077",
+                    "background": "#021232",
+                    "secondary-fixed": "#f8e290",
+                    "primary": "#fff6df",
+                    "outline-variant": "#4d4732",
+                    "surface-tint": "#e9c400",
+                    "on-background": "#d9e2ff",
+                    "secondary-fixed-dim": "#dbc677",
+                    "on-primary-fixed": "#221b00",
+                    "on-tertiary": "#00363a",
+                    "on-secondary-container": "#c9b468",
+                    "surface-container": "#0f1e3f",
+                    "inverse-surface": "#d9e2ff",
+                    "secondary": "#dbc677",
+                    "surface-dim": "#021232",
+                    "error": "#ffb4ab",
+                    "surface-bright": "#2a385a",
+                    "tertiary": "#defcff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation Anchor (Manual construction based on JSON & Shared Logic) -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-[#021232]/70 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-6 h-16 max-w-screen-xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="p-2 -ml-2 rounded-full hover:bg-surface-container-highest transition-colors" style="">
+<span class="material-symbols-outlined text-[#FFD700]" style="">arrow_back</span>
+</button>
+<h1 class="font-headline font-black tracking-tighter text-[#FFD700] text-lg" style="">Movie Details</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container-highest transition-colors" style="">
+<span class="material-symbols-outlined text-[#FFD700]" style="">favorite</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-highest transition-colors" style="">
+<span class="material-symbols-outlined text-[#FFD700]" style="">share</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pb-32">
+<!-- Hero Section: Backdrop & Core Metadata -->
+<section class="relative h-[751px] w-full overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Neon Phantoms movie poster backdrop" class="w-full h-full object-cover" data-alt="atmospheric cinematic shot of a futuristic neon-lit city street at night with rain reflecting purple and cyan light on pavement" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0pIRoUua0M8wPAYH_cAp4kSJyfOV8QvLAyVMpXam4D1n1YWOgm95-u02swBZxAQwxrLavNtgTYyq-MWTDbfik1taJWXSKwCMo18253Y8XCd1B_m-riusSsjJiUE23cviFQEErU2_ja45NZW1bGAFYlPurh-L_-V6MqyiBug3fXRQtGeGYVZ0K-4tM3w0eWqjTCEzkCZVH0TrkHIoZ9O3MwtdwjpSVLeuAA4bp5uwdOZLboy04Y0Gkdx2GJD1snGAKHRuv8PV7358" style=""/>
+<!-- Dramatic Gradient Layering -->
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-[#021232]/60 via-transparent to-transparent"></div>
+</div>
+<!-- Title & Quick Info Overlay -->
+<div class="absolute bottom-0 left-0 right-0 px-6 pb-12 z-10">
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="bg-primary-container/20 border border-primary-container/30 text-primary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase" style="">R-RATED</span>
+<span class="text-tertiary-fixed-dim text-[11px] font-bold uppercase tracking-widest" style="">IMAX 4K</span>
+</div>
+<h2 class="font-headline text-5xl font-black text-primary tracking-tighter leading-none" style="">Neon Phantoms</h2>
+<div class="flex items-center gap-4 text-on-surface-variant font-medium text-sm">
+<span class="" style=""><br/></span><span class="w-1.5 h-1.5 bg-outline-variant/30 rounded-full"></span><span class="" style="">24/10/2024</span>
+<span class="w-1.5 h-1.5 bg-outline-variant/30 rounded-full"></span>
+<span class="" style="">2h45</span>
+<span class="w-1.5 h-1.5 bg-outline-variant/30 rounded-full"></span>
+<span class="flex items-center gap-1" style=""><span class="material-symbols-outlined text-primary-container text-sm" style='font-variation-settings: "FILL" 1;'>star</span>Allemagne<br/></span>
+</div>
+<div class="flex flex-col gap-3 pt-6"><div class="flex flex-wrap justify-center gap-2 mb-2"><span class="px-4 py-1.5 rounded-full bg-secondary-container/40 backdrop-blur-sm border border-secondary-container/30 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider" style="">Cyberpunk</span><span class="px-4 py-1.5 rounded-full bg-secondary-container/40 backdrop-blur-sm border border-secondary-container/30 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider" style="">Thriller</span><span class="px-4 py-1.5 rounded-full bg-secondary-container/40 backdrop-blur-sm border border-secondary-container/30 text-on-secondary-container text-[10px] font-bold uppercase tracking-wider" style="">Sci-Fi</span></div>
+<button class="w-full py-4 bg-primary-container text-on-primary-container font-headline font-extrabold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-transform shadow-[0_12px_24px_rgba(255,215,0,0.2)]" style="">
+<span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>play_arrow</span>
+                            Watch Trailer
+                        </button>
+<button class="w-full py-4 bg-surface-container-highest/80 backdrop-blur-md text-primary font-headline font-bold rounded-full flex items-center justify-center gap-2 hover:bg-surface-container-highest transition-colors" style="">
+<span class="material-symbols-outlined" style="">download</span>
+                            Download
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Content Sections -->
+<div class="px-6 space-y-12 mt-10">
+<!-- Section: The Narrative -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline text-xs font-black text-on-surface-variant uppercase tracking-[0.3em]" style="">Synopsis</h3>
+<div class="h-[1px] flex-grow ml-4 bg-outline-variant/20"></div>
+</div>
+<p class="text-on-surface/90 leading-relaxed font-body text-lg" style="">
+                    In the rain-slicked sprawl of Neo-Tokyo, a spectral data-thief uncovers a conspiracy that threatens to rewrite human consciousness. As the lines between organic memory and synthetic projection blur, they must race against a faceless corporate entity before the last phantom of their identity is erased forever.
+                </p>
+</section>
+<!-- Section: Creative Ensemble -->
+<!-- Section: The Director -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline text-xs font-black text-on-surface-variant uppercase tracking-[0.3em]">Le Réalisateur</h3>
+<div class="h-[1px] flex-grow ml-4 bg-outline-variant/20"></div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+<div class="w-16 h-16 rounded-full overflow-hidden ring-2 ring-primary-container/20 ring-offset-4 ring-offset-background">
+<img alt="Denis Villeneuve" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgFw0lFQGRprzldmfEqDHKkBMY1K9r90x6KXM6oBgiZPXxlJXioSqV1_XbDurmN6ZbRsRw6UmWBqgWpkm0kqgu4ZMe81a1XxWEkhJJDTg1HpGL7kE9zhBACpoMWEe6mzzNFzx6gynfm_zBBOWg00T9IN8sWd3YL7499PGfzWsA5UhUlGF7k1PYZqDj40ouNgkJqA8b-kzsloVHd-gYEPOrb9596xW0Stc4cFg0ODeZLAGdZmGoBdLoYEClxsFQB1L0447Nc84k6zw"/>
+</div>
+<div>
+<p class="text-lg font-headline font-bold text-primary">Denis Villeneuve</p>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest">Director / Visionary</p>
+</div>
+</div>
+</section><section class="space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-headline text-xs font-black text-on-surface-variant uppercase tracking-[0.3em]" style="">Creative Ensemble</h3>
+<div class="h-[1px] flex-grow ml-4 bg-outline-variant/20"></div>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-4 hide-scrollbar -mx-6 px-6">
+<!-- Actor 1 -->
+<div class="flex flex-col items-center gap-3 shrink-0 text-center w-20">
+<div class="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary-container/20 ring-offset-4 ring-offset-background transition-transform active:scale-90">
+<img alt="Actor Portrait" class="w-full h-full object-cover" data-alt="studio portrait of a middle-aged actor with intense eyes and short hair, dramatic rim lighting on dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoaQkI20BReL6ghlwu8K7fra0JnWMyywH_cU72TeVuARvr_9SYQsH11u8C-DIGn3LEg4ux-9DAdvuN_tNIFlUVN4REr-7M6HKWvvmOeqY-ub5uBk5itoEJ1uOHlAclHtbeOFdWWVVxEOJfDMcAJpKiqlg3p2eFUZX8ESCSFEn4PA4mWnF1DRMPdSWD8gtpDzkK2dkw5lKs4pLwA7bGlCGdG1_nI6R4rlg0mkDsR5kh2kPUe3zSoFiwJaUS0yBZro6gJ-dzEp8nD2A" style=""/>
+</div>
+<div>
+<p class="text-[11px] font-bold text-on-surface leading-tight" style="">Cillian Vance</p>
+<p class="text-[9px] text-on-surface-variant uppercase tracking-tighter mt-1" style="">Protagonist</p>
+</div>
+</div>
+<!-- Actor 2 -->
+<div class="flex flex-col items-center gap-3 shrink-0 text-center w-20">
+<div class="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary-container/20 ring-offset-4 ring-offset-background transition-transform active:scale-90">
+<img alt="Actor Portrait" class="w-full h-full object-cover" data-alt="close-up of a young actress with striking features and neon pink accent lighting on her face, cinematic fashion style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0U2sA_tjqqok6NVgx20KsD9JG3lAgpXW5M4HVeJHw8SXxQpUAsu-5cYD8zjuP_6fE8EJJ_afRpY3-2yBzwbZTptriDSN5I0h3jOHnbw219_YGld_f6nTXNPcU_x4BE8t0W_ZubwmbBOcCZP2Ismr1Hmgg0NeYMRC8R2vINaEGbgLvuDPCxAQjXd_rKSkJZrf82tul3t2x_mGRctT49LYFt9-8VkFjb4mehq0QokbrumP80WxBgmKJvZ4Id-1d6ggNXV7i1CNUd4k" style=""/>
+</div>
+<div>
+<p class="text-[11px] font-bold text-on-surface leading-tight" style="">Maya Kovic</p>
+<p class="text-[9px] text-on-surface-variant uppercase tracking-tighter mt-1" style="">Lead Tech</p>
+</div>
+</div>
+<!-- Actor 3 -->
+<div class="flex flex-col items-center gap-3 shrink-0 text-center w-20">
+<div class="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary-container/20 ring-offset-4 ring-offset-background transition-transform active:scale-90">
+<img alt="Actor Portrait" class="w-full h-full object-cover" data-alt="professional headshot of an older male director with glasses and a thoughtful expression, warm soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgFw0lFQGRprzldmfEqDHKkBMY1K9r90x6KXM6oBgiZPXxlJXioSqV1_XbDurmN6ZbRsRw6UmWBqgWpkm0kqgu4ZMe81a1XxWEkhJJDTg1HpGL7kE9zhBACpoMWEe6mzzNFzx6gynfm_zBBOWg00T9IN8sWd3YL7499PGfzWsA5UhUlGF7k1PYZqDj40ouNgkJqA8b-kzsloVHd-gYEPOrb9596xW0Stc4cFg0ODeZLAGdZmGoBdLoYEClxsFQB1L0447Nc84k6zw" style=""/>
+</div>
+<div>
+<p class="text-[11px] font-bold text-on-surface leading-tight" style="">L. Villeneuve</p>
+<p class="text-[9px] text-on-surface-variant uppercase tracking-tighter mt-1" style="">Director</p>
+</div>
+</div>
+<!-- Actor 4 -->
+<div class="flex flex-col items-center gap-3 shrink-0 text-center w-20">
+<div class="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary-container/20 ring-offset-4 ring-offset-background transition-transform active:scale-90">
+<img alt="Actor Portrait" class="w-full h-full object-cover" data-alt="close-up of a woman with braided hair and high contrast lighting, moody shadows and sharp focus on eyes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjiburRRIdtegl1pheBP_IsgCZTOXAgw2WRFf0BTpurNFpA1kf3hSLzLw747HREPc_5-d1IDRzcZLTakloZXeKfPtPFHj7Jk7lNemD4Wl0MeurvKN8fGB1g5yKkC1bWiVczoe3aJIQNH669zNiTvon9A93E2dIUY_QQNmf4PcgKAylC5JAVch9BGUFgtCfGZE6QHscoCtWMW8js2nH3_cWz4GrPKCW4I7FvNrr-FQXXpYLxu_C7mCB3k7bOuS57riGOSWAk3mEi-U" style=""/>
+</div>
+<div>
+<p class="text-[11px] font-bold text-on-surface leading-tight" style="">Sora Han</p>
+<p class="text-[9px] text-on-surface-variant uppercase tracking-tighter mt-1" style="">Antagonist</p>
+</div>
+</div>
+<!-- Actor 5 -->
+<div class="flex flex-col items-center gap-3 shrink-0 text-center w-20">
+<div class="w-20 h-20 rounded-full overflow-hidden ring-2 ring-primary-container/20 ring-offset-4 ring-offset-background transition-transform active:scale-90">
+<img alt="Actor Portrait" class="w-full h-full object-cover" data-alt="moody portrait of a male actor in a high-collar jacket, futuristic silhouette against a dark navy background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1Af6gefHs1v5418VBMJoBYofr5Zz8dY2RTE0qckaJD2O04k_T0BfQPXA8IkaGLK3ws6nanup5J7-oDjH1GxPggkcsaqraR00CTBaajk-rz2xprNwehAc_Y3GKMAEqCc4J2AOnddSltnpe5haREteVwagAnmiCggWB8F3xy1YwRGYfkg-NwOMWdVlHZhktR9XEorZvNxCnq8Tz1vQZoGhejeXqEgPcNBzWBZi_euFSiDu4wUe0I_7PbZy37A0gGSNqr_FveZHbruU" style=""/>
+</div>
+<div>
+<p class="text-[11px] font-bold text-on-surface leading-tight" style="">Ivan Reed</p>
+<p class="text-[9px] text-on-surface-variant uppercase tracking-tighter mt-1" style="">Support</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Technical Specs (Bento Grid Style) -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-headline text-xs font-black text-on-surface-variant uppercase tracking-[0.3em]" style="">Technical Specs</h3>
+<div class="h-[1px] flex-grow ml-4 bg-outline-variant/20"></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-tertiary-fixed-dim mb-2" style="">aspect_ratio</span>
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1" style="">Aspect Ratio</p>
+<p class="text-on-surface font-headline font-bold" style="">2.39:1 (IMAX)</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-tertiary-fixed-dim mb-2" style="">surround_sound</span>
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest mb-1" style="">Audio</p>
+<p class="text-on-surface font-headline font-bold" style="">Dolby Atmos</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10 col-span-2 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" style="">high_quality</span>
+<div>
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest" style="">Mastering Format</p>
+<p class="text-on-surface font-headline font-bold" style="">Digital 4K Cinema DCI</p>
+</div>
+</div>
+<span class="text-primary-container material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>check_circle</span>
+</div>
+<!-- Distributor Card -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10 col-span-2 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-white/10 rounded flex items-center justify-center p-1">
+<img alt="Warner Bros Logo" class="w-full h-full object-contain filter brightness-0 invert opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx6Sb3qoz_xVmvLSayR13jVzFCWlqdSwQWNXSCYgGc60akEQgfk5VdDuJNMErTi3Gh4LLXBvg8Pgv125h7VH8ZbA-XU4DZoQGdvmRM0DrFvIm9LF2jYtlP1fhf3OpHMyMtN_TLGfgksGpcdnTcHNGUhaecT3jzCiz-QR1dkE32Tq3IMSAAf5gHFtqnnPTXF2jirw2PX3v0QcE5czTcdjYF45kfsaGszkP9AebDYJ1Gj-L2Rv1Ls2dZ5lnjyMOkXEpSfCd6qZUrUTg"/>
+</div>
+<div>
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Le Distributeur</p>
+<p class="text-on-surface font-headline font-bold">Warner Bros. Pictures</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-tertiary-fixed-dim">corporate_fare</span>
+</div></div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Shell (Mapped from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#0A1A3A]/80 backdrop-blur-xl rounded-t-xl shadow-[0_-12px_24px_rgba(0,12,42,0.4)]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-[#D0C6AB] opacity-60 hover:opacity-100 hover:text-[#FFD700] transition-all" href="#" style="">
+<span class="material-symbols-outlined" style="">home</span>
+<span class="font-label text-[11px] font-bold tracking-widest uppercase mt-1" style="">Home</span>
+</a>
+<!-- Agenda -->
+<a class="flex flex-col items-center justify-center text-[#D0C6AB] opacity-60 hover:opacity-100 hover:text-[#FFD700] transition-all" href="#" style="">
+<span class="material-symbols-outlined" style="">calendar_month</span>
+<span class="font-label text-[11px] font-bold tracking-widest uppercase mt-1" style="">Agenda</span>
+</a>
+<!-- Discover (Active Placeholder for Movie Exploration) -->
+<a class="flex flex-col items-center justify-center text-[#FFF6DF] relative after:content-[''] after:block after:w-1 after:h-1 after:bg-[#FFD700] after:rounded-full after:mt-1 scale-105" href="#" style="">
+<span class="material-symbols-outlined" style='font-variation-settings: "FILL" 1;'>explore</span>
+<span class="font-label text-[11px] font-bold tracking-widest uppercase mt-1" style="">Discover</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#D0C6AB] opacity-60 hover:opacity-100 hover:text-[#FFD700] transition-all" href="#" style="">
+<span class="material-symbols-outlined" style="">person</span>
+<span class="font-label text-[11px] font-bold tracking-widest uppercase mt-1" style="">Profile</span>
+</a>
+</nav>
+</body></html>

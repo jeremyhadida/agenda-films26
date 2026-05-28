@@ -1,0 +1,396 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Inter:wght@300..700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#d9e2ff",
+                        "error": "#ffb4ab",
+                        "surface": "#021232",
+                        "on-tertiary-container": "#006a70",
+                        "error-container": "#93000a",
+                        "primary-fixed-dim": "#e9c400",
+                        "on-primary-fixed-variant": "#544600",
+                        "on-secondary-fixed": "#221b00",
+                        "background": "#021232",
+                        "outline": "#999077",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#fff6df",
+                        "on-surface-variant": "#d0c6ab",
+                        "primary-fixed": "#ffe16d",
+                        "on-tertiary": "#00363a",
+                        "on-error": "#690005",
+                        "primary-container": "#ffd700",
+                        "surface-container-highest": "#263455",
+                        "surface-container-high": "#1b294a",
+                        "secondary-fixed": "#f8e290",
+                        "inverse-surface": "#d9e2ff",
+                        "tertiary-fixed": "#79f5ff",
+                        "tertiary-container": "#00f1ff",
+                        "tertiary-fixed-dim": "#00dbe8",
+                        "surface-tint": "#e9c400",
+                        "inverse-primary": "#705d00",
+                        "on-tertiary-fixed": "#002022",
+                        "secondary": "#dbc677",
+                        "on-secondary": "#3a3000",
+                        "on-primary-fixed": "#221b00",
+                        "on-secondary-container": "#c9b468",
+                        "on-secondary-fixed-variant": "#544601",
+                        "surface-bright": "#2a385a",
+                        "surface-variant": "#263455",
+                        "on-tertiary-fixed-variant": "#004f54",
+                        "outline-variant": "#4d4732",
+                        "surface-container": "#0f1e3f",
+                        "on-primary": "#3a3000",
+                        "on-background": "#d9e2ff",
+                        "surface-container-low": "#0a1a3a",
+                        "surface-dim": "#021232",
+                        "surface-container-lowest": "#000c2a",
+                        "on-primary-container": "#705e00",
+                        "inverse-on-surface": "#213050",
+                        "tertiary": "#defcff",
+                        "secondary-fixed-dim": "#dbc677",
+                        "secondary-container": "#544601"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .distributor-logo { filter: grayscale(1) brightness(1.5); transition: filter 0.3s ease; }
+        .group:hover .distributor-logo { filter: grayscale(0) brightness(1); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-slate-950/70 backdrop-blur-xl text-slate-100 docked full-width top-0 sticky z-50 shadow-2xl shadow-slate-950/50 tonal-shift">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black tracking-tighter text-yellow-400 font-headline" style="">Agenda des sorties</div>
+<nav class="hidden md:flex gap-8 font-headline tracking-tight">
+<a class="text-yellow-400 font-bold border-b-2 border-yellow-400 pb-1" href="#" style="">Agenda</a>
+<a class="text-slate-400 font-medium hover:text-slate-200 transition-all duration-300" href="#" style="">Films</a>
+<a class="text-slate-400 font-medium hover:text-slate-200 transition-all duration-300" href="#" style="">Derniers ajouts</a>
+<a class="text-slate-400 font-medium hover:text-slate-200 transition-all duration-300" href="#" style=""><br></a>
+</nav>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-slate-100 hover:bg-slate-800/50 transition-all duration-300 p-2 rounded-full cursor-pointer" data-icon="calendar_month" style="">calendar_month</span>
+<span class="material-symbols-outlined text-slate-100 hover:bg-slate-800/50 transition-all duration-300 p-2 rounded-full cursor-pointer" data-icon="person" style="">person</span>
+</div>
+</div>
+</header>
+<!-- Monthly & Yearly Anchor Navigation -->
+<nav class="sticky top-[72px] z-40 bg-surface-container-low/95 backdrop-blur-md border-y border-outline-variant/10">
+<div class="max-w-screen-2xl mx-auto px-8 py-3 flex items-center justify-between gap-4">
+<div class="flex items-center gap-6 overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-2 pr-4 border-r border-outline-variant/20">
+<select class="bg-surface-container-highest/50 border-none rounded-lg text-primary-container font-headline font-extrabold text-sm tracking-widest uppercase py-1.5 pl-3 pr-8 focus:ring-1 focus:ring-primary-container cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23ffd700%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-[length:16px_16px] bg-[right_8px_center] bg-no-repeat">
+<option value="2023">2023</option>
+<option selected="" value="2024">2024</option>
+<option value="2025">2025</option>
+</select>
+</div>
+<div class="flex gap-2 shrink-0">
+<a class="px-5 py-2 rounded-full bg-primary-container text-on-primary-container font-headline font-bold text-sm transition-transform active:scale-90" href="#april" style="">April</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#may" style="">May</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#june" style="">June</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#july" style="">July</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#august" style="">August</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#september" style="">September</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#october" style="">October</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#november" style="">November</a>
+<a class="px-5 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-headline font-semibold text-sm hover:bg-surface-bright transition-all" href="#december" style="">December</a>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-screen-2xl mx-auto px-8 pt-12 pb-32">
+<!-- Month Section: April -->
+<section class="mb-24 scroll-mt-40" id="april">
+<div class="flex items-baseline gap-4 mb-8">
+<h2 class="text-6xl font-headline font-black text-primary-container tracking-tighter" style="">April</h2>
+<span class="text-on-surface-variant font-headline font-light text-2xl tracking-widest uppercase" style=""><br></span>
+</div>
+<!-- Weekly Strip 1 -->
+<div class="mb-12">
+<div class="flex justify-between items-end mb-6 border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-4">
+<div>
+<p class="text-tertiary-fixed-dim font-headline font-bold text-xs uppercase tracking-[0.2em] mb-1" style="">Week 15</p>
+<h3 class="text-2xl font-headline font-semibold text-on-surface" style="">April 08 — April 14</h3>
+</div>
+<div class="flex items-center bg-tertiary-container/20 border border-tertiary-container/30 px-3 py-1 rounded-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-sm mr-2" data-icon="beach_access" style="">beach_access</span>
+<span class="text-tertiary-fixed-dim font-headline font-bold text-[10px] uppercase tracking-widest" style="">Pâques / Vacances</span>
+</div>
+</div>
+<button class="text-primary-fixed-dim hover:text-primary-container font-headline font-bold text-sm transition-colors flex items-center gap-2" style="">
+                        View Full Week <span class="material-symbols-outlined text-sm" data-icon="arrow_forward" style="">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+<!-- Movie Card 1: Sci-Fi -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="dramatic cinematic still of a futuristic city with glowing neon lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6hd_ZPPiv9uP-rFHCHpT39cjvOIxTB84o49jG0DWc9bTj8I0i8B807URcRlfzojYSG0EY_hLFwtZABezz40A476InS2jzGk4kcjuhD4jdOBl8P5knvE4YDaY23dpbFgoP8EJL2Y8e9jEa2Ds-DDWLBmgj60hk-1-2vocnC7K-Efb8WLCn7ViD7qXJ8CVpMT6lm6JtC9Y0krnXApThVBOpHnpsUbXaZdXoL_okBI6NSPz_oykfwpRaqcWNwg8nt4gESAsQGtLWPsk" style="">
+<div class="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none"><span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Action</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">1h 52m</span></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Neon Horizon</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Elena Thorne</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Robert Pattinson, Zoe Kravitz</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style=""><br></p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="shield_moon" style="">shield_moon</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Warner Bros.</span>
+</div>
+</div>
+<!-- Movie Card 2: Drama -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="monochrome cinematic close up of film camera reel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYMvrc6Xn3WJSs-cQ1v65AfH6DEd5u01aZF_s_17mkPiPDTLG6DBBVNDmapxQPoi5_AN_W7y_YnjjZ_aaLGb_95Ofm1bQEvLoS7000HD-w22fekU0ztkw-xPuwwVH_nf6cS1iB8xsCJh5EWTM9AWgIJreUid71eLaxMvksGFhEBJvVVK-KJ4h0JU8vLopEL-NXv7XjR9XTHVf95nt79QvXUAi7b0LOGF4E2JghGx2qBqHiCn9JdWBaQ4w0ccmQLKs8Pn0urVrR16o" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-pink-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Musical</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">2h 15m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">The Silent Lens</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Marcus Vane</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Zendaya, Austin Butler</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style=""><br></p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="public" style="">public</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Universal</span>
+</div>
+</div>
+<!-- Movie Card 3: Thriller -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="abstract flowing ink in water" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyFF1vMr2_ElllY2SeKoszdPml18GqC1LERSfZx1WX2hh2pxUGBSy_7q_FtWN1ErslZ_flNPfKHuUmfWU9rZBqBmEoM2HkyC47U0V8tZwy_mF54iN4uSTD8XJ8gsdgj5qtQqX7qwl1D65xOMsmgloiIoiGUsNeownH9MvHYWbb3yf5-M5CQTHgFg1Ol-4ChGFwY16obRKSYe6glF_1tcpiJzNighfEsSFpVXtvJGoitWpzyQZemrZHtR6pWPlFgq3hIDateMu4MQ4" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-cyan-700 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Sports</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">1h 40m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Deep Current</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Sarah Chen</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Tom Hardy, Charlize Theron</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style=""><br></p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="apartment" style="">apartment</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Metropolitan</span>
+</div>
+</div>
+<!-- Movie Card 4: Mystery -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="moody landscape of misty mountains" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQptxoyyA6nG5YUEwmJumv6p5wne1mXQ4wqGHblb7rr5EL3ZX9o_UcyhhsnroblhUuXb9ShWntMc16JqwUnsBEKyfOwm5l6L6wu72Bx8Z8JgGs7J9zvCL-UiYsSJdGpl_I0CbtzslZVVXxg7MR3Wz7wgEtvibF-ssHj7rDNuvabE8NU6GInVR8g5E_ziVHNUJNHt53RDH5ChLROBJPIOD49I7l4rxq7DOkiHkF1SndoUcfgUz1VzasuWxccar3J0yj17-XlBYVPco" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-lime-800 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Adventure</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">2h 20m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Misty Peaks</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Julian Frost</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Tom Hanks, Felicity Jones</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style=""><br></p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="castle" style="">castle</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Disney</span>
+</div>
+</div>
+<!-- Movie Card 5: Classic -->
+<div class="group cursor-pointer hidden lg:block">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="interior of an ornate old movie theater" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXF1NxelktjncVeC3I7jYf12aUVRp_U3mA-zDY63ykasSIZDsa9SCMCWDclLTT-fWHP1mlE8-AWZtgcQADdyYT3oBC5cSdUL4OybUgBqOh852WBrUaIzgAo8Aq80iw62VIzYzI1dDiSJKPl38NyRLvphKLKGsfFMqSxJ4WiBA2ypcuCm676YNUAJwNunn1Kl8ROSTt5_RGfxSBccTG2xQFwUjTb5NxxSQjqhyO7r_HQ76jEvCDbM9Z1lQ0HwUUak0r3Ou0DpFlC_w" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-amber-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Classic</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">2h 35m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Cinema Paradiso</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Giuseppe T.</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Philippe Noiret, Jacques Perrin</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="stat_3" style="">stat_3</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Columbia</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Weekly Strip 2 -->
+<div class="mb-12">
+<div class="flex justify-between items-end mb-6 border-b border-outline-variant/20 pb-4">
+<div>
+<p class="text-tertiary-fixed-dim font-headline font-bold text-xs uppercase tracking-[0.2em] mb-1" style="">Week 16</p>
+<h3 class="text-2xl font-headline font-semibold text-on-surface" style="">April 15 — April 21</h3>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+<!-- Movie Card 1 (April W16): Action -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="vibrant neon lighting on an urban street at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgjdJMsT4yPfGHUwErLJeT6Tt76HNnFnG4v6qh_QSJeVyCBRWJvHR5vlodZyWKHb0V2FoB-O8EwVIINe9ktZ2GaYTTCEpVo97ONotUDbqDQS4V_uwBJ1ETvW6u40iYFl3CQIzbtI2KPNCDauFqf8aIf6pWNW6ANCPvw2WFi0iTfgE0g6MU6SjExnU62i1Mrn_AIh3z9obxTt_naHqcNRcvQiHwklw4IXsxa_PUUTo_w6jgwemUznwzordGvMzI7QGSTYXEVL0s6Ew" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Sci-Fi</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">2h 10m</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">4K</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Midnight Rain</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Chloe Kim</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Emma Stone, Ryan Gosling</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="shield_moon" style="">shield_moon</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Warner Bros.</span>
+</div>
+</div>
+<!-- Movie Card 2 (April W16): Musical -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="artistic silhouette of a dancer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-remjqJ5w-nnLcwsvpgvnMPq_RCo1Cz25hfmiwf_rHldxlgxHjdxSWGqtsRp58VClMphJbxp-PmQ5Z13T-zl6CuDGcCExFKK5o2ZQEfTj9QAD5gZ31zoLRp01cv4vmxXG2O80gR9lnaWt9BNWn6pyp4DVnnsDn8PP_w5a0eIueE0Ttp9GeCAc4H4lEgti5hIci1jA3oP0l49I1_nLz70u-8FvXxOJzyA_Tpq5U8icr_4a_O9tQUN1XMwtQkRKaTkkQDussIv587M" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-blue-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Drama</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">1h 45m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Gold Rhythm</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Leo Rossi</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Christian Bale, Meryl Streep</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="public" style="">public</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Universal</span>
+</div>
+</div>
+<!-- Movie Card 3 (April W16): Sports -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="sleek luxury car driving through a desert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQfFYrG_Uaox2RP-Y1Sq-AHosEC8Td_nUtkS-md2LNzBQSRFEmkBqA_Ahr3NWMuZ_Tas5B9quyw-Pp5zV5RseMclYQP3Mgxs0EGplUPGhYeE2x-saRU8F6pCNBOOPCcDFAWSy4Vmr3WNBW1uZDbSREuBHKvNCirS0vKtk-syiwtmC2GVTBEwUgymuJ5lAsIxwfykXw18AhxP_Nx4OZLSd4PL9r3IHkK2MDEp74L4CBqaipRemscFxbBybTn4YRzC9RKpUOdNMZg7M" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-orange-700 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Thriller</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">2h 05m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Drift Theory</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Sam Peterson</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Oscar Isaac, Jessica Chastain</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="apartment" style="">apartment</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Metropolitan</span>
+</div>
+</div>
+<!-- Movie Card 4 (April W16): Adventure -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="close up of an old antique compass" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlK7UlSpNPpYde5Aurt0UfYKK8NUtqelD53IoBlABFNNRczSHipUdEEbUpjrGsYcHyv2omLJmXfTdECcwfr7VL4ywhAcipJRGKXuDLNh3kEP9M_AWwdCjjQI2W7YwoJLUJUUt9uXlHJm0NxXifjuIiYftbw7Tz6T2-UmyUU54vjzFV1s9KK14Qffl1L6DlKQu6JBXjHFcnSQDJF4Zz32rtaxZkL5074PSlJRCQ_N7QHCyY3dIHcSA3OGt1nbumbZU1KoSk5zG57Es" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-emerald-700 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Mystery</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">1h 58m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Lost Meridian</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Ana Silva</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Timothée Chalamet, Florence Pugh</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="castle" style="">castle</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Disney</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Month Section: May -->
+<section class="mb-24 scroll-mt-40" id="may">
+<div class="flex items-baseline gap-4 mb-8">
+<h2 class="text-6xl font-headline font-black text-primary-container tracking-tighter" style="">May</h2>
+<span class="text-on-surface-variant font-headline font-light text-2xl tracking-widest uppercase" style=""><br></span>
+</div>
+<!-- Weekly Strip 1 (May) -->
+<div class="mb-12">
+<div class="flex justify-between items-end mb-6 border-b border-outline-variant/20 pb-4">
+<div class="flex items-center gap-4">
+<div>
+<p class="text-tertiary-fixed-dim font-headline font-bold text-xs uppercase tracking-[0.2em] mb-1" style="">Week 18</p>
+<h3 class="text-2xl font-headline font-semibold text-on-surface" style="">May 01 — May 07</h3>
+</div>
+<div class="flex items-center bg-primary-container/20 border border-primary-container/30 px-3 py-1 rounded-sm">
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm mr-2" data-icon="festival" style="">festival</span>
+<span class="text-primary-fixed-dim font-headline font-bold text-[10px] uppercase tracking-widest" style="">Cannes Special</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+<!-- Movie Card 1 (May): Indie -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="dramatic portrait of a woman looking out a window" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArpoFb-UoXLjf2Qt8aEZNyHXtVe2mGplVPfSHNueugXQjMouuXWDtVv4O9XGPz4KfmsawQn57QVatuFfBYt3NMOQlVdrRCX1VO1vvdn1wog4cuuPuEMmwCH5sNHAiihjdAhpVcXcCZJJtNy9-nd8ipJQqpZTJFUgTwJ5wXQCwXzQPUQcdV84MM08IPjPcOPxDiW4Kz8n3jJVpQDdqAd3yb_V-zqjdUuqollqCVdYG51TNuhUzqIIgQbKg1i6DOmXmBzCtAYtdNhC8" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-gray-700 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Indie</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">1h 38m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">A Silent Breath</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Julia Meyer</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Saoirse Ronan, Paul Mescal</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="star" style="">star</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">A24</span>
+</div>
+</div>
+<!-- Movie Card 2 (May): Sci-Fi -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="surreal landscape of a planet with two moons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjfdcVTp1gahvDinJf7TioSH49MwMjXSpNUV0rRv_a3EnMHmaBq2dEWHd0FQB26bgHIAJNAbPw8eH-I6EKGDxn9Y9YC_6NApMVSM3kW-SonRsIKHQDf2971C9F0lbzbmd5PtQS11VOJfjKSWYpltelC3ZbYdGxwPukARTFukRigG5X36INAZDaHRzcr3Nm2bnXWI52ZXNC-5TUKkAfFWx495x-AAzUtFUcF_p10XSS-dgheA7jvUKE96ddFVwp7e6Y46PzySWtiGE" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-purple-600 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Sci-Fi</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">2h 12m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Double Moon</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Oscar Wells</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Adam Driver, Rooney Mara</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed-dim" data-icon="public" style="">public</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Universal</span>
+</div>
+</div>
+<!-- Movie Card 3 (May): Docu -->
+<div class="group cursor-pointer">
+<div class="relative aspect-[2/3] rounded-lg overflow-hidden mb-3 bg-surface-container-highest shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
+<img class="w-full h-full object-cover" data-alt="vibrant abstract colors swirling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxEAZIcPdo4gZroY7AwBZpOtV0Dfa8n9xD6Lk0eMyfbThIHeKFas7y_ed9-f5n_J6Raw5SS45jZQ1SN74G_veJebVR33_u-Z7njzdL0R47nY0mWjSAv2tHfzjIqR58EJpratlmB1ExivcXT9TmyMOtY4JYiyA3JJ7rdUJGOWMQHY4SWQVjEKObsStV_vFl5v-1SxNxUqSWBn0eeFniweKbAuM0A2QArxrt6AnHyzoWyl8Cmzicg9WJCBZbpL5ya9fMIPBEhiHDPDE" style="">
+<div class="absolute top-3 left-3 pointer-events-none"><span class="bg-teal-700 text-white px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg" style="">Docu</span>
+<span class="bg-black/80 backdrop-blur-sm text-tertiary-fixed-dim border border-tertiary-container/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider" style="">1h 55m</span></div>
+</div>
+<h4 class="font-headline font-bold text-on-surface leading-tight mb-0.5 truncate" style="">Ignition</h4>
+<p class="text-on-surface-variant font-body text-xs mb-1.5" style="">Dir. Franky D.</p><p class="text-on-surface-variant/70 font-body text-[10px] mb-2 italic" style="">Casting: Cillian Murphy, Emily Blunt</p>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-md w-fit hover:bg-surface-bright transition-colors border border-outline-variant/10">
+<span class="material-symbols-outlined text-[18px] text-red-600 font-black" data-icon="navigation" style="">navigation</span>
+<span class="text-[11px] font-black text-on-surface uppercase tracking-tight" style="">Netflix</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex gap-8 items-center justify-center bg-slate-950/80 backdrop-blur-2xl w-auto min-w-[320px] rounded-full px-8 py-3 shadow-[0_12px_24px_rgba(0,12,42,0.4)]">
+<a class="text-slate-500 flex flex-col items-center gap-1 hover:text-yellow-200 transition-colors" href="#" style="">
+<span class="material-symbols-outlined text-2xl" data-icon="home" style="">home</span>
+<span class="font-inter text-[10px] uppercase tracking-widest" style="">Home</span>
+</a>
+<a class="text-slate-50 flex flex-col items-center gap-1 after:w-1 after:h-1 after:bg-yellow-400 after:rounded-full after:mt-1 transition-transform scale-110" href="#" style="">
+<span class="material-symbols-outlined text-2xl" data-icon="event_note" style="font-variation-settings: &quot;FILL&quot; 1;">event_note</span>
+<span class="font-inter text-[10px] uppercase tracking-widest" style="">Agenda</span>
+</a>
+<a class="text-slate-500 flex flex-col items-center gap-1 hover:text-yellow-200 transition-colors" href="#" style="">
+<span class="material-symbols-outlined text-2xl" data-icon="explore" style="">explore</span>
+<span class="font-inter text-[10px] uppercase tracking-widest" style="">Discover</span>
+</a>
+<a class="text-slate-500 flex flex-col items-center gap-1 hover:text-yellow-200 transition-colors" href="#" style="">
+<span class="material-symbols-outlined text-2xl" data-icon="confirmation_number" style="">confirmation_number</span>
+<span class="font-inter text-[10px] uppercase tracking-widest" style=""><br></span>
+</a>
+<a class="text-slate-500 flex flex-col items-center gap-1 hover:text-yellow-200 transition-colors" href="#" style="">
+<span class="material-symbols-outlined text-2xl" data-icon="person" style="">person</span>
+<span class="font-inter text-[10px] uppercase tracking-widest" style="">Profile</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="bg-slate-950 w-full border-t border-slate-900/50 mt-20 tonal-shift pt-12 pb-24">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="font-manrope font-bold text-slate-300 text-lg" style="">Agenda des sorties</div>
+<div class="flex gap-6">
+<a class="font-inter text-xs tracking-wide text-slate-500 hover:text-yellow-400 transition-colors" href="#" style="">Privacy</a>
+<a class="font-inter text-xs tracking-wide text-slate-500 hover:text-yellow-400 transition-colors" href="#" style="">Terms</a>
+<a class="font-inter text-xs tracking-wide text-slate-500 hover:text-yellow-400 transition-colors" href="#" style="">Editorial Policy</a>
+<a class="font-inter text-xs tracking-wide text-slate-500 hover:text-yellow-400 transition-colors" href="#" style=""><br></a>
+</div>
+<p class="font-inter text-xs tracking-wide text-slate-500" style=""><br></p>
+</div>
+</footer>
+</body></html>

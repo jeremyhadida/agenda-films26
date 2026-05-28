@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-films par semaine — Films26</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #010c1e; --surface: #021232; --low: #0a1a3a;
+  --card: #263455; --gold: #ffd700; --text: #fff6df;
+  --muted: #d0c6ab; --cyan: #defcff; --border: #2a3a5a;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 24px 16px 60px;
+  display: flex; flex-direction: column; align-items: center; gap: 32px;
+}
+h2 { font-size: 17px; font-weight: 800; text-align: center; color: var(--text); letter-spacing: .02em; }
+.subtitle { font-size: 11px; color: #8899bb; text-align: center; max-width: 460px; line-height: 1.6; }
+
+/* ─── 3-col layout ─── */
+.cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 760px; }
+
+/* ─── Phone shell ─── */
+.col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.phone {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 24px; width: 100%; aspect-ratio: 9/17;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  max-width: 200px;
+}
+.ph-hdr {
+  background: #010c22; padding: 7px 10px 6px;
+  font-size: 7px; font-weight: 800; color: var(--gold);
+  letter-spacing: .12em; text-align: center; flex-shrink: 0;
+  border-bottom: 1px solid #1a2a4a;
+}
+.ph-body { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.ph-nav {
+  background: #010c22; height: 28px; border-top: 1px solid #1a2a4a;
+  display: flex; align-items: center; justify-content: center; gap: 14px; flex-shrink: 0;
+}
+.ndot { width: 16px; height: 2.5px; border-radius: 2px; background: var(--border); }
+.ndot.on { background: var(--gold); }
+
+/* ─── Frise base ─── */
+.frise-scroll {
+  flex: 1; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+  position: relative; cursor: grab;
+}
+.frise-scroll::-webkit-scrollbar { display: none; }
+.frise-track {
+  height: 100%; display: flex; align-items: flex-end;
+  padding: 10px 100px 0; gap: 0; min-width: max-content; position: relative;
+}
+.axis-line {
+  position: absolute; bottom: 40px; left: 0; right: 0; height: 1.5px;
+  background: linear-gradient(to right, transparent, var(--border) 8%, var(--border) 92%, transparent);
+  pointer-events: none;
+}
+.center-mark {
+  position: absolute; bottom: 33px; left: 50%; transform: translateX(-50%);
+  width: 2px; height: 16px; background: var(--gold); opacity: .5; border-radius: 1px;
+  pointer-events: none; z-index: 5;
+}
+.center-glow {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 20px; pointer-events: none; z-index: 4;
+  background: radial-gradient(ellipse, rgba(255,215,0,.18) 0%, transparent 70%);
+}
+.fade-l, .fade-r {
+  position: absolute; top: 0; bottom: 0; width: 40px; pointer-events: none; z-index: 10;
+}
+.fade-l { left: 0; background: linear-gradient(to right, var(--surface), transparent); }
+.fade-r { right: 0; background: linear-gradient(to left, var(--surface), transparent); }
+
+/* ─── Week sep ─── */
+.wsep { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 28px; flex-shrink: 0; padding-bottom: 40px; position: relative; }
+.wsep-tick { width: 1px; height: 16px; background: var(--border); }
+.wsep-label { position: absolute; bottom: 44px; font-size: 5px; font-weight: 700; color: var(--muted); opacity: .45; letter-spacing: .06em; }
+.wsep.current .wsep-tick { background: var(--gold); opacity: .5; height: 22px; }
+.wsep.current .wsep-label { color: var(--gold); opacity: .9; }
+
+/* ─── Genre colors ─── */
+.g-action { background: #7f1d1d; color: #fca5a5; }
+.g-drame  { background: #1e3a5f; color: #93c5fd; }
+.g-come   { background: #713f12; color: #fde68a; }
+.g-anim   { background: #064e3b; color: #6ee7b7; }
+.g-sf     { background: #0c4a6e; color: #7dd3fc; }
+.g-hor    { background: #3b0764; color: #d8b4fe; }
+.g-mus    { background: #3f1d6e; color: #c4b5fd; }
+
+/* ════════════════════════════════════════════
+   OPTION A — FAN
+   Films s'éventent symétriquement depuis l'axe
+═══════════════════════════════════════════ */
+.week-fan { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; padding-bottom: 40px; flex-shrink: 0; }
+.fan-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: #3a5a8a;
+  position: relative; z-index: 3; flex-shrink: 0;
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.fan-dot .badge {
+  position: absolute; top: -4px; right: -4px;
+  background: var(--gold); color: var(--surface);
+  font-size: 4px; font-weight: 800; border-radius: 50%;
+  width: 8px; height: 8px; display: flex; align-items: center; justify-content: center;
+}
+.week-fan.active .fan-dot {
+  background: var(--gold); border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(255,215,0,.5); transform: scale(1.5);
+}
+.fans-container {
+  position: absolute;
+  bottom: calc(40px + 9px + 2px);
+  display: flex; gap: 3px; align-items: flex-end;
+  transform-origin: bottom center;
+  opacity: 0;
+  pointer-events: none;
+}
+.week-fan.active .fans-container { opacity: 1; pointer-events: auto; }
+.fan-card {
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 7px; padding: 5px 6px;
+  width: 52px; flex-shrink: 0;
+  transform: scaleY(0) translateY(6px);
+  transform-origin: bottom center;
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), border-color .2s;
+}
+.fan-card.open { transform: scaleY(1) translateY(0); }
+.fan-card:hover { border-color: rgba(255,215,0,.35); }
+.fc-genre { border-radius: 2px; padding: 1px 3px; font-size: 4.5px; font-weight: 700; margin-bottom: 2px; display: inline-block; }
+.fc-title { font-size: 6.5px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.fc-dir   { font-size: 5px; color: var(--muted); opacity: .65; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fc-meta  { font-size: 5px; color: var(--cyan); margin-top: 1px; }
+
+/* fan-connector lines */
+.fans-container::before {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%; transform: translateX(-50%);
+  width: 1px; height: 8px; background: var(--gold); opacity: .4;
+}
+
+/* solo film node (A) */
+.solo-node-a { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 40px; flex-shrink: 0; width: 52px; position: relative; }
+.solo-line-a { width: 1px; background: linear-gradient(to bottom, transparent, var(--border)); height: 48px; opacity: .35; transition: opacity .2s, height .2s; }
+.solo-dot-a { width: 7px; height: 7px; border-radius: 50%; background: #3a5a8a; border: 1.5px solid var(--border); transition: transform .2s, background .2s, box-shadow .2s; }
+.solo-card-a {
+  position: absolute; bottom: calc(40px + 7px + 48px); width: 52px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 7px;
+  padding: 5px 6px; transform: scaleY(0) translateY(6px); transform-origin: bottom center;
+  opacity: 0; transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+}
+.solo-node-a.active .solo-dot-a { background: var(--gold); border-color: var(--gold); transform: scale(1.5); box-shadow: 0 0 8px rgba(255,215,0,.4); }
+.solo-node-a.active .solo-line-a { opacity: .7; height: 56px; background: linear-gradient(to bottom, transparent, var(--gold)); }
+.solo-node-a.active .solo-card-a { transform: scaleY(1) translateY(0); opacity: 1; }
+.solo-node-a.near .solo-dot-a { transform: scale(1.2); }
+.solo-node-a.near .solo-line-a { opacity: .5; }
+
+/* ════════════════════════════════════════════
+   OPTION B — CARROUSEL
+   Une semaine = 1 point · swipe dans la carte
+═══════════════════════════════════════════ */
+.week-carousel { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; position: relative; padding-bottom: 40px; flex-shrink: 0; width: 60px; }
+.car-line { width: 1px; height: 52px; background: linear-gradient(to bottom, transparent, var(--border)); opacity: .3; transition: all .25s; }
+.car-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #3a5a8a; border: 1.5px solid var(--border);
+  position: relative; z-index: 3; flex-shrink: 0;
+  transition: all .25s;
+}
+.car-dot .badge {
+  position: absolute; top: -4px; right: -5px;
+  background: rgba(255,215,0,.9); color: #000;
+  font-size: 4px; font-weight: 900; border-radius: 50%;
+  width: 8px; height: 8px; display: flex; align-items: center; justify-content: center;
+}
+.week-carousel.active .car-dot { background: var(--gold); border-color: var(--gold); transform: scale(1.5); box-shadow: 0 0 10px rgba(255,215,0,.5); }
+.week-carousel.active .car-line { opacity: .7; background: linear-gradient(to bottom, transparent, var(--gold)); }
+.car-card-wrap {
+  position: absolute; bottom: calc(40px + 9px + 52px + 4px);
+  width: 70px; left: 50%; transform: translateX(-50%);
+  transform-origin: bottom center;
+  opacity: 0; transform: translateX(-50%) scaleY(0) translateY(8px);
+  pointer-events: none;
+}
+.week-carousel.active .car-card-wrap {
+  opacity: 1; transform: translateX(-50%) scaleY(1) translateY(0);
+  pointer-events: auto;
+}
+.car-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 7px; overflow: hidden;
+  position: relative;
+}
+.car-film { display: none; }
+.car-film.visible { display: block; }
+.car-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 4px; padding-top: 3px; border-top: 1px solid #1a2a4a;
+}
+.car-btn {
+  background: #1a2a4a; border: none; color: var(--muted);
+  font-size: 8px; border-radius: 3px; padding: 2px 5px; cursor: pointer;
+  transition: background .15s;
+}
+.car-btn:hover { background: #2a3a6a; }
+.car-dots { display: flex; gap: 3px; align-items: center; }
+.car-pip { width: 4px; height: 4px; border-radius: 50%; background: var(--border); transition: background .2s; }
+.car-pip.on { background: var(--gold); }
+.car-cnt { font-size: 5px; color: var(--muted); opacity: .6; }
+
+/* solo B */
+.solo-b { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 40px; flex-shrink: 0; width: 60px; position: relative; }
+.solo-b-line { width: 1px; height: 52px; background: linear-gradient(to bottom, transparent, var(--border)); opacity: .3; transition: all .25s; }
+.solo-b-dot { width: 7px; height: 7px; border-radius: 50%; background: #3a5a8a; border: 1.5px solid var(--border); transition: all .25s; }
+.solo-b-card {
+  position: absolute; bottom: calc(40px + 7px + 52px + 4px); width: 68px;
+  left: 50%; transform: translateX(-50%) scaleY(0) translateY(6px);
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 7px; opacity: 0; transform-origin: bottom center;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+}
+.solo-b.active .solo-b-dot { background: var(--gold); border-color: var(--gold); transform: scale(1.5); box-shadow: 0 0 8px rgba(255,215,0,.4); }
+.solo-b.active .solo-b-line { opacity: .7; background: linear-gradient(to bottom, transparent, var(--gold)); }
+.solo-b.active .solo-b-card { transform: translateX(-50%) scaleY(1) translateY(0); opacity: 1; }
+.solo-b.near .solo-b-dot { transform: scale(1.2); }
+.solo-b.near .solo-b-line { opacity: .5; }
+
+/* ════════════════════════════════════════════
+   OPTION C — CLUSTER
+   Films = points groupés côte à côte sur l'axe
+═══════════════════════════════════════════ */
+.week-cluster { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 40px; flex-shrink: 0; position: relative; }
+.cluster-dots { display: flex; gap: 3px; align-items: flex-end; margin-bottom: 0; }
+.cluster-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  border: 1.5px solid var(--border);
+  transition: all .25s; flex-shrink: 0;
+  cursor: pointer;
+}
+.week-cluster.active .cluster-dot { transform: scale(1.4); box-shadow: 0 0 6px rgba(255,215,0,.4); }
+.cluster-card-wrap {
+  position: absolute; bottom: calc(40px + 10px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 3px; opacity: 0; pointer-events: none;
+  transform-origin: bottom center;
+}
+.week-cluster.active .cluster-card-wrap { opacity: 1; pointer-events: auto; }
+.cluster-film-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 7px;
+  padding: 5px 6px; width: 52px; flex-shrink: 0;
+  transform: scaleY(0) translateY(6px); transform-origin: bottom center;
+}
+.cluster-film-card.open { transform: scaleY(1) translateY(0); transition: transform .26s cubic-bezier(.34,1.56,.64,1) var(--delay, 0s); }
+
+/* solo C */
+.solo-c { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 40px; flex-shrink: 0; width: 52px; position: relative; }
+.solo-c-dot { width: 7px; height: 7px; border-radius: 50%; background: #3a5a8a; border: 1.5px solid var(--border); transition: all .25s; }
+.solo-c-card {
+  position: absolute; bottom: calc(40px + 7px + 4px); width: 52px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 7px;
+  padding: 5px 6px; opacity: 0; transform: scaleY(0) translateY(6px);
+  transform-origin: bottom center;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .2s;
+}
+.solo-c.active .solo-c-dot { background: var(--gold); border-color: var(--gold); transform: scale(1.4); box-shadow: 0 0 8px rgba(255,215,0,.4); }
+.solo-c.active .solo-c-card { transform: scaleY(1) translateY(0); opacity: 1; }
+.solo-c.near .solo-c-dot { transform: scale(1.2); }
+
+/* card internals */
+.cg { border-radius: 2px; padding: 1px 3px; font-size: 4.5px; font-weight: 700; display: inline-block; margin-bottom: 2px; }
+.ct { font-size: 6.5px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.cd { font-size: 5px; color: var(--muted); opacity: .65; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cm { font-size: 5px; color: var(--cyan); margin-top: 1px; }
+
+/* ─── Labels ─── */
+.col-label { font-size: 13px; font-weight: 800; color: var(--text); text-align: center; }
+.col-desc  { font-size: 9px; color: #8899bb; text-align: center; line-height: 1.5; max-width: 160px; }
+.pro { font-size: 9px; color: #22c55e; text-align: center; margin-top: 2px; }
+.con { font-size: 9px; color: #ef4444; text-align: center; margin-top: 1px; }
+.gsap-tag { display: inline-block; background: #0f2; color: #000; font-size: 7px; font-weight: 800; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h2>Semaine avec plusieurs films — comment les traiter ?</h2>
+<p class="subtitle">3 approches sans hiérarchie de position. Clique sur les semaines colorées (S22) pour voir le déploiement.</p>
+
+<div class="cols">
+
+  <!-- ══ OPTION A — FAN ══ -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+  <div class="col">
+    <div class="phone">
+      <div class="ph-hdr">FILMS 26</div>
+      <div class="ph-body">
+        <div class="fade-l"></div><div class="fade-r"></div>
+        <div class="axis-line"></div>
+        <div class="center-glow"></div><div class="center-mark"></div>
+
+        <div class="frise-scroll" id="scrA">
+          <div class="frise-track">
+            <!-- S20 solo -->
+            <div class="wsep"><div class="wsep-label">S20</div><div class="wsep-tick"></div></div>
+            <div class="solo-node-a near" data-frise="a" data-idx="0">
+              <div class="solo-card-a"><div class="cg g-anim">ANI</div><div class="ct">KFP 4</div><div class="cd">Dindal</div><div class="cm">1h34</div></div>
+              <div class="solo-line-a"></div><div class="solo-dot-a"></div>
+            </div>
+
+            <!-- S22 fan (3 films) -->
+            <div class="wsep current"><div class="wsep-label">S22</div><div class="wsep-tick"></div></div>
+            <div class="week-fan active" data-frise="a" data-idx="1">
+              <div class="fans-container">
+                <div class="fan-card open"><div class="fc-genre g-come">COMÉDIE</div><div class="fc-title">Disco Dancer</div><div class="fc-dir">Mukerji</div><div class="fc-meta">1h52</div></div>
+                <div class="fan-card open" style="transition-delay:.05s"><div class="fc-genre g-hor">HORREUR</div><div class="fc-title">Alien: Romulus</div><div class="fc-dir">Álvarez</div><div class="fc-meta">1h59</div></div>
+                <div class="fan-card open" style="transition-delay:.1s"><div class="fc-genre g-action">ACTION</div><div class="fc-title">Acct. 2</div><div class="fc-dir">O'Russell</div><div class="fc-meta">1h55</div></div>
+              </div>
+              <div class="fan-dot"><div class="badge">3</div></div>
+            </div>
+
+            <!-- S23 solo -->
+            <div class="wsep"><div class="wsep-label">S23</div><div class="wsep-tick"></div></div>
+            <div class="solo-node-a near" data-frise="a" data-idx="2">
+              <div class="solo-card-a"><div class="cg g-action">ACT</div><div class="ct">F&F 11</div><div class="cd">Morales</div><div class="cm">2h10</div></div>
+              <div class="solo-line-a"></div><div class="solo-dot-a"></div>
+            </div>
+
+            <!-- S25 solo -->
+            <div class="wsep"><div class="wsep-label">S25</div><div class="wsep-tick"></div></div>
+            <div class="solo-node-a" data-frise="a" data-idx="3">
+              <div class="solo-card-a"><div class="cg g-sf">SF</div><div class="ct">Avatar 3</div><div class="cd">Cameron</div><div class="cm">2h50</div></div>
+              <div class="solo-line-a"></div><div class="solo-dot-a"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ph-nav"><div class="ndot on"></div><div class="ndot"></div></div>
+    </div>
+    <div class="col-label">A — Éventail</div>
+    <div class="col-desc">Les films s'étalent côte à côte vers le haut. Pas de premier, pas de dernier.</div>
+    <div class="pro">✓ Tous visibles simultanément</div>
+    <div class="con">✗ Largeur × nb films · peut déborder</div>
+  </div>
+    </div>
+  </div>
+
+  <!-- ══ OPTION B — CARROUSEL ══ -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+  <div class="col">
+    <div class="phone">
+      <div class="ph-hdr">FILMS 26</div>
+      <div class="ph-body">
+        <div class="fade-l"></div><div class="fade-r"></div>
+        <div class="axis-line"></div>
+        <div class="center-glow"></div><div class="center-mark"></div>
+
+        <div class="frise-scroll" id="scrB">
+          <div class="frise-track">
+            <div class="wsep"><div class="wsep-label">S20</div><div class="wsep-tick"></div></div>
+            <div class="solo-b near" data-frise="b" data-idx="0">
+              <div class="solo-b-card"><div class="cg g-anim">ANI</div><div class="ct">KFP 4</div><div class="cd">Dindal</div><div class="cm">1h34</div></div>
+              <div class="solo-b-line"></div><div class="solo-b-dot"></div>
+            </div>
+
+            <!-- S22 carousel -->
+            <div class="wsep current"><div class="wsep-label">S22</div><div class="wsep-tick"></div></div>
+            <div class="week-carousel active" id="carB" data-frise="b" data-idx="1">
+              <div class="car-card-wrap" id="carBwrap" style="opacity:1;transform:translateX(-50%) scaleY(1) translateY(0);pointer-events:auto">
+                <div class="car-card">
+                  <div class="car-film visible" id="cB0">
+                    <div class="cg g-come">COMÉDIE</div><div class="ct">Disco Dancer</div><div class="cd" style="margin-top:3px">Dir. Mukerji · 1h52</div>
+                  </div>
+                  <div class="car-film" id="cB1">
+                    <div class="cg g-hor">HORREUR</div><div class="ct">Alien: Romulus</div><div class="cd" style="margin-top:3px">Dir. Álvarez · 1h59</div>
+                  </div>
+                  <div class="car-film" id="cB2">
+                    <div class="cg g-action">ACTION</div><div class="ct">Accountant 2</div><div class="cd" style="margin-top:3px">Dir. O'Russell · 1h55</div>
+                  </div>
+                  <div class="car-nav">
+                    <button class="car-btn" onclick="carPrev(event)">←</button>
+                    <div class="car-dots" id="carBpips">
+                      <div class="car-pip on"></div><div class="car-pip"></div><div class="car-pip"></div>
+                    </div>
+                    <button class="car-btn" onclick="carNext(event)">→</button>
+                  </div>
+                </div>
+              </div>
+              <div class="car-line"></div>
+              <div class="car-dot"><div class="badge" id="carBbadge">3</div></div>
+            </div>
+
+            <div class="wsep"><div class="wsep-label">S23</div><div class="wsep-tick"></div></div>
+            <div class="solo-b near" data-frise="b" data-idx="2">
+              <div class="solo-b-card"><div class="cg g-action">ACT</div><div class="ct">F&F 11</div><div class="cd">Morales</div><div class="cm">2h10</div></div>
+              <div class="solo-b-line"></div><div class="solo-b-dot"></div>
+            </div>
+
+            <div class="wsep"><div class="wsep-label">S25</div><div class="wsep-tick"></div></div>
+            <div class="solo-b" data-frise="b" data-idx="3">
+              <div class="solo-b-card"><div class="cg g-sf">SF</div><div class="ct">Avatar 3</div><div class="cd">Cameron</div><div class="cm">2h50</div></div>
+              <div class="solo-b-line"></div><div class="solo-b-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ph-nav"><div class="ndot on"></div><div class="ndot"></div></div>
+    </div>
+    <div class="col-label">B — Carrousel</div>
+    <div class="col-desc">1 point sur l'axe par semaine. Badge du nombre. Flèches ← → pour parcourir les films.</div>
+    <div class="pro">✓ Axe propre · aucun débordement</div>
+    <div class="con">✗ Films cachés → effort d'exploration</div>
+  </div>
+    </div>
+  </div>
+
+  <!-- ══ OPTION C — CLUSTER ══ -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+  <div class="col">
+    <div class="phone">
+      <div class="ph-hdr">FILMS 26</div>
+      <div class="ph-body">
+        <div class="fade-l"></div><div class="fade-r"></div>
+        <div class="axis-line"></div>
+        <div class="center-glow"></div><div class="center-mark"></div>
+
+        <div class="frise-scroll" id="scrC">
+          <div class="frise-track">
+            <div class="wsep"><div class="wsep-label">S20</div><div class="wsep-tick"></div></div>
+            <div class="solo-c near" data-frise="c" data-idx="0">
+              <div class="solo-c-card"><div class="cg g-anim">ANI</div><div class="ct">KFP 4</div><div class="cd">Dindal</div><div class="cm">1h34</div></div>
+              <div class="solo-c-dot" style="background:#064e3b;border-color:#6ee7b7"></div>
+            </div>
+
+            <!-- S22 cluster -->
+            <div class="wsep current"><div class="wsep-label">S22</div><div class="wsep-tick"></div></div>
+            <div class="week-cluster active" data-frise="c" data-idx="1">
+              <div class="cluster-card-wrap" style="opacity:1;pointer-events:auto">
+                <div class="cluster-film-card open" style="--delay:0s"><div class="cg g-come">COM</div><div class="ct">Disco Dancer</div><div class="cd">Mukerji · 1h52</div></div>
+                <div class="cluster-film-card open" style="--delay:.06s"><div class="cg g-hor">HOR</div><div class="ct">Alien: Romulus</div><div class="cd">Álvarez · 1h59</div></div>
+                <div class="cluster-film-card open" style="--delay:.12s"><div class="cg g-action">ACT</div><div class="ct">Accountant 2</div><div class="cd">O'Russell · 1h55</div></div>
+              </div>
+              <div class="cluster-dots">
+                <div class="cluster-dot" style="background:#713f12;border-color:#fde68a"></div>
+                <div class="cluster-dot" style="background:#3b0764;border-color:#d8b4fe"></div>
+                <div class="cluster-dot" style="background:#7f1d1d;border-color:#fca5a5"></div>
+              </div>
+            </div>
+
+            <div class="wsep"><div class="wsep-label">S23</div><div class="wsep-tick"></div></div>
+            <div class="solo-c near" data-frise="c" data-idx="2">
+              <div class="solo-c-card"><div class="cg g-action">ACT</div><div class="ct">F&F 11</div><div class="cd">Morales</div><div class="cm">2h10</div></div>
+              <div class="solo-c-dot" style="background:#7f1d1d;border-color:#fca5a5"></div>
+            </div>
+
+            <div class="wsep"><div class="wsep-label">S25</div><div class="wsep-tick"></div></div>
+            <div class="solo-c" data-frise="c" data-idx="3">
+              <div class="solo-c-card"><div class="cg g-sf">SF</div><div class="ct">Avatar 3</div><div class="cd">Cameron</div><div class="cm">2h50</div></div>
+              <div class="solo-c-dot" style="background:#0c4a6e;border-color:#7dd3fc"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ph-nav"><div class="ndot on"></div><div class="ndot"></div></div>
+    </div>
+    <div class="col-label">C — Cluster coloré</div>
+    <div class="col-desc">Chaque film = 1 point couleur genre. Groupés sur l'axe. Tous les cartes s'ouvrent simultanément.</div>
+    <div class="pro">✓ Genre visible sans ouvrir · densité maximale</div>
+    <div class="con">✗ Beaucoup de cartes ouvertes en même temps</div>
+  </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Carrousel B ──
+let carIdx = 0;
+const carFilms = ['cB0','cB1','cB2'];
+function showCar(i) {
+  carIdx = ((i % 3) + 3) % 3;
+  carFilms.forEach((id,j) => {
+    document.getElementById(id).classList.toggle('visible', j === carIdx);
+  });
+  document.querySelectorAll('#carBpips .car-pip').forEach((p,j) => p.classList.toggle('on', j === carIdx));
+}
+function carNext(e) { e.stopPropagation(); showCar(carIdx + 1); }
+function carPrev(e) { e.stopPropagation(); showCar(carIdx - 1); }
+
+// ── Inject helper.js for toggleSelect ──
+</script>
+<script src="/helper.js"></script>
+</body>
+</html>

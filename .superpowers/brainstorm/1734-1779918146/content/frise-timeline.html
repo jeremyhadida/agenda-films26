@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frise chronologique — Films26</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #010c1e;
+  color: #fff6df;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+  gap: 20px;
+}
+
+h2 {
+  font-family: 'Manrope', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff6df;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+.subtitle {
+  font-size: 12px;
+  color: #8899bb;
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+/* ─── Phone shell ─── */
+.phone-frame {
+  background: #021232;
+  border: 2px solid #2a3a5a;
+  border-radius: 32px;
+  width: 320px;
+  height: 580px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.ph-header {
+  background: #010c22;
+  padding: 10px 16px 8px;
+  font-size: 9px;
+  font-weight: 800;
+  color: #ffd700;
+  letter-spacing: 0.15em;
+  text-align: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid #1a2a4a;
+}
+
+.ph-tabs {
+  background: #0a1a3a;
+  padding: 6px 12px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid #1a2a4a;
+  flex-shrink: 0;
+}
+.tab { background: transparent; color: #d0c6ab; border-radius: 5px; padding: 4px 10px; font-size: 7px; font-weight: 700; letter-spacing: 0.08em; }
+.tab.on { background: #ffd700; color: #021232; }
+
+/* ─── Frise container ─── */
+.frise-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scroll zone */
+.frise-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  position: relative;
+  cursor: grab;
+}
+.frise-scroll:active { cursor: grabbing; }
+.frise-scroll::-webkit-scrollbar { display: none; }
+
+/* Inner track */
+.frise-track {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px 160px 0;
+  gap: 0;
+  min-width: max-content;
+  position: relative;
+}
+
+/* ─── Timeline axis ─── */
+.axis {
+  position: absolute;
+  bottom: 52px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #2a3a5a 10%, #2a3a5a 90%, transparent);
+  pointer-events: none;
+}
+.axis-center-glow {
+  position: absolute;
+  bottom: 46px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 14px;
+  background: radial-gradient(ellipse, rgba(255,215,0,0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+.axis-center-mark {
+  position: absolute;
+  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 18px;
+  background: #ffd700;
+  opacity: 0.6;
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* Fade edges */
+.fade-l, .fade-r {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  pointer-events: none;
+  z-index: 10;
+}
+.fade-l { left: 0; background: linear-gradient(to right, #021232, transparent); }
+.fade-r { right: 0; background: linear-gradient(to left, #021232, transparent); }
+
+/* ─── Film node ─── */
+.film-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 80px;
+  position: relative;
+  padding-bottom: 52px; /* space for axis */
+}
+
+/* Week separator */
+.week-sep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  position: relative;
+  padding-bottom: 52px;
+  justify-content: flex-end;
+}
+.week-tick {
+  width: 1px;
+  height: 24px;
+  background: #2a3a5a;
+  margin-bottom: 0;
+}
+.week-label {
+  position: absolute;
+  bottom: 56px;
+  font-size: 7px;
+  font-weight: 700;
+  color: #d0c6ab;
+  opacity: 0.45;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* The connector line */
+.node-line {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, #3a5a8a);
+  flex-shrink: 0;
+  transition: height 0.3s ease, opacity 0.3s ease;
+  height: 60px;
+  opacity: 0.4;
+}
+
+/* The dot on axis */
+.node-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3a5a8a;
+  border: 1.5px solid #5a7aaa;
+  margin-bottom: 0;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+/* The card */
+.node-card {
+  background: #263455;
+  border: 1px solid #3a5a8a;
+  border-radius: 10px;
+  padding: 8px 10px;
+  width: 76px;
+  overflow: hidden;
+  flex-shrink: 0;
+  transform-origin: bottom center;
+  position: absolute;
+  bottom: calc(52px + 8px + 60px); /* above dot */
+  opacity: 0;
+  transform: scaleY(0) translateY(10px);
+  pointer-events: none;
+}
+.node-genre {
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 6px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: inline-block;
+  letter-spacing: 0.04em;
+}
+.node-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff6df;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.node-dir {
+  font-size: 7px;
+  color: #d0c6ab;
+  opacity: 0.7;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.node-meta {
+  font-size: 7px;
+  color: #defcff;
+  opacity: 0.8;
+}
+
+/* Active node states */
+.film-node.active .node-dot {
+  background: #ffd700;
+  border-color: #ffd700;
+  box-shadow: 0 0 12px rgba(255,215,0,0.5);
+  transform: scale(1.5);
+}
+.film-node.active .node-line {
+  background: linear-gradient(to bottom, transparent, #ffd700);
+  opacity: 0.7;
+  height: 80px;
+}
+.film-node.active .node-card {
+  opacity: 1;
+  transform: scaleY(1) translateY(0);
+  pointer-events: auto;
+  border-color: rgba(255,215,0,0.3);
+}
+
+/* Near states */
+.film-node.near .node-dot {
+  background: #4a6a9a;
+  transform: scale(1.2);
+}
+.film-node.near .node-line {
+  opacity: 0.6;
+  height: 70px;
+}
+
+/* Bottom nav */
+.ph-nav {
+  background: #010c22;
+  height: 36px;
+  border-top: 1px solid #1a2a4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+.nav-dot { width: 22px; height: 3px; border-radius: 2px; background: #2a3a5a; }
+.nav-dot.on { background: #ffd700; }
+
+/* ─── Genre colors ─── */
+.g-action { background: #7f1d1d; color: #fca5a5; }
+.g-drame  { background: #1e3a5f; color: #93c5fd; }
+.g-come   { background: #713f12; color: #fde68a; }
+.g-anim   { background: #064e3b; color: #6ee7b7; }
+.g-sf     { background: #0c4a6e; color: #7dd3fc; }
+.g-hor    { background: #3b0764; color: #d8b4fe; }
+.g-mus    { background: #3f1d6e; color: #c4b5fd; }
+
+/* ─── Explanation panel ─── */
+.explanation {
+  background: #0a1a3a;
+  border: 1px solid #1a3a6a;
+  border-radius: 12px;
+  padding: 16px 20px;
+  max-width: 480px;
+  width: 100%;
+}
+.expl-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+.expl-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.expl-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.expl-text {
+  font-size: 10px;
+  color: #d0c6ab;
+  line-height: 1.6;
+}
+.gsap-tag {
+  display: inline-block;
+  background: #0f2;
+  color: #000;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 3px;
+}
+.note {
+  font-size: 10px;
+  color: #8899bb;
+  text-align: center;
+  max-width: 480px;
+  line-height: 1.6;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<h2>Frise chronologique interactive</h2>
+<p class="subtitle">Scroll horizontal — les films se déploient au centre. Fais glisser la frise ou clique sur un film pour l'activer.</p>
+
+<!-- Phone frame -->
+<div class="phone-frame">
+  <div class="ph-header">FILMS 26 · ALGÉRIE</div>
+  <div class="ph-tabs">
+    <span class="tab on">MAI</span>
+    <span class="tab">JUIN</span>
+    <span class="tab">JUIL</span>
+  </div>
+
+  <div class="frise-wrapper">
+    <div class="fade-l"></div>
+    <div class="fade-r"></div>
+    <div class="axis-center-glow"></div>
+    <div class="axis-center-mark"></div>
+
+    <div class="frise-scroll" id="friseScroll">
+      <div class="frise-track" id="friseTrack">
+
+        <!-- Week 19 -->
+        <div class="week-sep">
+          <div class="week-label">S19</div>
+          <div class="week-tick"></div>
+        </div>
+
+        <div class="film-node" data-id="0" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-action">ACTION</div>
+            <div class="node-title">The Accountant 2</div>
+            <div class="node-dir">Dir. O'Russell</div>
+            <div class="node-meta">1h55 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <div class="film-node" data-id="1" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-drame">DRAME</div>
+            <div class="node-title">Mufasa</div>
+            <div class="node-dir">Dir. B. Jenkins</div>
+            <div class="node-meta">1h58 · IMAX</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <!-- Week 20 -->
+        <div class="week-sep">
+          <div class="week-label">S20</div>
+          <div class="week-tick"></div>
+        </div>
+
+        <div class="film-node" data-id="2" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-anim">ANIMATION</div>
+            <div class="node-title">Kung Fu Panda 4</div>
+            <div class="node-dir">Dir. M. Dindal</div>
+            <div class="node-meta">1h34 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <!-- Week 21 -->
+        <div class="week-sep">
+          <div class="week-label">S21</div>
+          <div class="week-tick"></div>
+        </div>
+
+        <div class="film-node" data-id="3" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-sf">SF</div>
+            <div class="node-title">Sinners</div>
+            <div class="node-dir">Dir. R. Coogler</div>
+            <div class="node-meta">2h17 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <div class="film-node" data-id="4" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-mus">MUSICAL</div>
+            <div class="node-title">Wicked</div>
+            <div class="node-dir">Dir. J. Chu</div>
+            <div class="node-meta">2h40 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <!-- Week 22 — CURRENT -->
+        <div class="week-sep">
+          <div class="week-label" style="color:#ffd700;opacity:0.9">S22</div>
+          <div class="week-tick" style="background:#ffd700;opacity:0.5;height:30px"></div>
+        </div>
+
+        <div class="film-node active" data-id="5" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-come">COMÉDIE</div>
+            <div class="node-title">Disco Dancer</div>
+            <div class="node-dir">Dir. Mukerji</div>
+            <div class="node-meta">1h52 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <div class="film-node near" data-id="6" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-hor">HORREUR</div>
+            <div class="node-title">Alien: Romulus</div>
+            <div class="node-dir">Dir. F. Álvarez</div>
+            <div class="node-meta">1h59 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <!-- Week 23 -->
+        <div class="week-sep">
+          <div class="week-label">S23</div>
+          <div class="week-tick"></div>
+        </div>
+
+        <div class="film-node" data-id="7" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-action">ACTION</div>
+            <div class="node-title">Fast & Furious 11</div>
+            <div class="node-dir">Dir. L. Morales</div>
+            <div class="node-meta">2h10 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <!-- Week 25 -->
+        <div class="week-sep">
+          <div class="week-label">S25</div>
+          <div class="week-tick"></div>
+        </div>
+
+        <div class="film-node" data-id="8" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-drame">DRAME</div>
+            <div class="node-title">The Novice</div>
+            <div class="node-dir">Dir. L. Thompson</div>
+            <div class="node-meta">1h34 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <div class="film-node" data-id="9" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-sf">SF</div>
+            <div class="node-title">Avatar 3</div>
+            <div class="node-dir">Dir. J. Cameron</div>
+            <div class="node-meta">2h50 · IMAX</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+        <!-- Week 26 -->
+        <div class="week-sep">
+          <div class="week-label">S26</div>
+          <div class="week-tick"></div>
+        </div>
+
+        <div class="film-node" data-id="10" onclick="activateNode(this)">
+          <div class="node-card">
+            <div class="node-genre g-anim">ANIMATION</div>
+            <div class="node-title">Moana 2</div>
+            <div class="node-dir">Dir. D. Hall</div>
+            <div class="node-meta">1h40 · 2D</div>
+          </div>
+          <div class="node-line"></div>
+          <div class="node-dot"></div>
+        </div>
+
+      </div>
+      <div class="axis"></div>
+    </div>
+  </div>
+
+  <div class="ph-nav">
+    <div class="nav-dot on"></div>
+    <div class="nav-dot"></div>
+  </div>
+</div>
+
+<div class="explanation">
+  <div class="expl-title">COMMENT ÇA FONCTIONNE</div>
+  <div class="expl-row">
+    <div class="expl-icon">↔</div>
+    <div class="expl-text"><strong>Scroll horizontal</strong> — la frise se parcourt de gauche (passé) à droite (futur). Les semaines sans film n'ont qu'une encoche sur l'axe.</div>
+  </div>
+  <div class="expl-row">
+    <div class="expl-icon">◉</div>
+    <div class="expl-text"><strong>Déploiement au centre</strong> — le film qui arrive au centre se déploie : le point grossit, la ligne s'allonge, la carte s'ouvre vers le haut. <span class="gsap-tag">GSAP</span> <code>gsap.to(card, {scaleY:1, opacity:1})</code></div>
+  </div>
+  <div class="expl-row">
+    <div class="expl-icon">⟨⟩</div>
+    <div class="expl-text"><strong>Dégradé de présence</strong> — les films adjacents sont légèrement activés (point plus grand, ligne visible) pour donner la profondeur de la frise.</div>
+  </div>
+  <div class="expl-row">
+    <div class="expl-icon">📳</div>
+    <div class="expl-text"><strong>Haptique</strong> — <code>navigator.vibrate(10)</code> à chaque changement de film actif (Android).</div>
+  </div>
+</div>
+
+<p class="note">Fais glisser la frise ou clique sur un film pour voir le déploiement.<br>C'est interactif — pas juste un mockup statique.</p>
+
+<script>
+const scroll = document.getElementById('friseScroll');
+const nodes  = Array.from(document.querySelectorAll('.film-node'));
+let activeId = 5;
+
+// ── Activate by click ──
+function activateNode(el) {
+  const id = parseInt(el.dataset.id);
+  setActive(id);
+  // Scroll to center
+  const scrollRect = scroll.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+  const target = scroll.scrollLeft + elRect.left - scrollRect.left - scrollRect.width / 2 + elRect.width / 2;
+  gsap.to(scroll, { scrollLeft: target, duration: 0.45, ease: 'power2.inOut' });
+}
+
+function setActive(id) {
+  activeId = id;
+  nodes.forEach((n, i) => {
+    const dist = Math.abs(i - id);
+    const card = n.querySelector('.node-card');
+    const line = n.querySelector('.node-line');
+    const dot  = n.querySelector('.node-dot');
+
+    n.classList.remove('active', 'near');
+
+    if (dist === 0) {
+      n.classList.add('active');
+      gsap.to(card, { opacity: 1, scaleY: 1, y: 0, duration: 0.28, ease: 'back.out(1.4)', transformOrigin: 'bottom center' });
+      gsap.to(dot,  { scale: 1.6, duration: 0.2, ease: 'power2.out' });
+      gsap.to(line, { opacity: 0.8, duration: 0.2 });
+    } else if (dist === 1) {
+      n.classList.add('near');
+      gsap.to(card, { opacity: 0, scaleY: 0, y: 8, duration: 0.18, ease: 'power2.in', transformOrigin: 'bottom center' });
+      gsap.to(dot,  { scale: 1.2, duration: 0.2 });
+      gsap.to(line, { opacity: 0.5, duration: 0.2 });
+    } else {
+      gsap.to(card, { opacity: 0, scaleY: 0, y: 8, duration: 0.15, ease: 'power2.in', transformOrigin: 'bottom center' });
+      gsap.to(dot,  { scale: 1.0, duration: 0.2 });
+      gsap.to(line, { opacity: 0.3, duration: 0.2 });
+    }
+  });
+}
+
+// ── Scroll-driven activation ──
+let rafId = null;
+scroll.addEventListener('scroll', () => {
+  if (rafId) return;
+  rafId = requestAnimationFrame(() => {
+    rafId = null;
+    const cx = scroll.scrollLeft + scroll.clientWidth / 2;
+    let closest = 0, minDist = Infinity;
+    nodes.forEach((n, i) => {
+      const nx = n.offsetLeft + n.offsetWidth / 2;
+      const d = Math.abs(nx - cx);
+      if (d < minDist) { minDist = d; closest = i; }
+    });
+    if (closest !== activeId) {
+      setActive(closest);
+      if (navigator.vibrate) navigator.vibrate(10);
+    }
+  });
+});
+
+// ── Drag to scroll ──
+let isDragging = false, startX = 0, startScroll = 0;
+scroll.addEventListener('mousedown', e => {
+  isDragging = true; startX = e.pageX; startScroll = scroll.scrollLeft;
+  scroll.style.cursor = 'grabbing';
+});
+window.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  scroll.scrollLeft = startScroll - (e.pageX - startX);
+});
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+  scroll.style.cursor = 'grab';
+  // Snap to nearest
+  const cx = scroll.scrollLeft + scroll.clientWidth / 2;
+  let closest = nodes[0], minDist = Infinity;
+  nodes.forEach(n => {
+    const d = Math.abs(n.offsetLeft + n.offsetWidth / 2 - cx);
+    if (d < minDist) { minDist = d; closest = n; }
+  });
+  activateNode(closest);
+});
+
+// Init
+gsap.set(document.querySelectorAll('.node-card'), { scaleY: 0, opacity: 0, y: 8, transformOrigin: 'bottom center' });
+setTimeout(() => setActive(5), 100);
+
+// Initial scroll to active
+setTimeout(() => {
+  const activeNode = nodes[5];
+  const target = activeNode.offsetLeft + activeNode.offsetWidth / 2 - scroll.clientWidth / 2;
+  scroll.scrollLeft = target;
+}, 50);
+</script>
+</body>
+</html>

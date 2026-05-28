@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline verticale — Films26</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #010c1e; --surface: #021232; --low: #0a1a3a;
+  --card: #263455; --gold: #ffd700; --text: #fff6df;
+  --muted: #d0c6ab; --cyan: #defcff; --border: #2a3a5a;
+  --line: #1e3260;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+  gap: 20px;
+}
+h2 { font-size: 17px; font-weight: 800; text-align: center; }
+.subtitle { font-size: 11px; color: #8899bb; text-align: center; max-width: 420px; line-height: 1.6; }
+
+/* ─── Phone ─── */
+.phone-frame {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 32px;
+  width: 300px;
+  height: 580px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.7);
+  position: relative;
+}
+.ph-hdr {
+  background: #010c22;
+  padding: 10px 16px 8px;
+  font-size: 8px; font-weight: 800; color: var(--gold);
+  letter-spacing: .15em; text-align: center;
+  border-bottom: 1px solid #1a2a4a; flex-shrink: 0;
+}
+.ph-tabs {
+  background: var(--low); padding: 5px 12px;
+  display: flex; gap: 6px;
+  border-bottom: 1px solid #1a2a4a; flex-shrink: 0;
+}
+.tab { background: transparent; color: var(--muted); border-radius: 5px; padding: 4px 10px; font-size: 7px; font-weight: 700; letter-spacing: .08em; }
+.tab.on { background: var(--gold); color: var(--surface); }
+
+/* ─── Scroll area ─── */
+.timeline-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  position: relative;
+}
+.timeline-scroll::-webkit-scrollbar { display: none; }
+
+/* ─── Inner container ─── */
+.timeline-inner {
+  position: relative;
+  padding: 20px 0 40px;
+  min-height: 100%;
+}
+
+/* ─── Center vertical line ─── */
+.center-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, transparent 0%, var(--line) 5%, var(--line) 95%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ─── Fade top/bottom ─── */
+.fade-top {
+  position: sticky; top: 0; left: 0; right: 0; height: 32px; z-index: 20;
+  background: linear-gradient(to bottom, var(--surface), transparent);
+  pointer-events: none; margin-bottom: -32px;
+}
+.fade-bottom {
+  position: sticky; bottom: 0; left: 0; right: 0; height: 32px; z-index: 20;
+  background: linear-gradient(to top, var(--surface), transparent);
+  pointer-events: none; margin-top: -32px;
+}
+
+/* ─── Month header ─── */
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 16px 0 8px;
+  z-index: 2;
+}
+.month-label {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 8px; font-weight: 800;
+  color: var(--gold); letter-spacing: .12em;
+  z-index: 2;
+}
+
+/* ─── Week node on the line ─── */
+.week-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 10px 0 4px;
+  z-index: 2;
+}
+.week-circle {
+  background: var(--low);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 6px; font-weight: 800;
+  color: var(--muted); letter-spacing: .08em;
+  z-index: 2;
+  position: relative;
+}
+.week-node.current .week-circle {
+  background: rgba(255,215,0,.12);
+  border-color: rgba(255,215,0,.5);
+  color: var(--gold);
+  box-shadow: 0 0 12px rgba(255,215,0,.15);
+}
+.week-count {
+  font-size: 5px;
+  color: var(--muted);
+  opacity: .5;
+  margin-left: 4px;
+  font-weight: 400;
+}
+
+/* ─── Film row ─── */
+.film-row {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  align-items: center;
+  padding: 6px 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* connector dot on the line */
+.row-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: #2a4060;
+  justify-self: center;
+  flex-shrink: 0;
+  transition: all .2s;
+  position: relative; z-index: 3;
+}
+.film-row.in-view .row-dot {
+  background: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(255,215,0,.5);
+  transform: scale(1.3);
+}
+
+/* film card */
+.film-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  transition: border-color .2s;
+}
+.film-row.in-view .film-card {
+  border-color: rgba(255,215,0,.2);
+}
+
+/* left card */
+.film-card.left {
+  grid-column: 1;
+  text-align: right;
+}
+.film-card.right {
+  grid-column: 3;
+  text-align: left;
+}
+/* connector line from card to dot */
+.film-card.left::after {
+  content: '';
+  position: absolute;
+  right: calc(50% + 4px);
+  top: 50%;
+  height: 1px;
+  width: calc(50% - 116px);
+  background: linear-gradient(to left, var(--border), transparent);
+  opacity: .5;
+}
+.film-card.right::after {
+  content: '';
+  position: absolute;
+  left: calc(50% + 4px);
+  top: 50%;
+  height: 1px;
+  width: calc(50% - 116px);
+  background: linear-gradient(to right, var(--border), transparent);
+  opacity: .5;
+}
+
+.film-row.in-view .film-card.left::after,
+.film-row.in-view .film-card.right::after {
+  background: linear-gradient(to left, rgba(255,215,0,.3), transparent);
+  opacity: 1;
+}
+
+.card-genre {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 5.5px; font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: .04em;
+}
+.card-title {
+  font-size: 8.5px; font-weight: 800;
+  color: var(--text); line-height: 1.2;
+  margin-bottom: 2px;
+}
+.card-dir {
+  font-size: 6.5px; color: var(--muted); opacity: .7;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-meta {
+  font-size: 6.5px; color: var(--cyan); margin-top: 3px;
+  display: flex; align-items: center; gap: 4px;
+}
+.film-card.right .card-meta { justify-content: flex-start; }
+.film-card.left .card-meta { justify-content: flex-end; }
+
+/* pair row (2 films même semaine) */
+.film-pair {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  align-items: center;
+  padding: 5px 0;
+  position: relative; z-index: 2;
+}
+.film-pair .row-dot {
+  width: 7px; height: 7px;
+}
+.film-pair.in-view .row-dot {
+  background: var(--gold); border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(255,215,0,.5); transform: scale(1.3);
+}
+.film-pair .film-card { padding: 6px 8px; }
+.film-pair.in-view .film-card { border-color: rgba(255,215,0,.2); }
+
+/* genre colors */
+.g-action { background: #7f1d1d; color: #fca5a5; }
+.g-drame  { background: #1e3a5f; color: #93c5fd; }
+.g-come   { background: #713f12; color: #fde68a; }
+.g-anim   { background: #064e3b; color: #6ee7b7; }
+.g-sf     { background: #0c4a6e; color: #7dd3fc; }
+.g-hor    { background: #3b0764; color: #d8b4fe; }
+.g-mus    { background: #3f1d6e; color: #c4b5fd; }
+.g-thrill { background: #431407; color: #fdba74; }
+
+/* nav */
+.ph-nav {
+  background: #010c22; height: 32px;
+  border-top: 1px solid #1a2a4a;
+  display: flex; align-items: center; justify-content: center; gap: 16px; flex-shrink: 0;
+}
+.ndot { width: 20px; height: 3px; border-radius: 2px; background: var(--border); }
+.ndot.on { background: var(--gold); }
+
+/* empty week slot */
+.empty-week { height: 8px; }
+</style>
+</head>
+<body>
+
+<h2>Timeline verticale — axe central</h2>
+<p class="subtitle">Scroll naturel · ligne centrale · films en alternance gauche/droite · GSAP ScrollTrigger. Scroll dans le téléphone.</p>
+
+<div class="phone-frame">
+  <div class="ph-hdr">FILMS 26 · ALGÉRIE</div>
+  <div class="ph-tabs">
+    <span class="tab on">MAI</span><span class="tab">JUIN</span><span class="tab">JUIL</span>
+  </div>
+
+  <div class="timeline-scroll" id="tlScroll">
+    <div class="fade-top"></div>
+
+    <div class="timeline-inner" id="tlInner">
+      <div class="center-line"></div>
+
+      <!-- ── MAI ── -->
+      <div class="month-header">
+        <div class="month-label">MAI 2026</div>
+      </div>
+
+      <!-- S19 · 2 films → paire gauche/droite simultanée -->
+      <div class="week-node">
+        <div class="week-circle">S19 <span class="week-count">· 2 films</span></div>
+      </div>
+
+      <div class="film-pair" data-anim="pair">
+        <div class="film-card left">
+          <div class="card-genre g-action">ACTION</div>
+          <div class="card-title">The Accountant 2</div>
+          <div class="card-dir">Dir. O'Russell</div>
+          <div class="card-meta">1h55 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div class="film-card right">
+          <div class="card-genre g-drame">DRAME</div>
+          <div class="card-title">Mufasa</div>
+          <div class="card-dir">Dir. Jenkins</div>
+          <div class="card-meta">1h58 · IMAX</div>
+        </div>
+      </div>
+
+      <!-- S20 · 1 film → gauche -->
+      <div class="week-node">
+        <div class="week-circle">S20 <span class="week-count">· 1 film</span></div>
+      </div>
+
+      <div class="film-row" data-anim="left">
+        <div class="film-card left">
+          <div class="card-genre g-anim">ANIMATION</div>
+          <div class="card-title">Kung Fu Panda 4</div>
+          <div class="card-dir">Dir. Dindal</div>
+          <div class="card-meta">1h34 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div></div>
+      </div>
+
+      <!-- S21 · 3 films → 1 paire + 1 seul -->
+      <div class="week-node">
+        <div class="week-circle">S21 <span class="week-count">· 3 films</span></div>
+      </div>
+
+      <div class="film-pair" data-anim="pair">
+        <div class="film-card left">
+          <div class="card-genre g-sf">SF</div>
+          <div class="card-title">Sinners</div>
+          <div class="card-dir">Dir. Coogler</div>
+          <div class="card-meta">2h17 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div class="film-card right">
+          <div class="card-genre g-mus">MUSICAL</div>
+          <div class="card-title">Wicked</div>
+          <div class="card-dir">Dir. Chu</div>
+          <div class="card-meta">2h40 · 2D</div>
+        </div>
+      </div>
+      <div class="film-row" data-anim="right">
+        <div></div>
+        <div class="row-dot"></div>
+        <div class="film-card right">
+          <div class="card-genre g-thrill">THRILLER</div>
+          <div class="card-title">Nemesis</div>
+          <div class="card-dir">Dir. Zeller</div>
+          <div class="card-meta">1h48 · 2D</div>
+        </div>
+      </div>
+
+      <!-- S22 CURRENT · 2 films -->
+      <div class="week-node current">
+        <div class="week-circle">S22 · SEMAINE EN COURS <span class="week-count">· 2 films</span></div>
+      </div>
+
+      <div class="film-pair" data-anim="pair">
+        <div class="film-card left">
+          <div class="card-genre g-come">COMÉDIE</div>
+          <div class="card-title">Disco Dancer</div>
+          <div class="card-dir">Dir. Mukerji</div>
+          <div class="card-meta">1h52 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div class="film-card right">
+          <div class="card-genre g-hor">HORREUR</div>
+          <div class="card-title">Alien: Romulus</div>
+          <div class="card-dir">Dir. Álvarez</div>
+          <div class="card-meta">1h59 · 2D</div>
+        </div>
+      </div>
+
+      <!-- S23 · 1 film -->
+      <div class="week-node">
+        <div class="week-circle">S23 <span class="week-count">· 1 film</span></div>
+      </div>
+
+      <div class="film-row" data-anim="left">
+        <div class="film-card left">
+          <div class="card-genre g-action">ACTION</div>
+          <div class="card-title">Fast & Furious 11</div>
+          <div class="card-dir">Dir. Morales</div>
+          <div class="card-meta">2h10 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div></div>
+      </div>
+
+      <!-- S24 vide -->
+      <div class="week-node">
+        <div class="week-circle" style="opacity:.3">S24 <span class="week-count">· aucune sortie</span></div>
+      </div>
+      <div class="empty-week"></div>
+
+      <!-- ── JUIN ── -->
+      <div class="month-header" style="padding-top:24px">
+        <div class="month-label">JUIN 2026</div>
+      </div>
+
+      <!-- S25 · 2 films -->
+      <div class="week-node">
+        <div class="week-circle">S25 <span class="week-count">· 2 films</span></div>
+      </div>
+
+      <div class="film-pair" data-anim="pair">
+        <div class="film-card left">
+          <div class="card-genre g-drame">DRAME</div>
+          <div class="card-title">The Novice</div>
+          <div class="card-dir">Dir. Thompson</div>
+          <div class="card-meta">1h34 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div class="film-card right">
+          <div class="card-genre g-sf">SF</div>
+          <div class="card-title">Avatar 3</div>
+          <div class="card-dir">Dir. Cameron</div>
+          <div class="card-meta">2h50 · IMAX</div>
+        </div>
+      </div>
+
+      <!-- S26 · 3 films -->
+      <div class="week-node">
+        <div class="week-circle">S26 <span class="week-count">· 3 films</span></div>
+      </div>
+
+      <div class="film-pair" data-anim="pair">
+        <div class="film-card left">
+          <div class="card-genre g-action">ACTION</div>
+          <div class="card-title">Mission Imp. 8</div>
+          <div class="card-dir">Dir. McQuarrie</div>
+          <div class="card-meta">2h43 · IMAX</div>
+        </div>
+        <div class="row-dot"></div>
+        <div class="film-card right">
+          <div class="card-genre g-come">COMÉDIE</div>
+          <div class="card-title">Le Grand Départ</div>
+          <div class="card-dir">Dir. Nakache</div>
+          <div class="card-meta">1h45 · 2D</div>
+        </div>
+      </div>
+      <div class="film-row" data-anim="left">
+        <div class="film-card left">
+          <div class="card-genre g-anim">ANIMATION</div>
+          <div class="card-title">Moana 2</div>
+          <div class="card-dir">Dir. Hall</div>
+          <div class="card-meta">1h40 · 2D</div>
+        </div>
+        <div class="row-dot"></div>
+        <div></div>
+      </div>
+
+    </div><!-- /timeline-inner -->
+
+    <div class="fade-bottom"></div>
+  </div><!-- /timeline-scroll -->
+
+  <div class="ph-nav"><div class="ndot on"></div><div class="ndot"></div></div>
+</div>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+const scroller = document.getElementById('tlScroll');
+
+// ── Animate film rows as they enter view ──
+document.querySelectorAll('.film-row[data-anim], .film-pair[data-anim]').forEach(row => {
+  const anim  = row.dataset.anim;
+  const cards = row.querySelectorAll('.film-card');
+  const dot   = row.querySelector('.row-dot');
+
+  // Set initial state
+  cards.forEach(card => {
+    const isLeft = card.classList.contains('left');
+    gsap.set(card, { opacity: 0, x: isLeft ? -28 : 28 });
+  });
+  gsap.set(dot, { scale: 0, opacity: 0 });
+
+  ScrollTrigger.create({
+    trigger: row,
+    scroller: scroller,
+    start: 'top 78%',
+    end:   'top 30%',
+    onEnter: () => {
+      row.classList.add('in-view');
+      // dot pops first
+      gsap.to(dot, { scale: 1.3, opacity: 1, duration: 0.22, ease: 'back.out(2)' });
+      // cards fly in from sides with slight stagger
+      cards.forEach((card, i) => {
+        const isLeft = card.classList.contains('left');
+        gsap.to(card, {
+          opacity: 1, x: 0,
+          duration: 0.32,
+          delay: 0.06 + i * 0.05,
+          ease: 'power3.out'
+        });
+      });
+    },
+    onLeaveBack: () => {
+      row.classList.remove('in-view');
+      cards.forEach(card => {
+        const isLeft = card.classList.contains('left');
+        gsap.to(card, { opacity: 0, x: isLeft ? -28 : 28, duration: 0.18, ease: 'power2.in' });
+      });
+      gsap.to(dot, { scale: 0, opacity: 0, duration: 0.15 });
+    }
+  });
+});
+
+// ── Week nodes fade in ──
+document.querySelectorAll('.week-node').forEach(node => {
+  gsap.set(node, { opacity: 0, y: 8 });
+  ScrollTrigger.create({
+    trigger: node,
+    scroller: scroller,
+    start: 'top 85%',
+    onEnter: () => gsap.to(node, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }),
+    onLeaveBack: () => gsap.to(node, { opacity: 0, y: 8, duration: 0.15 }),
+  });
+});
+
+// ── Center line progressive draw ──
+const centerLine = document.querySelector('.center-line');
+gsap.set(centerLine, { scaleY: 0, transformOrigin: 'top center' });
+ScrollTrigger.create({
+  trigger: document.getElementById('tlInner'),
+  scroller: scroller,
+  start: 'top top',
+  end:   'bottom bottom',
+  onUpdate: self => {
+    gsap.set(centerLine, { scaleY: Math.min(1, self.progress * 1.1) });
+  }
+});
+</script>
+</body>
+</html>

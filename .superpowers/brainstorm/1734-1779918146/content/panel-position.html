@@ -1,0 +1,201 @@
+<h2>Challenge #1 — Position du panneau info</h2>
+<p class="subtitle">Le plan prévoit un panneau fixe de 120px en haut, sous le header. Trois approches alternatives — laquelle est la plus ergonomique sur mobile ?</p>
+
+<style>
+.phone-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 24px 0; }
+.phone { background: #0a1224; border: 2px solid #2a3a5a; border-radius: 20px; overflow: hidden; aspect-ratio: 9/17; display: flex; flex-direction: column; position: relative; }
+.phone-header { background: #021232; padding: 8px 10px; border-bottom: 1px solid #1a2a4a; font-size: 9px; color: #d0c6ab; font-family: sans-serif; text-align: center; letter-spacing: 0.05em; flex-shrink: 0; }
+.phone-tabs { background: #0a1a3a; padding: 4px 8px; border-bottom: 1px solid #1a2a4a; display: flex; gap: 6px; flex-shrink: 0; }
+.tab-pill { background: #ffd700; color: #021232; border-radius: 4px; padding: 2px 6px; font-size: 7px; font-family: sans-serif; font-weight: bold; }
+.tab-pill.inactive { background: transparent; color: #d0c6ab; }
+.phone-content { flex: 1; position: relative; overflow: hidden; }
+.panel-top { background: #263455; border-bottom: 1px solid #1a2a4a; padding: 8px 10px; }
+.panel-bottom { background: #263455; border-top: 1px solid #1a2a4a; padding: 8px 10px; position: absolute; bottom: 36px; left: 0; right: 0; }
+.panel-floating { background: #263455; border: 1px solid #3a5a8a; border-radius: 8px; padding: 6px 8px; position: absolute; top: 10px; left: 8px; right: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
+.panel-title { font-size: 8px; font-weight: bold; color: #fff6df; font-family: sans-serif; margin-bottom: 2px; }
+.panel-sub { font-size: 6px; color: #d0c6ab; font-family: sans-serif; }
+.frise-area { display: flex; align-items: center; gap: 6px; padding: 0 8px; overflow: hidden; }
+.frise-area.mid { position: absolute; top: 50%; left: 0; right: 0; transform: translateY(-50%); }
+.frise-area.low { position: absolute; bottom: 40px; left: 0; right: 0; }
+.film-node { background: #263455; border-radius: 4px; padding: 4px 3px; min-width: 32px; text-align: center; flex-shrink: 0; }
+.film-node.active { background: #3a5a8a; transform: scale(1.4); }
+.film-node-genre { background: #7f1d1d; color: #fca5a5; border-radius: 2px; padding: 1px 2px; font-size: 4px; font-family: sans-serif; margin-bottom: 2px; }
+.film-node-title { font-size: 4px; color: #fff6df; font-family: sans-serif; line-height: 1.2; }
+.week-sep { color: #d0c6ab; font-size: 6px; font-family: sans-serif; writing-mode: vertical-lr; text-orientation: mixed; opacity: 0.5; padding: 0 2px; flex-shrink: 0; }
+.bottom-nav { background: #021232; height: 36px; border-top: 1px solid #1a2a4a; display: flex; align-items: center; justify-content: center; gap: 20px; flex-shrink: 0; }
+.nav-icon { width: 20px; height: 4px; background: #2a3a5a; border-radius: 2px; }
+.nav-icon.active { background: #ffd700; }
+.arrow-hint { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); color: #d0c6ab; font-size: 10px; opacity: 0.4; }
+.frise-fade-r { position: absolute; right: 0; top: 0; bottom: 0; width: 20px; background: linear-gradient(to right, transparent, #0a1224); pointer-events: none; }
+.label-tag { position: absolute; top: 4px; left: 6px; background: rgba(255,215,0,0.15); color: #ffd700; font-size: 5px; font-family: sans-serif; padding: 1px 4px; border-radius: 3px; }
+.cons-note { font-size: 9px; color: #ef4444; font-family: sans-serif; margin-top: 4px; }
+.pros-note { font-size: 9px; color: #22c55e; font-family: sans-serif; margin-top: 2px; }
+.phone-label { text-align: center; font-size: 11px; font-family: sans-serif; color: #d0c6ab; margin-top: 8px; font-weight: bold; }
+.phone-desc { text-align: center; font-size: 9px; font-family: sans-serif; color: #8899bb; margin-top: 3px; line-height: 1.4; }
+.gsap-badge { display: inline-block; background: #0f2; color: #000; font-size: 7px; font-family: sans-serif; padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 4px; }
+</style>
+
+<div class="phone-grid">
+
+  <!-- Option A: Top panel (plan actuel) -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <div class="phone">
+        <div class="phone-header">FILMS 26 · Algérie</div>
+        <div class="phone-tabs">
+          <span class="tab-pill">MAI</span>
+          <span class="tab-pill inactive">JUIN</span>
+          <span class="tab-pill inactive">JUIL</span>
+        </div>
+        <!-- Panel info en haut -->
+        <div class="panel-top">
+          <div class="panel-title">The Accountant 2</div>
+          <div class="panel-sub">Dir. O. Russell · 1h55 · 2D</div>
+          <div class="panel-sub" style="color:#d0c6ab;opacity:0.6">B. Affleck, J. Bernthal</div>
+        </div>
+        <!-- Frise au milieu -->
+        <div class="phone-content">
+          <div class="frise-area mid">
+            <span class="week-sep">S22</span>
+            <div class="film-node">
+              <div class="film-node-genre">ACT</div>
+              <div class="film-node-title">Acctnt</div>
+            </div>
+            <div class="film-node active">
+              <div class="film-node-genre" style="background:#713f12;color:#fde68a">DRM</div>
+              <div class="film-node-title">Mufasa</div>
+            </div>
+            <div class="film-node">
+              <div class="film-node-genre" style="background:#3b0764;color:#d8b4fe">MUS</div>
+              <div class="film-node-title">Wicked</div>
+            </div>
+            <span class="week-sep">S23</span>
+            <div class="film-node">
+              <div class="film-node-genre" style="background:#064e3b;color:#6ee7b7">ANI</div>
+              <div class="film-node-title">Panda</div>
+            </div>
+            <div class="frise-fade-r"></div>
+          </div>
+          <div class="label-tag">PLAN ACTUEL</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-icon active"></div>
+          <div class="nav-icon"></div>
+        </div>
+      </div>
+      <p class="phone-label">A — Panel en haut</p>
+      <p class="phone-desc">Plan actuel · 120px sous MonthTabs<br>Regard qui monte, pouce qui scroll en bas</p>
+      <p class="cons-note">✗ Dissociation main/regard</p>
+      <p class="pros-note">✓ Texte jamais caché par le pouce</p>
+    </div>
+  </div>
+
+  <!-- Option B: Bottom panel -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <div class="phone">
+        <div class="phone-header">FILMS 26 · Algérie</div>
+        <div class="phone-tabs">
+          <span class="tab-pill">MAI</span>
+          <span class="tab-pill inactive">JUIN</span>
+          <span class="tab-pill inactive">JUIL</span>
+        </div>
+        <div class="phone-content">
+          <!-- Frise centrée -->
+          <div class="frise-area mid">
+            <span class="week-sep">S22</span>
+            <div class="film-node">
+              <div class="film-node-genre">ACT</div>
+              <div class="film-node-title">Acctnt</div>
+            </div>
+            <div class="film-node active">
+              <div class="film-node-genre" style="background:#713f12;color:#fde68a">DRM</div>
+              <div class="film-node-title">Mufasa</div>
+            </div>
+            <div class="film-node">
+              <div class="film-node-genre" style="background:#3b0764;color:#d8b4fe">MUS</div>
+              <div class="film-node-title">Wicked</div>
+            </div>
+            <div class="frise-fade-r"></div>
+          </div>
+          <!-- Panel bas, juste au-dessus du nav -->
+          <div class="panel-bottom">
+            <div class="panel-title">Mufasa <span class="gsap-badge">GSAP</span></div>
+            <div class="panel-sub">Dir. B. Jenkins · 1h58 · 2D</div>
+            <div class="panel-sub" style="color:#d0c6ab;opacity:0.6">A. Serkis, K. Boyega</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-icon active"></div>
+          <div class="nav-icon"></div>
+        </div>
+      </div>
+      <p class="phone-label">B — Panel en bas</p>
+      <p class="phone-desc">Juste au-dessus du bottom nav<br>Regard & pouce dans la même zone</p>
+      <p class="pros-note">✓ Zone naturelle pour le pouce</p>
+      <p class="cons-note">✗ Frise comprimée entre tabs et panel</p>
+    </div>
+  </div>
+
+  <!-- Option C: Floating above node -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <div class="phone">
+        <div class="phone-header">FILMS 26 · Algérie</div>
+        <div class="phone-tabs">
+          <span class="tab-pill">MAI</span>
+          <span class="tab-pill inactive">JUIN</span>
+          <span class="tab-pill inactive">JUIL</span>
+        </div>
+        <div class="phone-content">
+          <!-- Frise basse -->
+          <div class="frise-area low">
+            <span class="week-sep">S22</span>
+            <div class="film-node">
+              <div class="film-node-genre">ACT</div>
+              <div class="film-node-title">Acctnt</div>
+            </div>
+            <div class="film-node active" style="position:relative;">
+              <div class="film-node-genre" style="background:#713f12;color:#fde68a">DRM</div>
+              <div class="film-node-title">Mufasa</div>
+            </div>
+            <div class="film-node">
+              <div class="film-node-genre" style="background:#3b0764;color:#d8b4fe">MUS</div>
+              <div class="film-node-title">Wicked</div>
+            </div>
+            <div class="frise-fade-r"></div>
+          </div>
+          <!-- Floating card contextualisée -->
+          <div class="panel-floating">
+            <div class="panel-title">Mufasa — Le Roi Lion <span class="gsap-badge">GSAP</span></div>
+            <div class="panel-sub">Dir. Barry Jenkins · 1h58 · 2D · IMAX</div>
+            <div class="panel-sub" style="color:#d0c6ab;opacity:0.6">A. Serkis, K. Boyega, T. Mbatha</div>
+            <div style="display:flex;gap:6px;margin-top:4px;align-items:center;">
+              <div style="background:#263455;border-radius:2px;padding:1px 4px;font-size:5px;color:#6ee7b7;font-family:sans-serif">ANIMATION</div>
+              <div style="font-size:5px;color:#d0c6ab;font-family:sans-serif;opacity:0.7">IMAX disponible</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-icon active"></div>
+          <div class="nav-icon"></div>
+        </div>
+      </div>
+      <p class="phone-label">C — Card flottante</p>
+      <p class="phone-desc">Au-dessus du contenu, animée<br>via gsap.fromTo() au changement</p>
+      <p class="pros-note">✓ Plus d'espace pour la frise</p>
+      <p class="cons-note">✗ Peut cacher du contenu</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="background:#0a1a3a;border-radius:8px;padding:16px;margin-top:8px;">
+  <h3 style="margin:0 0 8px">Ce que GSAP change dans les 3 cas</h3>
+  <p style="font-size:11px;color:#d0c6ab;margin:0">
+    Avec <strong style="color:#0f2">GSAP</strong>, l'animation du panneau passe de <code>@keyframes CSS statiques</code> à <code>gsap.fromTo(panelRef, {opacity:0, y:8}, {opacity:1, y:0, duration:0.18, ease:'power2.out'})</code> — déclenchable à la demande, interruptible, et animable dans les deux sens (appear/disappear). La différence est visible sur les transitions rapides entre films.
+  </p>
+</div>

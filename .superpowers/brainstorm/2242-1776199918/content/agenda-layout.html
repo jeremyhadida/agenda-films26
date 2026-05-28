@@ -1,0 +1,129 @@
+<h2>Layout de la page Agenda <code>/[pays]</code></h2>
+<p class="subtitle">Comment organiser la navigation par semaine et les cartes films ?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#021232;padding:12px;font-family:sans-serif;font-size:11px;color:#FFF6DF;border-radius:6px;">
+        <div style="background:#1a2f5e;padding:6px 10px;border-radius:4px;margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+          <span style="color:#FFD700;font-weight:700;">🎬 FILMS 26</span>
+          <span style="margin-left:auto;color:#D0C6AB;">🇨🇮 Côte d'Ivoire ▾</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div style="width:90px;background:#0d1e40;border-radius:4px;padding:8px;flex-shrink:0;">
+            <div style="color:#FFD700;font-size:10px;font-weight:700;margin-bottom:6px;">SEMAINES</div>
+            <div style="background:#FFD700;color:#021232;padding:3px 6px;border-radius:3px;margin-bottom:3px;font-weight:700;">Sem 16</div>
+            <div style="padding:3px 6px;color:#D0C6AB;margin-bottom:3px;">Sem 17</div>
+            <div style="padding:3px 6px;color:#D0C6AB;margin-bottom:3px;">Sem 18</div>
+            <div style="padding:3px 6px;color:#D0C6AB;">Sem 19</div>
+          </div>
+          <div style="flex:1;">
+            <div style="color:#FFD700;font-size:10px;font-weight:700;margin-bottom:6px;border-bottom:1px solid #1a2f5e;padding-bottom:4px;">SEMAINE 16 — 14 avr 2026</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <div style="background:#0d1e40;border-radius:4px;overflow:hidden;">
+                <div style="background:#1a2f5e;height:45px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬 POSTER</div>
+                <div style="padding:5px;font-size:9px;font-weight:700;">Titre du Film</div>
+                <div style="padding:0 5px 5px;font-size:8px;color:#D0C6AB;">14 avr · 2h10 · Drame</div>
+              </div>
+              <div style="background:#0d1e40;border-radius:4px;overflow:hidden;">
+                <div style="background:#1a2f5e;height:45px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬 POSTER</div>
+                <div style="padding:5px;font-size:9px;font-weight:700;">Autre Film</div>
+                <div style="padding:0 5px 5px;font-size:8px;color:#D0C6AB;">14 avr · 1h48 · Action</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Sidebar semaines + grille</h3>
+      <p>Navigation latérale sticky avec la liste des semaines. Contenu principal en grille 2-3 colonnes. Classique et très lisible sur desktop.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#021232;padding:12px;font-family:sans-serif;font-size:11px;color:#FFF6DF;border-radius:6px;">
+        <div style="background:#1a2f5e;padding:6px 10px;border-radius:4px;margin-bottom:6px;display:flex;gap:8px;align-items:center;">
+          <span style="color:#FFD700;font-weight:700;">🎬 FILMS 26</span>
+          <span style="margin-left:auto;color:#D0C6AB;">🇨🇮 Côte d'Ivoire ▾</span>
+        </div>
+        <div style="background:#0d1e40;padding:5px 8px;border-radius:4px;margin-bottom:8px;display:flex;gap:4px;overflow:hidden;">
+          <div style="background:#FFD700;color:#021232;padding:3px 7px;border-radius:3px;font-weight:700;font-size:10px;white-space:nowrap;">Sem 16</div>
+          <div style="padding:3px 7px;color:#D0C6AB;font-size:10px;white-space:nowrap;">Sem 17</div>
+          <div style="padding:3px 7px;color:#D0C6AB;font-size:10px;white-space:nowrap;">Sem 18</div>
+          <div style="padding:3px 7px;color:#D0C6AB;font-size:10px;white-space:nowrap;">Sem 19 →</div>
+        </div>
+        <div style="color:#FFD700;font-size:10px;font-weight:700;margin-bottom:6px;">SEMAINE 16 — 14 avr 2026</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;flex:1;">
+            <div style="background:#1a2f5e;height:50px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬</div>
+            <div style="padding:5px;font-size:9px;font-weight:700;">Film A</div>
+          </div>
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;flex:1;">
+            <div style="background:#1a2f5e;height:50px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬</div>
+            <div style="padding:5px;font-size:9px;font-weight:700;">Film B</div>
+          </div>
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;flex:1;">
+            <div style="background:#1a2f5e;height:50px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬</div>
+            <div style="padding:5px;font-size:9px;font-weight:700;">Film C</div>
+          </div>
+        </div>
+        <div style="color:#FFD700;font-size:10px;font-weight:700;margin-bottom:4px;">SEMAINE 17 — 21 avr 2026</div>
+        <div style="display:flex;gap:6px;">
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;flex:1;">
+            <div style="background:#1a2f5e;height:40px;"></div>
+            <div style="padding:5px;font-size:9px;">Film D</div>
+          </div>
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;flex:1;">
+            <div style="background:#1a2f5e;height:40px;"></div>
+            <div style="padding:5px;font-size:9px;">Film E</div>
+          </div>
+          <div style="flex:1;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Tabs horizontaux + scroll continu</h3>
+      <p>Barre de navigation sticky en haut avec onglets semaines. On scrolle à travers toutes les semaines en une seule page continue. Idéal mobile.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#021232;padding:12px;font-family:sans-serif;font-size:11px;color:#FFF6DF;border-radius:6px;">
+        <div style="background:#1a2f5e;padding:6px 10px;border-radius:4px;margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+          <span style="color:#FFD700;font-weight:700;">🎬 FILMS 26</span>
+          <span style="margin-left:auto;color:#D0C6AB;">🇨🇮 Côte d'Ivoire ▾</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="color:#D0C6AB;font-size:9px;margin-bottom:4px;">◀ Semaine 15</div>
+          <div style="background:#FFD700;color:#021232;padding:4px 8px;border-radius:4px;font-weight:700;text-align:center;">SEMAINE 16 — 14 avr 2026</div>
+          <div style="color:#D0C6AB;font-size:9px;margin-top:4px;text-align:right;">Semaine 17 ▶</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;">
+            <div style="background:#1a2f5e;height:50px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬 POSTER</div>
+            <div style="padding:5px;">
+              <div style="font-size:9px;font-weight:700;">Titre du Film</div>
+              <div style="font-size:8px;color:#D0C6AB;">14 avr · Action</div>
+            </div>
+          </div>
+          <div style="background:#0d1e40;border-radius:4px;overflow:hidden;">
+            <div style="background:#1a2f5e;height:50px;display:flex;align-items:center;justify-content:center;color:#D0C6AB;font-size:9px;">🎬 POSTER</div>
+            <div style="padding:5px;">
+              <div style="font-size:9px;font-weight:700;">Autre Film</div>
+              <div style="font-size:8px;color:#D0C6AB;">14 avr · Drame</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Vue semaine par semaine</h3>
+      <p>Une seule semaine visible à la fois, navigation gauche/droite. Simple et épuré, mais moins de contexte global.</p>
+    </div>
+  </div>
+
+</div>

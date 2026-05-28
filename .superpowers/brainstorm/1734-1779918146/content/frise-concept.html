@@ -1,0 +1,577 @@
+<h2>Vue frise — 3 interprétations</h2>
+<p class="subtitle">Chaque option donne une "vision large" différente. Quelle lecture correspond à ton besoin ?</p>
+
+<style>
+/* ── palette Films26 ── */
+:root {
+  --surface: #021232;
+  --surface-low: #0a1a3a;
+  --card: #263455;
+  --gold: #ffd700;
+  --text: #fff6df;
+  --muted: #d0c6ab;
+  --cyan: #defcff;
+}
+
+/* ── phone shell ── */
+.phones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 24px 0; }
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.phone {
+  background: var(--surface);
+  border: 2px solid #2a3a5a;
+  border-radius: 22px;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 9/18;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.ph-header {
+  background: #010c22;
+  padding: 7px 12px 6px;
+  font: 700 8px/1 sans-serif;
+  color: var(--gold);
+  letter-spacing: 0.12em;
+  text-align: center;
+  flex-shrink: 0;
+}
+.ph-tabs {
+  background: var(--surface-low);
+  padding: 4px 8px;
+  display: flex;
+  gap: 5px;
+  border-bottom: 1px solid #1a2a4a;
+  flex-shrink: 0;
+}
+.tab { background: transparent; color: var(--muted); border-radius: 4px; padding: 3px 7px; font: 600 6px/1 sans-serif; }
+.tab.on { background: var(--gold); color: var(--surface); }
+.ph-body { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.ph-nav {
+  background: #010c22;
+  height: 32px;
+  border-top: 1px solid #1a2a4a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.nav-dot { width: 18px; height: 3px; border-radius: 2px; background: #2a3a5a; }
+.nav-dot.on { background: var(--gold); }
+
+/* ── genre colors ── */
+.g-action { background: #7f1d1d; color: #fca5a5; }
+.g-drame  { background: #1e3a5f; color: #93c5fd; }
+.g-come   { background: #713f12; color: #fde68a; }
+.g-anim   { background: #064e3b; color: #6ee7b7; }
+.g-sf     { background: #0c4a6e; color: #7dd3fc; }
+.g-hor    { background: #3b0764; color: #d8b4fe; }
+.g-mus    { background: #3f1d6e; color: #c4b5fd; }
+.g-thrill { background: #431407; color: #fdba74; }
+
+/* ═══════════════════════════════════
+   OPTION A — Timeline horizontale
+   Semaines = colonnes, films = dots
+════════════════════════════════════ */
+.timeline-h {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  align-items: stretch;
+  padding: 8px 4px;
+  gap: 0;
+  scrollbar-width: none;
+}
+.week-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 34px;
+  flex-shrink: 0;
+  border-right: 1px solid #1a2a4a;
+  padding: 0 3px 4px;
+}
+.week-col:last-child { border-right: none; }
+.week-label {
+  font: 600 5px/1 sans-serif;
+  color: var(--muted);
+  opacity: 0.6;
+  margin-bottom: 4px;
+  text-align: center;
+}
+.week-date {
+  font: 400 4px/1 sans-serif;
+  color: var(--muted);
+  opacity: 0.4;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.film-pill {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 3px;
+  padding: 2px 3px;
+  margin-bottom: 3px;
+  width: 100%;
+  cursor: pointer;
+}
+.film-pill.active { outline: 1px solid var(--gold); }
+.film-pill-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.film-pill-name { font: 400 4.5px/1.2 sans-serif; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 22px; }
+.week-empty { opacity: 0.25; }
+/* Fade edges */
+.fade-l { position: absolute; left: 0; top: 0; bottom: 0; width: 14px; background: linear-gradient(to right, var(--surface), transparent); pointer-events: none; z-index: 2; }
+.fade-r { position: absolute; right: 0; top: 0; bottom: 0; width: 14px; background: linear-gradient(to left, var(--surface), transparent); pointer-events: none; z-index: 2; }
+
+/* ═══════════════════════════════════
+   OPTION B — Dot-map + détail
+   Vue minimap + strip infos en bas
+════════════════════════════════════ */
+.dotmap-area {
+  flex: 1;
+  padding: 8px 10px 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dotmap-header {
+  font: 600 6px/1 sans-serif;
+  color: var(--muted);
+  opacity: 0.5;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.dotmap-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 3px;
+  flex-shrink: 0;
+}
+.dot-week {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.dot-wlabel {
+  font: 500 4px/1 sans-serif;
+  color: var(--muted);
+  opacity: 0.4;
+}
+.dot-films {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+}
+.dot.active-week { outline: 1.5px solid var(--gold); outline-offset: 1px; }
+.dotmap-divider {
+  height: 1px;
+  background: #1a2a4a;
+  margin: 8px 0 6px;
+}
+.detail-strip {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 7px 9px;
+  flex: 1;
+}
+.detail-week-tag {
+  font: 700 6px/1 sans-serif;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+.detail-film-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 0;
+  border-bottom: 1px solid #1a2a4a;
+}
+.detail-film-row:last-child { border-bottom: none; }
+.detail-genre-chip {
+  border-radius: 3px;
+  padding: 1px 3px;
+  font: 600 4px/1 sans-serif;
+  flex-shrink: 0;
+}
+.detail-title {
+  font: 600 6px/1.2 sans-serif;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-meta {
+  font: 400 5px/1 sans-serif;
+  color: var(--muted);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════
+   OPTION C — Ruban continu
+   Films = segments colorés sur axe
+════════════════════════════════════ */
+.ribbon-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px 8px;
+  gap: 8px;
+  overflow: hidden;
+}
+.ribbon-months {
+  display: flex;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.ribbon-month-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  border-left: 1px solid #2a3a5a;
+  padding-left: 4px;
+}
+.ribbon-month-label {
+  font: 700 6px/1 sans-serif;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+.ribbon-weeks-row {
+  display: flex;
+  gap: 1px;
+  flex: 1;
+}
+.ribbon-week {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ribbon-week-num {
+  font: 400 4px/1 sans-serif;
+  color: var(--muted);
+  opacity: 0.4;
+  text-align: center;
+}
+.ribbon-bar {
+  height: 9px;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+.ribbon-bar.active { outline: 1.5px solid #fff; }
+/* ── divider mois ── */
+.ribbon-month-sep {
+  width: 1px;
+  background: #2a3a5a;
+  flex-shrink: 0;
+}
+
+/* info panel below ribbon */
+.ribbon-info {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 7px 9px;
+  flex-shrink: 0;
+}
+.ribbon-info-title {
+  font: 700 8px/1.2 sans-serif;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.ribbon-info-sub {
+  font: 400 6px/1.4 sans-serif;
+  color: var(--muted);
+  opacity: 0.7;
+}
+.ribbon-info-tags {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+.ribbon-tag {
+  border-radius: 3px;
+  padding: 1px 4px;
+  font: 600 5px/1 sans-serif;
+}
+
+.phone-name { font: 700 12px/1 sans-serif; color: var(--text); text-align: center; }
+.phone-desc { font: 400 9px/1.5 sans-serif; color: #8899bb; text-align: center; max-width: 160px; }
+.pro { color: #22c55e; font: 400 9px/1 sans-serif; margin-top: 3px; }
+.con { color: #ef4444; font: 400 9px/1 sans-serif; margin-top: 2px; }
+</style>
+
+<div class="phones">
+
+  <!-- ─── Option A ─── -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+
+      <div class="phone">
+        <div class="ph-header">FILMS 26</div>
+        <div class="ph-tabs">
+          <span class="tab on">MAI</span><span class="tab">JUIN</span><span class="tab">JUIL</span>
+        </div>
+        <div class="ph-body">
+          <div class="fade-l"></div>
+          <div class="fade-r"></div>
+          <div class="timeline-h">
+            <!-- S19 -->
+            <div class="week-col">
+              <div class="week-label">S19</div>
+              <div class="week-date">7 mai</div>
+              <div class="film-pill g-action"><div class="film-pill-dot" style="background:#fca5a5"></div><span class="film-pill-name">Acctn.</span></div>
+              <div class="film-pill g-drame"><div class="film-pill-dot" style="background:#93c5fd"></div><span class="film-pill-name">Mufasa</span></div>
+            </div>
+            <!-- S20 -->
+            <div class="week-col">
+              <div class="week-label">S20</div>
+              <div class="week-date">14 mai</div>
+              <div class="film-pill g-anim"><div class="film-pill-dot" style="background:#6ee7b7"></div><span class="film-pill-name">Panda 4</span></div>
+            </div>
+            <!-- S21 -->
+            <div class="week-col">
+              <div class="week-label">S21</div>
+              <div class="week-date">21 mai</div>
+              <div class="film-pill g-sf"><div class="film-pill-dot" style="background:#7dd3fc"></div><span class="film-pill-name">Sinners</span></div>
+              <div class="film-pill g-mus"><div class="film-pill-dot" style="background:#c4b5fd"></div><span class="film-pill-name">Wicked</span></div>
+              <div class="film-pill g-thrill"><div class="film-pill-dot" style="background:#fdba74"></div><span class="film-pill-name">Nemesis</span></div>
+            </div>
+            <!-- S22 -->
+            <div class="week-col">
+              <div class="week-label" style="color:var(--gold);opacity:1">S22</div>
+              <div class="week-date" style="color:var(--gold);opacity:0.7">28 mai</div>
+              <div class="film-pill g-come active"><div class="film-pill-dot" style="background:#fde68a"></div><span class="film-pill-name">Disco</span></div>
+              <div class="film-pill g-hor"><div class="film-pill-dot" style="background:#d8b4fe"></div><span class="film-pill-name">Alien:R</span></div>
+            </div>
+            <!-- S23 -->
+            <div class="week-col">
+              <div class="week-label">S23</div>
+              <div class="week-date">4 juin</div>
+              <div class="film-pill g-action"><div class="film-pill-dot" style="background:#fca5a5"></div><span class="film-pill-name">F&F 11</span></div>
+            </div>
+            <!-- S24 -->
+            <div class="week-col week-empty">
+              <div class="week-label">S24</div>
+              <div class="week-date">11 juin</div>
+              <div style="font:400 5px/1 sans-serif;color:var(--muted);opacity:0.3;margin-top:4px;text-align:center">—</div>
+            </div>
+            <!-- S25 -->
+            <div class="week-col">
+              <div class="week-label">S25</div>
+              <div class="week-date">18 juin</div>
+              <div class="film-pill g-drame"><div class="film-pill-dot" style="background:#93c5fd"></div><span class="film-pill-name">Novice</span></div>
+              <div class="film-pill g-sf"><div class="film-pill-dot" style="background:#7dd3fc"></div><span class="film-pill-name">Avatar3</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="ph-nav"><div class="nav-dot on"></div><div class="nav-dot"></div></div>
+      </div>
+
+      <div class="phone-name">A — Colonnes semaines</div>
+      <div class="phone-desc">Scroll horizontal · chaque colonne = 1 semaine · films = lignes</div>
+      <div class="pro">✓ Densité maximale · vides visibles</div>
+      <div class="con">✗ Titres tronqués · lecture difficile</div>
+
+    </div>
+  </div>
+
+  <!-- ─── Option B ─── -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+
+      <div class="phone">
+        <div class="ph-header">FILMS 26</div>
+        <div class="ph-tabs">
+          <span class="tab on">MAI</span><span class="tab">JUIN</span><span class="tab">JUIL</span>
+        </div>
+        <div class="ph-body">
+          <div class="dotmap-area">
+            <div class="dotmap-header">VUE GLOBALE — MAI → AOÛT 2026</div>
+            <div class="dotmap-grid">
+              <!-- S19 -->
+              <div class="dot-week"><div class="dot-wlabel">S19</div><div class="dot-films"><div class="dot g-action" style="background:#fca5a5"></div><div class="dot g-drame" style="background:#93c5fd"></div></div></div>
+              <!-- S20 -->
+              <div class="dot-week"><div class="dot-wlabel">S20</div><div class="dot-films"><div class="dot g-anim" style="background:#6ee7b7"></div></div></div>
+              <!-- S21 -->
+              <div class="dot-week"><div class="dot-wlabel">S21</div><div class="dot-films"><div class="dot" style="background:#7dd3fc"></div><div class="dot" style="background:#c4b5fd"></div><div class="dot" style="background:#fdba74"></div></div></div>
+              <!-- S22 active -->
+              <div class="dot-week"><div class="dot-wlabel" style="color:var(--gold);opacity:1">S22</div><div class="dot-films"><div class="dot active-week" style="background:#fde68a"></div><div class="dot" style="background:#d8b4fe"></div></div></div>
+              <!-- S23 -->
+              <div class="dot-week"><div class="dot-wlabel">S23</div><div class="dot-films"><div class="dot" style="background:#fca5a5"></div></div></div>
+              <!-- S24 vide -->
+              <div class="dot-week"><div class="dot-wlabel">S24</div><div class="dot-films"></div></div>
+              <!-- S25 -->
+              <div class="dot-week"><div class="dot-wlabel">S25</div><div class="dot-films"><div class="dot" style="background:#93c5fd"></div><div class="dot" style="background:#7dd3fc"></div></div></div>
+              <!-- S26 -->
+              <div class="dot-week"><div class="dot-wlabel">S26</div><div class="dot-films"><div class="dot" style="background:#fca5a5"></div><div class="dot" style="background:#fde68a"></div><div class="dot" style="background:#6ee7b7"></div></div></div>
+              <!-- S27 -->
+              <div class="dot-week"><div class="dot-wlabel">S27</div><div class="dot-films"><div class="dot" style="background:#7dd3fc"></div></div></div>
+              <!-- S28 -->
+              <div class="dot-week"><div class="dot-wlabel">S28</div><div class="dot-films"><div class="dot" style="background:#d8b4fe"></div><div class="dot" style="background:#fdba74"></div></div></div>
+            </div>
+            <div class="dotmap-divider"></div>
+            <!-- Détail semaine sélectionnée -->
+            <div class="detail-week-tag">SEMAINE 22 · 28 mai — 3 juin</div>
+            <div class="detail-strip">
+              <div class="detail-film-row">
+                <div class="detail-genre-chip g-come">COMÉDIE</div>
+                <div class="detail-title">Disco Dancer</div>
+                <div class="detail-meta">1h52</div>
+              </div>
+              <div class="detail-film-row">
+                <div class="detail-genre-chip g-hor">HORREUR</div>
+                <div class="detail-title">Alien: Romulus</div>
+                <div class="detail-meta">1h59 · 2D</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ph-nav"><div class="nav-dot on"></div><div class="nav-dot"></div></div>
+      </div>
+
+      <div class="phone-name">B — Dot-map + détail</div>
+      <div class="phone-desc">Minimap dots en haut (vue globale) · tap semaine = liste dessous</div>
+      <div class="pro">✓ Vision + 3 mois d'un coup · densité lisible</div>
+      <div class="con">✗ Deux interactions pour voir un film</div>
+
+    </div>
+  </div>
+
+  <!-- ─── Option C ─── -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+
+      <div class="phone">
+        <div class="ph-header">FILMS 26</div>
+        <div class="ph-tabs">
+          <span class="tab on">MAI</span><span class="tab">JUIN</span><span class="tab">JUIL</span>
+        </div>
+        <div class="ph-body">
+          <div class="ribbon-area">
+            <!-- Ruban mois -->
+            <div style="display:flex;gap:2px;flex-shrink:0;align-items:stretch;">
+              <!-- MAI -->
+              <div style="flex:5;display:flex;flex-direction:column;gap:3px">
+                <div style="font:700 6px/1 sans-serif;color:var(--gold);letter-spacing:.06em;border-left:2px solid var(--gold);padding-left:4px">MAI</div>
+                <div style="display:flex;gap:2px;">
+                  <!-- S19 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S19</div>
+                    <div class="ribbon-bar g-action" style="background:#7f1d1d" title="The Accountant 2"></div>
+                    <div class="ribbon-bar g-drame" style="background:#1e3a5f" title="Mufasa"></div>
+                  </div>
+                  <!-- S20 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S20</div>
+                    <div class="ribbon-bar g-anim" style="background:#064e3b"></div>
+                  </div>
+                  <!-- S21 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S21</div>
+                    <div class="ribbon-bar" style="background:#0c4a6e"></div>
+                    <div class="ribbon-bar" style="background:#3f1d6e"></div>
+                    <div class="ribbon-bar" style="background:#431407"></div>
+                  </div>
+                  <!-- S22 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:600 4px/1 sans-serif;color:var(--gold);text-align:center">S22</div>
+                    <div class="ribbon-bar active" style="background:#713f12;outline:1.5px solid var(--gold)"></div>
+                    <div class="ribbon-bar" style="background:#3b0764"></div>
+                  </div>
+                  <!-- S23 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S23</div>
+                    <div class="ribbon-bar" style="background:#7f1d1d"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- sep -->
+              <div style="width:1px;background:#2a3a5a;flex-shrink:0;margin:10px 0 0"></div>
+              <!-- JUIN -->
+              <div style="flex:5;display:flex;flex-direction:column;gap:3px">
+                <div style="font:700 6px/1 sans-serif;color:var(--muted);opacity:.7;letter-spacing:.06em;border-left:2px solid #2a3a5a;padding-left:4px">JUIN</div>
+                <div style="display:flex;gap:2px;">
+                  <!-- S24 vide -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S24</div>
+                  </div>
+                  <!-- S25 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S25</div>
+                    <div class="ribbon-bar" style="background:#1e3a5f"></div>
+                    <div class="ribbon-bar" style="background:#0c4a6e"></div>
+                  </div>
+                  <!-- S26 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S26</div>
+                    <div class="ribbon-bar" style="background:#7f1d1d"></div>
+                    <div class="ribbon-bar" style="background:#713f12"></div>
+                    <div class="ribbon-bar" style="background:#064e3b"></div>
+                  </div>
+                  <!-- S27 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S27</div>
+                    <div class="ribbon-bar" style="background:#0c4a6e"></div>
+                  </div>
+                  <!-- S28 -->
+                  <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                    <div style="font:400 4px/1 sans-serif;color:var(--muted);opacity:.4;text-align:center">S28</div>
+                    <div class="ribbon-bar" style="background:#3b0764"></div>
+                    <div class="ribbon-bar" style="background:#431407"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info film sélectionné -->
+            <div class="ribbon-info">
+              <div class="ribbon-info-title">Disco Dancer</div>
+              <div class="ribbon-info-sub">Dir. Mukerji · 1h52 · S22 — 28 mai 2026</div>
+              <div class="ribbon-info-tags">
+                <div class="ribbon-tag g-come">COMÉDIE</div>
+                <div class="ribbon-tag" style="background:#1a2a4a;color:var(--cyan)">2D</div>
+              </div>
+            </div>
+
+            <!-- Note GSAP -->
+            <div style="font:400 7px/1.5 sans-serif;color:var(--muted);opacity:.5;text-align:center;padding:0 4px">
+              Tap une barre → gsap.to() anime l'info panel
+            </div>
+          </div>
+        </div>
+        <div class="ph-nav"><div class="nav-dot on"></div><div class="nav-dot"></div></div>
+      </div>
+
+      <div class="phone-name">C — Ruban coloré</div>
+      <div class="phone-desc">Barres couleur genre par semaine · tap = info · vue 2-3 mois d'un coup</div>
+      <div class="pro">✓ Vue annuelle possible · couleurs = genres instantanés</div>
+      <div class="con">✗ Titres non lisibles sans tap</div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:8px;padding:14px;margin-top:4px">
+  <p style="font-size:11px;color:var(--muted);margin:0"><strong style="color:var(--gold)">Ce que change GSAP dans chaque option :</strong> B et C peuvent avoir un panneau info animé avec <code>gsap.fromTo()</code> + ScrollTrigger pour synchroniser la semaine visible avec les MonthTabs. En A, GSAP peut animer le scroll vers la semaine active avec <code>gsap.to(container, { scrollLeft })</code> au lieu de <code>scrollIntoView</code>.</p>
+</div>

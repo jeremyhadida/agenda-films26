@@ -1,0 +1,168 @@
+<h2>Format des cards film</h2>
+<p class="subtitle">Vue programme pour l'exploitant — quelle densité pour construire sa programmation ?</p>
+
+<div class="cards">
+
+  <!-- OPTION A : Carte compacte sans cast -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#021232;padding:12px;font-family:'Inter',sans-serif;color:#fff6df;border-radius:6px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+
+          <div style="background:#263455;border-radius:10px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span style="background:#7f1d1d99;color:#fca5a5;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;">ACTION</span>
+            </div>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;margin:0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">The Accountant 2</p>
+            <p style="font-size:9px;color:#d0c6ab;margin:0;">Dir. G. O'Russell</p>
+            <div style="border-top:1px solid rgba(2,18,50,0.4);margin-top:2px;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Warner</span>
+              <span style="font-size:9px;color:#d0c6ab;">1h55</span>
+            </div>
+          </div>
+
+          <div style="background:#263455;border-radius:10px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span style="background:#1e3a8a99;color:#93c5fd;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;">DRAME</span>
+              <span style="background:#14532d99;color:#86efac;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;">ANIM.</span>
+            </div>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;margin:0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mufasa : Le Roi Lion</p>
+            <p style="font-size:9px;color:#d0c6ab;margin:0;">Dir. B. Jenkins</p>
+            <div style="border-top:1px solid rgba(2,18,50,0.4);margin-top:2px;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Disney</span>
+              <span style="font-size:9px;color:#d0c6ab;">1h58 <span style="color:#defcff;">3D</span></span>
+            </div>
+          </div>
+
+          <div style="background:#263455;border-radius:10px;padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span style="background:#78350f99;color:#fcd34d;font-size:9px;font-weight:700;padding:1px 7px;border-radius:99px;">COMÉDIE</span>
+            </div>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;margin:0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Disco Dancer</p>
+            <p style="font-size:9px;color:#d0c6ab;margin:0;">Dir. V. Rao</p>
+            <div style="border-top:1px solid rgba(2,18,50,0.4);margin-top:2px;padding-top:6px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Sony</span>
+              <span style="font-size:9px;color:#d0c6ab;">1h52</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Carte compacte</h3>
+      <p>Genre + titre + réal + pied studio/durée. <strong>Sans cast.</strong> 3 colonnes desktop. ~85px de hauteur.</p>
+    </div>
+  </div>
+
+  <!-- OPTION B : Micro-carte ultra-dense 4 colonnes -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#021232;padding:12px;font-family:'Inter',sans-serif;color:#fff6df;border-radius:6px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+
+          <div style="background:#263455;border-radius:8px;padding:8px;">
+            <span style="background:#7f1d1d99;color:#fca5a5;font-size:8px;font-weight:700;padding:1px 5px;border-radius:99px;display:inline-block;margin-bottom:4px;">ACTION</span>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:10px;color:#fff6df;margin:0 0 3px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">The Accountant 2</p>
+            <p style="font-size:8px;color:#d0c6ab;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">O'Russell · <span style="color:#d0c6ab;opacity:.7">WB</span> · 1h55</p>
+          </div>
+
+          <div style="background:#263455;border-radius:8px;padding:8px;">
+            <span style="background:#1e3a8a99;color:#93c5fd;font-size:8px;font-weight:700;padding:1px 5px;border-radius:99px;display:inline-block;margin-bottom:4px;">DRAME</span>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:10px;color:#fff6df;margin:0 0 3px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mufasa</p>
+            <p style="font-size:8px;color:#d0c6ab;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Jenkins · <span style="opacity:.7">Disney</span> · 1h58</p>
+          </div>
+
+          <div style="background:#263455;border-radius:8px;padding:8px;">
+            <span style="background:#78350f99;color:#fcd34d;font-size:8px;font-weight:700;padding:1px 5px;border-radius:99px;display:inline-block;margin-bottom:4px;">COMÉDIE</span>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:10px;color:#fff6df;margin:0 0 3px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Disco Dancer</p>
+            <p style="font-size:8px;color:#d0c6ab;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">V. Rao · <span style="opacity:.7">Sony</span> · 1h52</p>
+          </div>
+
+          <div style="background:#263455;border-radius:8px;padding:8px;">
+            <span style="background:#431407;color:#fb923c;font-size:8px;font-weight:700;padding:1px 5px;border-radius:99px;display:inline-block;margin-bottom:4px;">THRILLER</span>
+            <p style="font-family:'Manrope',sans-serif;font-weight:700;font-size:10px;color:#fff6df;margin:0 0 3px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Black Bag</p>
+            <p style="font-size:8px;color:#d0c6ab;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Soderbergh · <span style="opacity:.7">Focus</span> · 2h</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Micro-carte ultra-dense</h3>
+      <p>Tout sur 3 lignes. <strong>4 colonnes desktop.</strong> Maximum de films à l'écran. Genre · Titre · Réal/Studio/Durée inline.</p>
+    </div>
+  </div>
+
+  <!-- OPTION C : Lignes programme 2 colonnes -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#021232;padding:12px;font-family:'Inter',sans-serif;color:#fff6df;border-radius:6px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#0a1a3a;border-radius:6px;overflow:hidden;">
+
+          <div style="background:#263455;padding:9px 11px;">
+            <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:3px;">
+              <span style="background:#7f1d1d99;color:#fca5a5;font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;flex-shrink:0;">ACTION</span>
+              <span style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">The Accountant 2</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:9px;color:#d0c6ab;">Dir. G. O'Russell</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Warner</span>
+                <span style="font-size:9px;color:#d0c6ab;">1h55</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#263455;padding:9px 11px;">
+            <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:3px;">
+              <span style="background:#1e3a8a99;color:#93c5fd;font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;flex-shrink:0;">DRAME</span>
+              <span style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mufasa : Le Roi Lion</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:9px;color:#d0c6ab;">Dir. B. Jenkins</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Disney</span>
+                <span style="font-size:9px;color:#d0c6ab;">1h58 <span style="color:#defcff;">3D</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#263455;padding:9px 11px;">
+            <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:3px;">
+              <span style="background:#78350f99;color:#fcd34d;font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;flex-shrink:0;">COMÉDIE</span>
+              <span style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Disco Dancer</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:9px;color:#d0c6ab;">Dir. V. Rao</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Sony</span>
+                <span style="font-size:9px;color:#d0c6ab;">1h52</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#263455;padding:9px 11px;">
+            <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:3px;">
+              <span style="background:#431407;color:#fb923c;font-size:8px;font-weight:700;padding:1px 6px;border-radius:99px;flex-shrink:0;">THRILLER</span>
+              <span style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#fff6df;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Black Bag</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:9px;color:#d0c6ab;">Dir. S. Soderbergh</span>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:9px;font-weight:600;color:#d0c6ab;border:1px solid rgba(208,198,171,0.2);padding:1px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Focus</span>
+                <span style="font-size:9px;color:#d0c6ab;">2h</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Lignes programme 2 colonnes</h3>
+      <p>Pas des cards — des <strong>lignes denses</strong>. 2 colonnes, chaque film sur 2 lignes. Style programme imprimé. Densité max + lisibilité.</p>
+    </div>
+  </div>
+
+</div>
