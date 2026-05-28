@@ -21,8 +21,8 @@ export function AgendaViewToggle({ groups, events, children }: AgendaViewToggleP
 
   return (
     <>
-      {/* MonthTabs toujours visible en mode grille et timeline */}
-      <MonthTabs groups={allGroups} />
+      {/* MonthTabs toujours visible — key={view} force le remontage pour rebrancher l'IntersectionObserver */}
+      <MonthTabs key={view} groups={allGroups} />
 
       <div className="flex justify-end items-center gap-2 mb-3 mt-1">
         {view === 'timeline' && (
@@ -44,8 +44,8 @@ export function AgendaViewToggle({ groups, events, children }: AgendaViewToggleP
         </button>
       </div>
 
-      <div className={view === 'grid' ? 'block' : 'hidden'}>{children}</div>
-
+      {/* Rendu conditionnel — évite les id dupliqués entre grille et frise */}
+      {view === 'grid' && <div>{children}</div>}
       {view === 'timeline' && <AgendaTimeline groups={timelineGroups} events={events} />}
     </>
   )
