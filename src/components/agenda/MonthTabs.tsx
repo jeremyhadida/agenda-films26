@@ -13,7 +13,10 @@ interface MonthTabsProps {
 function getUniqueMonths(groups: WeekGroup[]): { month: number; year: number; firstWeekStartDate: string }[] {
   const seen = new Set<string>()
   const result: { month: number; year: number; firstWeekStartDate: string }[] = []
-  for (const group of groups) {
+  // N'utiliser que les semaines avec des films pour les cibles de scroll
+  // (les semaines vides peuvent ne pas avoir d'élément DOM selon le mode)
+  const filmWeeks = groups.filter(g => g.films.length > 0)
+  for (const group of filmWeeks) {
     const d = new Date(group.startDate + 'T00:00:00Z')
     const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}`
     if (!seen.has(key)) {
@@ -55,6 +58,8 @@ export function MonthTabs({ groups }: MonthTabsProps) {
   }, [activeMonthKey])
 
   function scrollToWeek(startDate: string) {
+    // Feedback visuel immédiat : ne pas attendre l'IntersectionObserver
+    setActiveStartDate(startDate)
     document.getElementById(`week-${startDate}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
