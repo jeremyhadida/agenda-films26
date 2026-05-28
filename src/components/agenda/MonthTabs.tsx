@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { WeekGroup } from '@/lib/types'
 
 const FR_MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -27,7 +27,9 @@ function getUniqueMonths(groups: WeekGroup[]): { month: number; year: number; fi
 export function MonthTabs({ groups }: MonthTabsProps) {
   const months = getUniqueMonths(groups)
   const [activeStartDate, setActiveStartDate] = useState<string>(groups[0]?.startDate ?? '')
+  const tabRefs = useRef<Map<string, HTMLButtonElement>>(new Map())
 
+  // Synchroniser l'état actif avec le scroll de la page
   useEffect(() => {
     const observers: IntersectionObserver[] = []
     for (const group of groups) {
@@ -43,32 +45,42 @@ export function MonthTabs({ groups }: MonthTabsProps) {
     return () => observers.forEach(o => o.disconnect())
   }, [groups])
 
-  function scrollToWeek(startDate: string) {
-    document.getElementById(`week-${startDate}`)?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  // Derive active month key from active week's startDate
+  // Amener l'onglet actif en vue dans la barre horizontale
   const activeD = new Date(activeStartDate + 'T00:00:00Z')
   const activeMonthKey = `${activeD.getUTCFullYear()}-${activeD.getUTCMonth()}`
+
+  useEffect(() => {
+    const btn = tabRefs.current.get(activeMonthKey)
+    btn?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  }, [activeMonthKey])
+
+  function scrollToWeek(startDate: string) {
+    document.getElementById(`week-${startDate}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <div className="sticky top-14 z-40 bg-surface/80 backdrop-blur-xl py-2">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
-          {months.map(({ month, year, firstWeekStartDate }) => (
-            <button
-              key={`${year}-${month}`}
-              onClick={() => scrollToWeek(firstWeekStartDate)}
-              aria-pressed={activeMonthKey === `${year}-${month}`}
-              className={`flex-shrink-0 flex items-center min-h-[44px] px-4 rounded-full text-sm font-body transition-colors ${
-                activeMonthKey === `${year}-${month}`
-                  ? 'bg-gold text-surface font-semibold'
-                  : 'text-muted hover:text-text'
-              }`}
-            >
-              {FR_MONTHS[month]}
-            </button>
-          ))}
+          {months.map(({ month, year, firstWeekStartDate }) => {
+            const key = `${year}-${month}`
+            const isActive = activeMonthKey === key
+            return (
+              <button
+                key={key}
+                ref={el => { if (el) tabRefs.current.set(key, el); else tabRefs.current.delete(key) }}
+                onClick={() => scrollToWeek(firstWeekStartDate)}
+                aria-pressed={isActive}
+                className={`flex-shrink-0 flex items-center min-h-[44px] px-4 rounded-full text-sm font-body transition-colors ${
+                  isActive
+                    ? 'bg-gold text-surface font-semibold'
+                    : 'text-muted hover:text-text'
+                }`}
+              >
+                {FR_MONTHS[month]}
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>

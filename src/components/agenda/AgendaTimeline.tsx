@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -57,6 +57,29 @@ interface FilmTimelineCardProps {
   side: 'left' | 'right'
 }
 
+function MetaChips({ film, genre, isLeft }: { film: Film; genre: string | undefined; isLeft: boolean }) {
+  if (!genre && !film.duration_min && !film.projection_fmt) return null
+  return (
+    <div className={`flex items-center gap-1 flex-wrap ${isLeft ? 'justify-end' : 'justify-start'}`}>
+      {genre && (
+        <span className={`rounded-sm px-1.5 py-px text-[7px] font-body font-bold leading-none ${genreClass(genre)}`}>
+          {genre}
+        </span>
+      )}
+      {film.duration_min && (
+        <span className="text-[8.5px] text-cyan/80 font-body font-medium leading-none">
+          {formatDuration(film.duration_min)}
+        </span>
+      )}
+      {film.projection_fmt && (
+        <span className="text-[8.5px] text-muted/50 font-body leading-none">
+          {film.projection_fmt}
+        </span>
+      )}
+    </div>
+  )
+}
+
 function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
   const genre  = film.genre?.split(',')[0]?.trim()
   const isLeft = side === 'left'
@@ -66,28 +89,7 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
       className={`tl-card-${side} relative min-w-0`}
       style={isLeft ? { marginRight: '0.75rem', opacity: 0 } : { marginLeft: '0.75rem', opacity: 0 }}
     >
-      {/* Desktop — métadonnées hors de la carte, sur la ligne visuelle du titre */}
-      {(genre || film.duration_min || film.projection_fmt) && (
-        <div className={`hidden md:flex items-center gap-2 mb-1 ${isLeft ? 'justify-end' : 'justify-start'}`}>
-          {genre && (
-            <span className={`rounded-sm px-1.5 py-px text-[7px] font-body font-bold ${genreClass(genre)}`}>
-              {genre}
-            </span>
-          )}
-          {film.duration_min && (
-            <span className="text-[8.5px] text-cyan font-body font-medium">
-              {formatDuration(film.duration_min)}
-            </span>
-          )}
-          {film.projection_fmt && (
-            <span className="text-[8.5px] text-muted/50 font-body">
-              {film.projection_fmt}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Wrapper avec bordure gradient animée (conic-gradient ou couleur unie) */}
+      {/* Bordure gradient animée (conic-gradient aurora ou couleur unie) */}
       <div
         className={`tl-card-border-wrap relative rounded-lg ${borderClass(event)}`}
         style={{ padding: '1.5px' }}
@@ -111,38 +113,38 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
         {/* Contenu */}
         <div className={`bg-surface-card rounded-[14px] p-2.5 ${isLeft ? 'text-right' : 'text-left'}`}>
 
-          {/* Mobile — genre chip dans la carte */}
-          {genre && (
-            <span className={`md:hidden inline-block rounded-sm px-1.5 py-px text-[6.5px] font-body font-bold mb-1.5 ${genreClass(genre)}`}>
-              {genre}
-            </span>
-          )}
+          {/* Desktop : titre + méta sur la même ligne */}
+          <div className={`hidden md:flex items-start gap-2 ${isLeft ? 'flex-row-reverse' : ''}`}>
+            <p className="font-display font-bold text-text text-[11px] leading-snug flex-1 min-w-0">
+              {film.title}
+            </p>
+            <div className={`shrink-0 flex flex-col gap-0.5 pt-px ${isLeft ? 'items-end' : 'items-start'}`}>
+              <MetaChips film={film} genre={genre} isLeft={isLeft} />
+            </div>
+          </div>
 
-          {/* Titre — toujours 2 lignes minimum */}
-          <p className="font-display font-bold text-text text-[10.5px] leading-snug line-clamp-2 min-h-[2.625rem]">
+          {/* Mobile : titre seul */}
+          <p className="md:hidden font-display font-bold text-text text-[11px] leading-snug line-clamp-2 min-h-[2rem]">
             {film.title}
           </p>
 
           {/* Réalisateur */}
           {film.director && (
-            <p className="text-[9.5px] font-body text-muted/80 mt-0.5 truncate">
-              Dir. {film.director}
+            <p className="text-[10px] font-body text-muted/75 mt-1 truncate">
+              {film.director}
             </p>
           )}
 
           {/* Casting */}
           {film.cast_main && (
-            <p className="text-[9px] font-body text-muted/60 mt-0.5 truncate">
+            <p className="text-[9.5px] font-body text-muted/55 mt-0.5 truncate">
               {film.cast_main}
             </p>
           )}
 
-          {/* Durée + format — mobile uniquement */}
-          <div className={`md:hidden flex gap-1 mt-1.5 text-[7.5px] font-body text-cyan ${
-            isLeft ? 'justify-end' : 'justify-start'
-          }`}>
-            {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
-            {film.projection_fmt && <span>· {film.projection_fmt}</span>}
+          {/* Mobile : méta row */}
+          <div className={`md:hidden mt-1.5 ${isLeft ? '' : ''}`}>
+            <MetaChips film={film} genre={genre} isLeft={isLeft} />
           </div>
 
           {/* Ayant-droit */}
@@ -176,11 +178,29 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   const currentWeek = getIsoWeek(todayStr)
 
+  // Scroll automatique vers la semaine courante (ou la prochaine disponible)
+  useEffect(() => {
+    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+    const dow = todayUTC.getUTCDay() || 7
+    const monday = new Date(todayUTC)
+    monday.setUTCDate(todayUTC.getUTCDate() - dow + 1)
+    const mondayStr = monday.toISOString().split('T')[0]
+
+    const target =
+      groups.find(g => g.startDate === mondayStr)?.startDate ??
+      groups.find(g => g.startDate >= mondayStr)?.startDate ??
+      groups[groups.length - 1]?.startDate
+
+    if (target) {
+      document.getElementById(`week-${target}`)?.scrollIntoView({ behavior: 'instant', block: 'start' })
+    }
+  }, [])
+
   useGSAP(() => {
     const container = containerRef.current
     if (!container) return
 
-    // Axe central — se dessine au scroll
+    // Axe central
     const axis = container.querySelector<HTMLElement>('.tl-axis')
     if (axis) {
       gsap.set(axis, { scaleY: 0, transformOrigin: 'top center' })
@@ -192,7 +212,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
       })
     }
 
-    // Nœuds semaine — fade up
+    // Nœuds semaine
     container.querySelectorAll<HTMLElement>('.tl-week-node').forEach(node => {
       gsap.set(node, { opacity: 0, y: 8 })
       ScrollTrigger.create({
@@ -203,7 +223,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
       })
     })
 
-    // Lignes de films — vol synchronisé : carte + contour apparaissent ensemble
+    // Lignes films
     container.querySelectorAll<HTMLElement>('.tl-film-row').forEach(row => {
       const leftCard  = row.querySelector<HTMLElement>('.tl-card-left')
       const rightCard = row.querySelector<HTMLElement>('.tl-card-right')
@@ -272,7 +292,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
           )
         }
 
-        // Paires gauche/droite
+        // Paires gauche / droite
         const rows: { left: typeof films[0]; right: typeof films[0] | null }[] = []
         for (let j = 0; j < films.length; j += 2) {
           rows.push({ left: films[j], right: films[j + 1] ?? null })
@@ -282,7 +302,6 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
           <div key={group.isoWeek} id={`week-${group.startDate}`} className="scroll-mt-28">
             {monthSeparator}
 
-            {/* Séparateur semaine — visible et contrasté */}
             <div className="tl-week-node flex items-center gap-3 py-4 relative z-10 px-4">
               <div className={`flex-1 h-px ${isCurrent ? 'bg-gold/40' : 'bg-[#2a4a7a]/60'}`} />
               <div className={`rounded-full px-4 py-1.5 text-[11px] font-body font-bold tracking-wider whitespace-nowrap ${
