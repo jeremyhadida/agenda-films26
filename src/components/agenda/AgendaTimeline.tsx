@@ -30,23 +30,10 @@ function genreClass(genre: string): string {
   return key ? GENRE_CLASSES[key] : 'bg-chip-bg text-chip-text'
 }
 
-// Per-segment border colors — clockwise seamless aurora for default
-function cardBorderBg(event: FilmReleaseEvent | undefined): {
-  top: string; right: string; bottom: string; left: string
-} {
-  if (event?.event_type === 'added') {
-    return { top: '#00ff88', right: '#00ff88', bottom: '#00ff88', left: '#00ff88' }
-  }
-  if (event?.event_type === 'date_changed') {
-    return { top: '#ffd700', right: '#ffd700', bottom: '#ffd700', left: '#ffd700' }
-  }
-  // Aurora multicolor — chaque segment reprend la couleur du coin précédent
-  return {
-    top:    'linear-gradient(90deg,  #defcff, #a855f7, #fb923c)',
-    right:  'linear-gradient(180deg, #fb923c, #a855f7, #defcff)',
-    bottom: 'linear-gradient(270deg, #defcff, #a855f7, #fb923c)',
-    left:   'linear-gradient(0deg,   #fb923c, #a855f7, #defcff)',
-  }
+function borderClass(event: FilmReleaseEvent | undefined): string {
+  if (event?.event_type === 'added')        return 'tl-border-added'
+  if (event?.event_type === 'date_changed') return 'tl-border-date-changed'
+  return 'tl-border-aurora'
 }
 
 function dotColorForRow(
@@ -71,77 +58,100 @@ interface FilmTimelineCardProps {
 }
 
 function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
-  const genre = film.genre?.split(',')[0]?.trim()
-  const bg = cardBorderBg(event)
+  const genre  = film.genre?.split(',')[0]?.trim()
+  const isLeft = side === 'left'
 
   return (
     <div
-      className={`tl-card-${side} relative rounded-lg min-w-0`}
-      style={side === 'left' ? { marginRight: '0.75rem' } : { marginLeft: '0.75rem' }}
+      className={`tl-card-${side} relative min-w-0`}
+      style={isLeft ? { marginRight: '0.75rem', opacity: 0 } : { marginLeft: '0.75rem', opacity: 0 }}
     >
-      {/* 4 segments de dessin — animés séquentiellement par GSAP (sens horaire) */}
-      <div className="tl-border-draw absolute inset-0 rounded-lg pointer-events-none z-10 overflow-hidden">
-        <div className="seg-top    absolute top-0    left-0   h-[1.5px] w-0" style={{ background: bg.top }} />
-        <div className="seg-right  absolute top-0    right-0  w-[1.5px] h-0" style={{ background: bg.right }} />
-        <div className="seg-bottom absolute bottom-0 right-0  h-[1.5px] w-0" style={{ background: bg.bottom }} />
-        <div className="seg-left   absolute bottom-0 left-0   w-[1.5px] h-0" style={{ background: bg.left }} />
-      </div>
+      {/* Desktop — métadonnées hors de la carte, sur la ligne visuelle du titre */}
+      {(genre || film.duration_min || film.projection_fmt) && (
+        <div className={`hidden md:flex items-center gap-2 mb-1 ${isLeft ? 'justify-end' : 'justify-start'}`}>
+          {genre && (
+            <span className={`rounded-sm px-1.5 py-px text-[7px] font-body font-bold ${genreClass(genre)}`}>
+              {genre}
+            </span>
+          )}
+          {film.duration_min && (
+            <span className="text-[8.5px] text-cyan font-body font-medium">
+              {formatDuration(film.duration_min)}
+            </span>
+          )}
+          {film.projection_fmt && (
+            <span className="text-[8.5px] text-muted/50 font-body">
+              {film.projection_fmt}
+            </span>
+          )}
+        </div>
+      )}
 
-      {/* Contenu de la carte */}
-      <div className={`bg-surface-card border border-[#2a3a5a]/20 rounded-lg p-2.5 ${side === 'left' ? 'text-right' : 'text-left'}`}>
-        {/* Event badge */}
+      {/* Wrapper avec bordure gradient animée (conic-gradient ou couleur unie) */}
+      <div
+        className={`tl-card-border-wrap relative rounded-lg ${borderClass(event)}`}
+        style={{ padding: '1.5px' }}
+      >
+        {/* Pastille événement — angle haut extérieur à la ligne centrale */}
         {event && (
-          <span
-            className={`absolute top-1.5 ${side === 'left' ? 'left-1.5' : 'right-1.5'} text-[9px] leading-none ${
-              event.event_type === 'added' ? 'text-[#00ff88]' : 'text-gold'
+          <div
+            className={`absolute -top-2.5 z-20 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-black leading-none ${
+              isLeft ? '-left-2.5' : '-right-2.5'
+            } ${
+              event.event_type === 'added'
+                ? 'bg-[#021232] border-2 border-[#00ff88] text-[#00ff88]'
+                : 'bg-[#021232] border-2 border-gold text-gold'
             }`}
-            title={event.event_type === 'added' ? 'Nouvelle sortie' : 'Date modifiée'}
             aria-label={event.event_type === 'added' ? 'Nouvelle sortie' : 'Date modifiée'}
           >
-            {event.event_type === 'added' ? '✦' : '↕'}
-          </span>
-        )}
-
-        {/* Genre chip */}
-        {genre && (
-          <span className={`inline-block rounded-sm px-1.5 py-px text-[6.5px] font-body font-bold mb-1.5 ${genreClass(genre)}`}>
-            {genre}
-          </span>
-        )}
-
-        {/* Title — always 2 lines minimum */}
-        <p className="font-display font-bold text-text text-[10.5px] leading-snug line-clamp-2 min-h-[2.625rem]">
-          {film.title}
-        </p>
-
-        {/* Director */}
-        {film.director && (
-          <p className="text-[8px] font-body text-muted/70 mt-0.5 truncate">
-            Dir. {film.director}
-          </p>
-        )}
-
-        {/* Cast */}
-        {film.cast_main && (
-          <p className="text-[7.5px] font-body text-muted/55 mt-0.5 truncate">
-            {film.cast_main}
-          </p>
-        )}
-
-        {/* Duration + format */}
-        <div className={`flex gap-1 mt-1.5 text-[7.5px] font-body text-cyan ${
-          side === 'left' ? 'justify-end' : 'justify-start'
-        }`}>
-          {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
-          {film.projection_fmt && <span>· {film.projection_fmt}</span>}
-        </div>
-
-        {/* Studio / ayant-droit */}
-        {film.studio && (
-          <div className={`mt-1.5 ${side === 'left' ? 'flex justify-end' : 'flex justify-start'}`}>
-            <StudioBadge studio={film.studio} size="sm" />
+            {event.event_type === 'added' ? '+' : '↕'}
           </div>
         )}
+
+        {/* Contenu */}
+        <div className={`bg-surface-card rounded-[14px] p-2.5 ${isLeft ? 'text-right' : 'text-left'}`}>
+
+          {/* Mobile — genre chip dans la carte */}
+          {genre && (
+            <span className={`md:hidden inline-block rounded-sm px-1.5 py-px text-[6.5px] font-body font-bold mb-1.5 ${genreClass(genre)}`}>
+              {genre}
+            </span>
+          )}
+
+          {/* Titre — toujours 2 lignes minimum */}
+          <p className="font-display font-bold text-text text-[10.5px] leading-snug line-clamp-2 min-h-[2.625rem]">
+            {film.title}
+          </p>
+
+          {/* Réalisateur */}
+          {film.director && (
+            <p className="text-[9.5px] font-body text-muted/80 mt-0.5 truncate">
+              Dir. {film.director}
+            </p>
+          )}
+
+          {/* Casting */}
+          {film.cast_main && (
+            <p className="text-[9px] font-body text-muted/60 mt-0.5 truncate">
+              {film.cast_main}
+            </p>
+          )}
+
+          {/* Durée + format — mobile uniquement */}
+          <div className={`md:hidden flex gap-1 mt-1.5 text-[7.5px] font-body text-cyan ${
+            isLeft ? 'justify-end' : 'justify-start'
+          }`}>
+            {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
+            {film.projection_fmt && <span>· {film.projection_fmt}</span>}
+          </div>
+
+          {/* Ayant-droit */}
+          {film.studio && (
+            <div className={`mt-1.5 ${isLeft ? 'flex justify-end' : 'flex justify-start'}`}>
+              <StudioBadge studio={film.studio} size="sm" />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -193,7 +203,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
       })
     })
 
-    // Lignes de films — vol + dessin progressif du contour
+    // Lignes de films — vol synchronisé : carte + contour apparaissent ensemble
     container.querySelectorAll<HTMLElement>('.tl-film-row').forEach(row => {
       const leftCard  = row.querySelector<HTMLElement>('.tl-card-left')
       const rightCard = row.querySelector<HTMLElement>('.tl-card-right')
@@ -207,37 +217,14 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
         trigger: row,
         start: 'top 82%',
         onEnter: () => {
-          if (dot)       gsap.to(dot, { scale: 1, opacity: 1, duration: 0.22, ease: 'back.out(2)' })
-          if (leftCard)  gsap.to(leftCard,  { opacity: 1, x: 0, duration: 0.32, delay: 0.05, ease: 'power3.out' })
-          if (rightCard) gsap.to(rightCard, { opacity: 1, x: 0, duration: 0.32, delay: 0.05, ease: 'power3.out' })
-
-          // Dessin du contour — démarre après que la carte soit en place
-          ;[leftCard, rightCard].forEach(card => {
-            if (!card) return
-            const segTop    = card.querySelector<HTMLElement>('.seg-top')
-            const segRight  = card.querySelector<HTMLElement>('.seg-right')
-            const segBottom = card.querySelector<HTMLElement>('.seg-bottom')
-            const segLeft   = card.querySelector<HTMLElement>('.seg-left')
-            if (!segTop || !segRight || !segBottom || !segLeft) return
-
-            gsap.timeline({ delay: 0.28 })
-              .to(segTop,    { width: '100%',  duration: 0.2,  ease: 'power2.inOut' })
-              .to(segRight,  { height: '100%', duration: 0.15, ease: 'power2.inOut' }, '-=0.05')
-              .to(segBottom, { width: '100%',  duration: 0.2,  ease: 'power2.inOut' }, '-=0.05')
-              .to(segLeft,   { height: '100%', duration: 0.15, ease: 'power2.inOut' }, '-=0.05')
-          })
+          if (dot)       gsap.to(dot,       { scale: 1, opacity: 1, duration: 0.22, ease: 'back.out(2)' })
+          if (leftCard)  gsap.to(leftCard,  { opacity: 1, x: 0, duration: 0.35, delay: 0.05, ease: 'power3.out' })
+          if (rightCard) gsap.to(rightCard, { opacity: 1, x: 0, duration: 0.35, delay: 0.05, ease: 'power3.out' })
         },
         onLeaveBack: () => {
           if (dot)       gsap.to(dot,       { scale: 0, opacity: 0, duration: 0.15 })
           if (leftCard)  gsap.to(leftCard,  { opacity: 0, x: -28, duration: 0.18, ease: 'power2.in' })
           if (rightCard) gsap.to(rightCard, { opacity: 0, x: 28,  duration: 0.18, ease: 'power2.in' })
-
-          // Reset instantané des segments
-          ;[leftCard, rightCard].forEach(card => {
-            if (!card) return
-            card.querySelectorAll<HTMLElement>('.seg-top, .seg-bottom').forEach(s => gsap.set(s, { width: 0 }))
-            card.querySelectorAll<HTMLElement>('.seg-right, .seg-left').forEach(s => gsap.set(s, { height: 0 }))
-          })
         },
       })
     })
@@ -260,22 +247,26 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
           new Date(group.startDate + 'T00:00:00Z').getUTCMonth() !==
           new Date(prevGroup.startDate + 'T00:00:00Z').getUTCMonth()
 
+        const monthSeparator = isNewMonth && (
+          <div className="flex items-center gap-3 pt-10 pb-4 px-4">
+            <span className="font-display font-bold text-text text-sm tracking-[0.2em] uppercase shrink-0">
+              {formatMonthFull(group.startDate)}
+            </span>
+            <div className="flex-1 h-px bg-gradient-to-r from-gold/60 to-transparent" />
+          </div>
+        )
+
         // Semaine vide
         if (films.length === 0) {
           return (
             <div key={`${group.isoWeek}-empty`} id={`week-${group.startDate}`} className="scroll-mt-28">
-              {isNewMonth && (
-                <div className="flex items-center gap-3 pt-8 pb-3 px-3">
-                  <span className="font-display font-bold text-text/80 text-xs tracking-[0.2em] uppercase shrink-0">
-                    {formatMonthFull(group.startDate)}
-                  </span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-gold/50 to-transparent" />
-                </div>
-              )}
-              <div className="tl-week-node flex justify-center py-2 relative z-10">
-                <div className="border rounded-full px-3 py-0.5 text-[8px] font-body tracking-wider border-[#2a3a5a]/25 text-muted/25">
+              {monthSeparator}
+              <div className="tl-week-node flex items-center gap-3 py-3 relative z-10 px-4">
+                <div className="flex-1 h-px bg-[#2a4a7a]/30" />
+                <div className="rounded-full px-3 py-0.5 text-[8.5px] font-body tracking-wider border border-[#2a3a5a]/20 text-muted/25 whitespace-nowrap">
                   S{group.isoWeek} · {formatDateShort(group.startDate)}
                 </div>
+                <div className="flex-1 h-px bg-[#2a4a7a]/30" />
               </div>
             </div>
           )
@@ -289,26 +280,22 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
 
         return (
           <div key={group.isoWeek} id={`week-${group.startDate}`} className="scroll-mt-28">
-            {isNewMonth && (
-              <div className="flex items-center gap-3 pt-8 pb-3 px-3">
-                <span className="font-display font-bold text-text/80 text-xs tracking-[0.2em] uppercase shrink-0">
-                  {formatMonthFull(group.startDate)}
-                </span>
-                <div className="flex-1 h-px bg-gradient-to-r from-gold/50 to-transparent" />
-              </div>
-            )}
+            {monthSeparator}
 
-            <div className="tl-week-node flex justify-center py-3 relative z-10">
-              <div
-                className={`border rounded-full px-4 py-1.5 text-[9.5px] font-body font-bold tracking-wider ${
-                  isCurrent
-                    ? 'bg-gold/10 border-gold/50 text-gold shadow-[0_0_16px_rgba(255,215,0,0.2)]'
-                    : 'bg-surface-low border-[#2a3a5a]/60 text-muted/60'
-                }`}
-              >
+            {/* Séparateur semaine — visible et contrasté */}
+            <div className="tl-week-node flex items-center gap-3 py-4 relative z-10 px-4">
+              <div className={`flex-1 h-px ${isCurrent ? 'bg-gold/40' : 'bg-[#2a4a7a]/60'}`} />
+              <div className={`rounded-full px-4 py-1.5 text-[11px] font-body font-bold tracking-wider whitespace-nowrap ${
+                isCurrent
+                  ? 'bg-gold/15 border border-gold/70 text-gold shadow-[0_0_20px_rgba(255,215,0,0.25)]'
+                  : 'bg-surface-low border border-[#2a4a7a] text-muted'
+              }`}>
                 S{group.isoWeek} · {formatDateShort(group.startDate)}
-                {isCurrent && <span className="ml-1.5 opacity-70 font-normal">— en cours</span>}
+                {isCurrent && (
+                  <span className="ml-1.5 text-gold/70 font-normal text-[9.5px]">— en cours</span>
+                )}
               </div>
+              <div className={`flex-1 h-px ${isCurrent ? 'bg-gold/40' : 'bg-[#2a4a7a]/60'}`} />
             </div>
 
             {rows.map(({ left, right }, rowIdx) => {

@@ -42,3 +42,43 @@ body {
   color: var(--color-text);
   font-family: var(--font-body), sans-serif;
 }
+
+/* ── Timeline card borders ── */
+@property --tl-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes tl-border-spin {
+  to { --tl-border-angle: 360deg; }
+}
+
+@keyframes tl-glow-green {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 255, 136, .15); }
+  50%       { box-shadow: 0 0 16px 3px rgba(0, 255, 136, .4); }
+}
+
+@keyframes tl-glow-gold {
+  0%, 100% { box-shadow: 0 0 4px rgba(255, 215, 0, .15); }
+  50%       { box-shadow: 0 0 16px 3px rgba(255, 215, 0, .4); }
+}
+
+.tl-border-aurora {
+  --tl-border-angle: 0deg;
+  background: conic-gradient(
+    from var(--tl-border-angle),
+    #defcff 0%, #a855f7 25%, #fb923c 50%, #a855f7 75%, #defcff 100%
+  );
+  animation: tl-border-spin 4s linear infinite;
+}
+
+.tl-border-added {
+  background: #00ff88;
+  animation: tl-glow-green 2.5s ease-in-out infinite;
+}
+
+.tl-border-date-changed {
+  background: #ffd700;
+  animation: tl-glow-gold 2.5s ease-in-out infinite;
+}
