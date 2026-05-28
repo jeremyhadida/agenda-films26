@@ -5,7 +5,6 @@ import { groupFilmsByWeek } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
-import { MonthTabs } from '@/components/agenda/MonthTabs'
 import { WeekSection } from '@/components/agenda/WeekSection'
 import { ScrollToCurrentWeek } from '@/components/agenda/ScrollToCurrentWeek'
 import { AgendaViewToggle } from '@/components/agenda/AgendaViewToggle'
@@ -69,7 +68,6 @@ export default async function AgendaPage({
         {groups.length > 0 ? (
           <AgendaViewToggle groups={groups} events={events}>
             <>
-              <MonthTabs groups={groups} />
               <ScrollToCurrentWeek startDates={groups.map(g => g.startDate)} />
               <div className="mt-6 space-y-12">
                 {groups.map((group, i) => {

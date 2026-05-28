@@ -15,7 +15,7 @@ export function getIsoWeek(dateStr: string): number {
  * Returns the ISO year for a date — may differ from calendar year at year boundaries.
  * (e.g., 2025-12-29 is in ISO year 2026)
  */
-function getIsoYear(dateStr: string): number {
+export function getIsoYear(dateStr: string): number {
   const date = new Date(dateStr)
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
@@ -69,6 +69,13 @@ export function formatDateShort(dateStr: string): string {
   return `${d.getUTCDate()} ${FR_MONTHS[d.getUTCMonth()]}`
 }
 
+const FR_MONTHS_FULL = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+
+export function formatMonthFull(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00Z')
+  return `${FR_MONTHS_FULL[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
 /**
  * Returns a formatted week date range (Monday → Sunday) in French.
  * Same month:  "08 — 14 avr 2026"
@@ -119,4 +126,23 @@ export function groupFilmsByWeek(
   }
 
   return Array.from(weekMap.values()).sort((a, b) => a.startDate.localeCompare(b.startDate))
+}
+
+export function fillWeekGaps(groups: WeekGroup[]): WeekGroup[] {
+  if (groups.length < 2) return groups
+  const existingDates = new Map(groups.map(g => [g.startDate, g]))
+  const result: WeekGroup[] = []
+  const cursor = new Date(groups[0].startDate + 'T00:00:00Z')
+  const end    = new Date(groups[groups.length - 1].startDate + 'T00:00:00Z')
+  while (cursor <= end) {
+    const iso = cursor.toISOString().split('T')[0]
+    if (existingDates.has(iso)) {
+      result.push(existingDates.get(iso)!)
+    } else {
+      const week = getIsoWeek(iso)
+      result.push({ isoWeek: week, label: formatWeekLabel(week, iso), startDate: iso, films: [] })
+    }
+    cursor.setUTCDate(cursor.getUTCDate() + 7)
+  }
+  return result
 }

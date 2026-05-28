@@ -5,7 +5,8 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Film, FilmReleaseEvent, WeekGroup } from '@/lib/types'
-import { formatDuration, formatDateShort, getIsoWeek } from '@/lib/utils'
+import { formatDuration, formatDateShort, getIsoWeek, formatMonthFull } from '@/lib/utils'
+import { StudioBadge } from './StudioBadge'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -29,11 +30,24 @@ function genreClass(genre: string): string {
   return key ? GENRE_CLASSES[key] : 'bg-chip-bg text-chip-text'
 }
 
-function dotColorClass(isoWeek: number, isCurrent: boolean): string {
+function cardBorderGradient(event: FilmReleaseEvent | undefined): string {
+  if (event?.event_type === 'added')        return 'linear-gradient(135deg, #00ff88, #00cc66)'
+  if (event?.event_type === 'date_changed') return 'linear-gradient(135deg, #ffd700, #ffaa00)'
+  return 'linear-gradient(135deg, #defcff 0%, #a855f7 35%, #fb923c 70%, #defcff 100%)'
+}
+
+function dotColorForRow(
+  leftEvent: FilmReleaseEvent | undefined,
+  rightEvent: FilmReleaseEvent | undefined,
+  isoWeek: number,
+  isCurrent: boolean
+): string {
   if (isCurrent) return 'bg-gold border-gold shadow-[0_0_8px_rgba(255,215,0,0.45)]'
-  return isoWeek % 2 === 0
-    ? 'bg-cyan/20 border-cyan/30'
-    : 'bg-muted/20 border-muted/30'
+  const added       = leftEvent?.event_type === 'added'        || rightEvent?.event_type === 'added'
+  const dateChanged = leftEvent?.event_type === 'date_changed' || rightEvent?.event_type === 'date_changed'
+  if (added)       return 'bg-[#00ff88]/30 border-[#00ff88]/60 shadow-[0_0_6px_rgba(0,255,136,0.25)]'
+  if (dateChanged) return 'bg-gold/30 border-gold/60 shadow-[0_0_6px_rgba(255,215,0,0.25)]'
+  return isoWeek % 2 === 0 ? 'bg-cyan/35 border-cyan/45' : 'bg-muted/35 border-muted/45'
 }
 
 // ── Film card within the timeline ──
@@ -48,55 +62,67 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
 
   return (
     <div
-      className={`tl-card-${side} relative bg-surface-card border border-[#2a3a5a] rounded-lg p-2.5 ${
-        side === 'left' ? 'mr-3 text-right' : 'ml-3 text-left'
-      }`}
+      className={`tl-card-${side} relative rounded-lg min-w-0 overflow-hidden`}
+      style={{
+        background: cardBorderGradient(event),
+        padding: '1.5px',
+        ...(side === 'left' ? { marginRight: '0.75rem' } : { marginLeft: '0.75rem' }),
+      }}
     >
-      {/* Event badge */}
-      {event && (
-        <span
-          className={`absolute top-1.5 ${side === 'left' ? 'left-1.5' : 'right-1.5'} text-[9px] leading-none ${
-            event.event_type === 'added' ? 'text-gold' : 'text-cyan'
-          }`}
-          title={event.event_type === 'added' ? 'Nouvelle sortie' : 'Date modifiée'}
-          aria-label={event.event_type === 'added' ? 'Nouvelle sortie' : 'Date modifiée'}
-        >
-          {event.event_type === 'added' ? '✦' : '↕'}
-        </span>
-      )}
+      <div className={`bg-surface-card rounded-lg p-2.5 h-full ${side === 'left' ? 'text-right' : 'text-left'}`}>
+        {/* Event badge */}
+        {event && (
+          <span
+            className={`absolute top-1.5 ${side === 'left' ? 'left-1.5' : 'right-1.5'} text-[9px] leading-none ${
+              event.event_type === 'added' ? 'text-[#00ff88]' : 'text-gold'
+            }`}
+            title={event.event_type === 'added' ? 'Nouvelle sortie' : 'Date modifiée'}
+            aria-label={event.event_type === 'added' ? 'Nouvelle sortie' : 'Date modifiée'}
+          >
+            {event.event_type === 'added' ? '✦' : '↕'}
+          </span>
+        )}
 
-      {/* Genre chip */}
-      {genre && (
-        <span className={`inline-block rounded-sm px-1.5 py-px text-[6.5px] font-body font-bold mb-1.5 ${genreClass(genre)}`}>
-          {genre}
-        </span>
-      )}
+        {/* Genre chip */}
+        {genre && (
+          <span className={`inline-block rounded-sm px-1.5 py-px text-[6.5px] font-body font-bold mb-1.5 ${genreClass(genre)}`}>
+            {genre}
+          </span>
+        )}
 
-      {/* Title */}
-      <p className="font-display font-bold text-text text-[10.5px] leading-snug line-clamp-2">
-        {film.title}
-      </p>
-
-      {/* Director */}
-      {film.director && (
-        <p className="text-[8px] font-body text-muted/70 mt-0.5 truncate">
-          Dir. {film.director}
+        {/* Title — always 2 lines minimum */}
+        <p className="font-display font-bold text-text text-[10.5px] leading-snug line-clamp-2 min-h-[2.625rem]">
+          {film.title}
         </p>
-      )}
 
-      {/* Cast */}
-      {film.cast_main && (
-        <p className="text-[7.5px] font-body text-muted/55 mt-0.5 truncate">
-          {film.cast_main}
-        </p>
-      )}
+        {/* Director */}
+        {film.director && (
+          <p className="text-[8px] font-body text-muted/70 mt-0.5 truncate">
+            Dir. {film.director}
+          </p>
+        )}
 
-      {/* Duration + format */}
-      <div className={`flex gap-1 mt-1.5 text-[7.5px] font-body text-cyan ${
-        side === 'left' ? 'justify-end' : 'justify-start'
-      }`}>
-        {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
-        {film.projection_fmt && <span>· {film.projection_fmt}</span>}
+        {/* Cast */}
+        {film.cast_main && (
+          <p className="text-[7.5px] font-body text-muted/55 mt-0.5 truncate">
+            {film.cast_main}
+          </p>
+        )}
+
+        {/* Duration + format */}
+        <div className={`flex gap-1 mt-1.5 text-[7.5px] font-body text-cyan ${
+          side === 'left' ? 'justify-end' : 'justify-start'
+        }`}>
+          {film.duration_min && <span>{formatDuration(film.duration_min)}</span>}
+          {film.projection_fmt && <span>· {film.projection_fmt}</span>}
+        </div>
+
+        {/* Studio / ayant-droit */}
+        {film.studio && (
+          <div className={`mt-1.5 ${side === 'left' ? 'flex justify-end' : 'flex justify-start'}`}>
+            <StudioBadge studio={film.studio} size="sm" />
+          </div>
+        )}
       </div>
     </div>
   )
@@ -147,7 +173,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
       ScrollTrigger.create({
         trigger: node,
         start: 'top 88%',
-        onEnter:    () => gsap.to(node, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }),
+        onEnter:     () => gsap.to(node, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }),
         onLeaveBack: () => gsap.to(node, { opacity: 0, y: 8, duration: 0.15 }),
       })
     })
@@ -187,9 +213,35 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
         aria-hidden="true"
       />
 
-      {groups.map(group => {
+      {groups.map((group, i) => {
         const isCurrent = group.isoWeek === currentWeek
         const films = group.films
+
+        const prevGroup = i > 0 ? groups[i - 1] : null
+        const isNewMonth = !prevGroup ||
+          new Date(group.startDate + 'T00:00:00Z').getUTCMonth() !==
+          new Date(prevGroup.startDate + 'T00:00:00Z').getUTCMonth()
+
+        // Semaine vide
+        if (films.length === 0) {
+          return (
+            <div key={`${group.isoWeek}-empty`} id={`week-${group.startDate}`} className="scroll-mt-28">
+              {isNewMonth && (
+                <div className="flex items-center gap-3 pt-8 pb-3 px-3">
+                  <span className="font-display font-bold text-text/80 text-xs tracking-[0.2em] uppercase shrink-0">
+                    {formatMonthFull(group.startDate)}
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-gold/50 to-transparent" />
+                </div>
+              )}
+              <div className="tl-week-node flex justify-center py-2 relative z-10">
+                <div className="border rounded-full px-3 py-0.5 text-[8px] font-body tracking-wider border-[#2a3a5a]/25 text-muted/25">
+                  S{group.isoWeek} · {formatDateShort(group.startDate)}
+                </div>
+              </div>
+            </div>
+          )
+        }
 
         // Build pairs: [0,1], [2,3], ...
         const rows: { left: typeof films[0]; right: typeof films[0] | null }[] = []
@@ -198,13 +250,23 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
         }
 
         return (
-          <div key={group.isoWeek}>
+          <div key={group.isoWeek} id={`week-${group.startDate}`} className="scroll-mt-28">
+            {/* Séparateur de mois */}
+            {isNewMonth && (
+              <div className="flex items-center gap-3 pt-8 pb-3 px-3">
+                <span className="font-display font-bold text-text/80 text-xs tracking-[0.2em] uppercase shrink-0">
+                  {formatMonthFull(group.startDate)}
+                </span>
+                <div className="flex-1 h-px bg-gradient-to-r from-gold/50 to-transparent" />
+              </div>
+            )}
+
             {/* Week node */}
             <div className="tl-week-node flex justify-center py-3 relative z-10">
               <div
-                className={`border rounded-full px-3 py-1 text-[8.5px] font-body font-bold tracking-wider ${
+                className={`border rounded-full px-4 py-1.5 text-[9.5px] font-body font-bold tracking-wider ${
                   isCurrent
-                    ? 'bg-gold/10 border-gold/50 text-gold shadow-[0_0_12px_rgba(255,215,0,0.15)]'
+                    ? 'bg-gold/10 border-gold/50 text-gold shadow-[0_0_16px_rgba(255,215,0,0.2)]'
                     : 'bg-surface-low border-[#2a3a5a]/60 text-muted/60'
                 }`}
               >
@@ -214,23 +276,30 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
             </div>
 
             {/* Film rows */}
-            {rows.map(({ left, right }, rowIdx) => (
-              <div
-                key={`${group.isoWeek}-${rowIdx}`}
-                className="tl-film-row grid grid-cols-[1fr_16px_1fr] items-center py-1.5 relative z-10 px-2"
-              >
-                <FilmTimelineCard film={left} event={eventMap.get(left.id)} side="left" />
+            {rows.map(({ left, right }, rowIdx) => {
+              const leftEvent  = eventMap.get(left.id)
+              const rightEvent = right ? eventMap.get(right.id) : undefined
 
+              return (
                 <div
-                  className={`tl-dot w-2.5 h-2.5 rounded-full border-[1.5px] justify-self-center flex-shrink-0 ${dotColorClass(group.isoWeek, isCurrent)}`}
-                />
+                  key={`${group.isoWeek}-${rowIdx}`}
+                  className="tl-film-row grid grid-cols-[1fr_16px_1fr] items-center py-1.5 relative z-10 px-2 min-w-0"
+                >
+                  <FilmTimelineCard film={left} event={leftEvent} side="left" />
 
-                {right
-                  ? <FilmTimelineCard film={right} event={eventMap.get(right.id)} side="right" />
-                  : <div />
-                }
-              </div>
-            ))}
+                  <div
+                    className={`tl-dot w-2.5 h-2.5 rounded-full border-[1.5px] justify-self-center flex-shrink-0 ${
+                      dotColorForRow(leftEvent, rightEvent, group.isoWeek, isCurrent)
+                    }`}
+                  />
+
+                  {right
+                    ? <FilmTimelineCard film={right} event={rightEvent} side="right" />
+                    : <div />
+                  }
+                </div>
+              )
+            })}
           </div>
         )
       })}
