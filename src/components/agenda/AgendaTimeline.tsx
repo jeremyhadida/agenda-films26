@@ -10,7 +10,7 @@ import { StudioBadge } from './StudioBadge'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// ── Genre classes (même mapping que FilmCard) ──
+// ── Genre classes ──
 const GENRE_CLASSES: Record<string, string> = {
   ACTION:       'bg-red-900/60 text-red-200',
   COMÉDIE:      'bg-yellow-900/60 text-yellow-200',
@@ -30,10 +30,23 @@ function genreClass(genre: string): string {
   return key ? GENRE_CLASSES[key] : 'bg-chip-bg text-chip-text'
 }
 
-function cardBorderGradient(event: FilmReleaseEvent | undefined): string {
-  if (event?.event_type === 'added')        return 'linear-gradient(135deg, #00ff88, #00cc66)'
-  if (event?.event_type === 'date_changed') return 'linear-gradient(135deg, #ffd700, #ffaa00)'
-  return 'linear-gradient(135deg, #defcff 0%, #a855f7 35%, #fb923c 70%, #defcff 100%)'
+// Per-segment border colors — clockwise seamless aurora for default
+function cardBorderBg(event: FilmReleaseEvent | undefined): {
+  top: string; right: string; bottom: string; left: string
+} {
+  if (event?.event_type === 'added') {
+    return { top: '#00ff88', right: '#00ff88', bottom: '#00ff88', left: '#00ff88' }
+  }
+  if (event?.event_type === 'date_changed') {
+    return { top: '#ffd700', right: '#ffd700', bottom: '#ffd700', left: '#ffd700' }
+  }
+  // Aurora multicolor — chaque segment reprend la couleur du coin précédent
+  return {
+    top:    'linear-gradient(90deg,  #defcff, #a855f7, #fb923c)',
+    right:  'linear-gradient(180deg, #fb923c, #a855f7, #defcff)',
+    bottom: 'linear-gradient(270deg, #defcff, #a855f7, #fb923c)',
+    left:   'linear-gradient(0deg,   #fb923c, #a855f7, #defcff)',
+  }
 }
 
 function dotColorForRow(
@@ -50,7 +63,7 @@ function dotColorForRow(
   return isoWeek % 2 === 0 ? 'bg-cyan/35 border-cyan/45' : 'bg-muted/35 border-muted/45'
 }
 
-// ── Film card within the timeline ──
+// ── Film card ──
 interface FilmTimelineCardProps {
   film: Film & { release_date: string }
   event: FilmReleaseEvent | undefined
@@ -59,17 +72,23 @@ interface FilmTimelineCardProps {
 
 function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
   const genre = film.genre?.split(',')[0]?.trim()
+  const bg = cardBorderBg(event)
 
   return (
     <div
-      className={`tl-card-${side} relative rounded-lg min-w-0 overflow-hidden`}
-      style={{
-        background: cardBorderGradient(event),
-        padding: '1.5px',
-        ...(side === 'left' ? { marginRight: '0.75rem' } : { marginLeft: '0.75rem' }),
-      }}
+      className={`tl-card-${side} relative rounded-lg min-w-0`}
+      style={side === 'left' ? { marginRight: '0.75rem' } : { marginLeft: '0.75rem' }}
     >
-      <div className={`bg-surface-card rounded-lg p-2.5 h-full ${side === 'left' ? 'text-right' : 'text-left'}`}>
+      {/* 4 segments de dessin — animés séquentiellement par GSAP (sens horaire) */}
+      <div className="tl-border-draw absolute inset-0 rounded-lg pointer-events-none z-10 overflow-hidden">
+        <div className="seg-top    absolute top-0    left-0   h-[1.5px] w-0" style={{ background: bg.top }} />
+        <div className="seg-right  absolute top-0    right-0  w-[1.5px] h-0" style={{ background: bg.right }} />
+        <div className="seg-bottom absolute bottom-0 right-0  h-[1.5px] w-0" style={{ background: bg.bottom }} />
+        <div className="seg-left   absolute bottom-0 left-0   w-[1.5px] h-0" style={{ background: bg.left }} />
+      </div>
+
+      {/* Contenu de la carte */}
+      <div className={`bg-surface-card border border-[#2a3a5a]/20 rounded-lg p-2.5 ${side === 'left' ? 'text-right' : 'text-left'}`}>
         {/* Event badge */}
         {event && (
           <span
@@ -137,14 +156,12 @@ interface AgendaTimelineProps {
 export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Build lookup: film_id → most recent visible non-removed event
   const eventMap = new Map<string, FilmReleaseEvent>()
   events
     .filter(e => e.visible && e.event_type !== 'removed')
     .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at))
     .forEach(e => { if (!eventMap.has(e.film_id)) eventMap.set(e.film_id, e) })
 
-  // Current ISO week
   const now = new Date()
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   const currentWeek = getIsoWeek(todayStr)
@@ -153,7 +170,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
     const container = containerRef.current
     if (!container) return
 
-    // Center axis — draws progressively as user scrolls
+    // Axe central — se dessine au scroll
     const axis = container.querySelector<HTMLElement>('.tl-axis')
     if (axis) {
       gsap.set(axis, { scaleY: 0, transformOrigin: 'top center' })
@@ -161,13 +178,11 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
         trigger: container,
         start: 'top 80%',
         end: 'bottom bottom',
-        onUpdate: self => {
-          gsap.set(axis, { scaleY: self.progress })
-        },
+        onUpdate: self => { gsap.set(axis, { scaleY: self.progress }) },
       })
     }
 
-    // Week nodes — fade up
+    // Nœuds semaine — fade up
     container.querySelectorAll<HTMLElement>('.tl-week-node').forEach(node => {
       gsap.set(node, { opacity: 0, y: 8 })
       ScrollTrigger.create({
@@ -178,7 +193,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
       })
     })
 
-    // Film rows — cards fly in from sides
+    // Lignes de films — vol + dessin progressif du contour
     container.querySelectorAll<HTMLElement>('.tl-film-row').forEach(row => {
       const leftCard  = row.querySelector<HTMLElement>('.tl-card-left')
       const rightCard = row.querySelector<HTMLElement>('.tl-card-right')
@@ -192,14 +207,37 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
         trigger: row,
         start: 'top 82%',
         onEnter: () => {
-          if (dot)       gsap.to(dot,       { scale: 1, opacity: 1, duration: 0.22, ease: 'back.out(2)' })
+          if (dot)       gsap.to(dot, { scale: 1, opacity: 1, duration: 0.22, ease: 'back.out(2)' })
           if (leftCard)  gsap.to(leftCard,  { opacity: 1, x: 0, duration: 0.32, delay: 0.05, ease: 'power3.out' })
           if (rightCard) gsap.to(rightCard, { opacity: 1, x: 0, duration: 0.32, delay: 0.05, ease: 'power3.out' })
+
+          // Dessin du contour — démarre après que la carte soit en place
+          ;[leftCard, rightCard].forEach(card => {
+            if (!card) return
+            const segTop    = card.querySelector<HTMLElement>('.seg-top')
+            const segRight  = card.querySelector<HTMLElement>('.seg-right')
+            const segBottom = card.querySelector<HTMLElement>('.seg-bottom')
+            const segLeft   = card.querySelector<HTMLElement>('.seg-left')
+            if (!segTop || !segRight || !segBottom || !segLeft) return
+
+            gsap.timeline({ delay: 0.28 })
+              .to(segTop,    { width: '100%',  duration: 0.2,  ease: 'power2.inOut' })
+              .to(segRight,  { height: '100%', duration: 0.15, ease: 'power2.inOut' }, '-=0.05')
+              .to(segBottom, { width: '100%',  duration: 0.2,  ease: 'power2.inOut' }, '-=0.05')
+              .to(segLeft,   { height: '100%', duration: 0.15, ease: 'power2.inOut' }, '-=0.05')
+          })
         },
         onLeaveBack: () => {
           if (dot)       gsap.to(dot,       { scale: 0, opacity: 0, duration: 0.15 })
           if (leftCard)  gsap.to(leftCard,  { opacity: 0, x: -28, duration: 0.18, ease: 'power2.in' })
           if (rightCard) gsap.to(rightCard, { opacity: 0, x: 28,  duration: 0.18, ease: 'power2.in' })
+
+          // Reset instantané des segments
+          ;[leftCard, rightCard].forEach(card => {
+            if (!card) return
+            card.querySelectorAll<HTMLElement>('.seg-top, .seg-bottom').forEach(s => gsap.set(s, { width: 0 }))
+            card.querySelectorAll<HTMLElement>('.seg-right, .seg-left').forEach(s => gsap.set(s, { height: 0 }))
+          })
         },
       })
     })
@@ -207,7 +245,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
 
   return (
     <div ref={containerRef} className="relative mt-4 pb-16">
-      {/* Vertical axis */}
+      {/* Axe vertical */}
       <div
         className="tl-axis pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#1e3260] to-transparent"
         aria-hidden="true"
@@ -243,15 +281,14 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
           )
         }
 
-        // Build pairs: [0,1], [2,3], ...
+        // Paires gauche/droite
         const rows: { left: typeof films[0]; right: typeof films[0] | null }[] = []
-        for (let i = 0; i < films.length; i += 2) {
-          rows.push({ left: films[i], right: films[i + 1] ?? null })
+        for (let j = 0; j < films.length; j += 2) {
+          rows.push({ left: films[j], right: films[j + 1] ?? null })
         }
 
         return (
           <div key={group.isoWeek} id={`week-${group.startDate}`} className="scroll-mt-28">
-            {/* Séparateur de mois */}
             {isNewMonth && (
               <div className="flex items-center gap-3 pt-8 pb-3 px-3">
                 <span className="font-display font-bold text-text/80 text-xs tracking-[0.2em] uppercase shrink-0">
@@ -261,7 +298,6 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
               </div>
             )}
 
-            {/* Week node */}
             <div className="tl-week-node flex justify-center py-3 relative z-10">
               <div
                 className={`border rounded-full px-4 py-1.5 text-[9.5px] font-body font-bold tracking-wider ${
@@ -275,7 +311,6 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
               </div>
             </div>
 
-            {/* Film rows */}
             {rows.map(({ left, right }, rowIdx) => {
               const leftEvent  = eventMap.get(left.id)
               const rightEvent = right ? eventMap.get(right.id) : undefined
