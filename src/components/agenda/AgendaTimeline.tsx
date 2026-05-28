@@ -251,7 +251,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
   }, { scope: containerRef })
 
   return (
-    <div ref={containerRef} className="relative mt-4 pb-16">
+    <div ref={containerRef} className="relative mt-4 pb-16 overflow-x-hidden">
       {/* Axe vertical */}
       <div
         className="tl-axis pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#1e3260] to-transparent"
