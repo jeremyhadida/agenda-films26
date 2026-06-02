@@ -53,7 +53,7 @@ export default async function AgendaPage({
         {allGroups.length > 0 ? (
           <>
             <MonthTabs groups={allGroups} />
-            <AgendaTimeline groups={allGroups} events={events} />
+            <AgendaTimeline groups={allGroups} events={events} paysId={pays} />
           </>
         ) : (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">

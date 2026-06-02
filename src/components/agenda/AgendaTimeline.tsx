@@ -4,11 +4,17 @@ import { useRef, useEffect } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Image from 'next/image'
 import type { Film, FilmReleaseEvent, WeekGroup } from '@/lib/types'
-import { formatDuration, formatDateShort, getIsoWeek, formatMonthFull } from '@/lib/utils'
+import { formatDuration, formatDateShort, formatDate, getIsoWeek, formatMonthFull } from '@/lib/utils'
 import { StudioBadge } from './StudioBadge'
 
 gsap.registerPlugin(ScrollTrigger)
+
+function formatDayShort(isoDate: string): string {
+  const [y, m, d] = isoDate.split('-')
+  return `${d}/${m}/${y.slice(2)}`
+}
 
 // ── Genre classes ──
 const GENRE_CLASSES: Record<string, string> = {
@@ -50,6 +56,57 @@ function dotColorForRow(
   return isoWeek % 2 === 0 ? 'bg-cyan/35 border-cyan/45' : 'bg-muted/35 border-muted/45'
 }
 
+// ── Bannière mouvement card ──
+const BANNER_EVENT_STYLES: Record<string, { text: string; bg: string }> = {
+  added:        { text: 'text-emerald-400', bg: 'bg-emerald-500/8' },
+  date_changed: { text: 'text-gold',        bg: 'bg-gold/8'        },
+  removed:      { text: 'text-red-400',     bg: 'bg-red-500/8'    },
+}
+
+function MovementBannerCard({ event }: { event: FilmReleaseEvent & { film?: Film } }) {
+  const style = BANNER_EVENT_STYLES[event.event_type] ?? BANNER_EVENT_STYLES.added
+
+  function handleClick() {
+    document.getElementById(`film-${event.film_id}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`flex gap-3 p-3 rounded-lg w-full text-left cursor-pointer hover:scale-[1.01] transition-transform ${style.bg}`}
+    >
+      <div className="w-8 h-11 rounded overflow-hidden shrink-0 bg-surface-low relative">
+        {event.film?.poster_url ? (
+          <Image src={event.film.poster_url} alt="" fill className="object-cover" sizes="32px" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-muted text-[10px]">🎬</div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-display font-semibold text-text text-xs truncate mb-0.5">
+          {event.film?.title ?? event.film_id}
+        </p>
+        <div className="text-[10px] font-body text-muted whitespace-nowrap overflow-hidden">
+          {event.event_type === 'added' && event.new_date && (
+            <span>Sortie : <span className="text-text">{formatDate(event.new_date)}</span></span>
+          )}
+          {event.event_type === 'date_changed' && event.old_date && event.new_date && (
+            <>
+              <span className="line-through opacity-60">{formatDate(event.old_date)}</span>
+              <span> → </span>
+              <span className="text-text">{formatDate(event.new_date)}</span>
+            </>
+          )}
+          {event.event_type === 'removed' && event.old_date && (
+            <span>Était prévu le <span className="text-text">{formatDate(event.old_date)}</span></span>
+          )}
+        </div>
+      </div>
+    </button>
+  )
+}
+
 // ── Film card ──
 interface FilmTimelineCardProps {
   film: Film & { release_date: string }
@@ -86,6 +143,7 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
 
   return (
     <div
+      id={`film-${film.id}`}
       className={`tl-card-${side} relative min-w-0`}
       style={isLeft ? { marginRight: '0.75rem', opacity: 0 } : { marginLeft: '0.75rem', opacity: 0 }}
     >
@@ -163,16 +221,51 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
 interface AgendaTimelineProps {
   groups: WeekGroup[]
   events: FilmReleaseEvent[]
+  paysId: string
 }
 
-export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
+export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const eventMap = new Map<string, FilmReleaseEvent>()
-  events
-    .filter(e => e.visible && e.event_type !== 'removed')
+  // Dernier jour de modification (granularité jour, heure ignorée)
+  const latestDay = events
+    .filter(e => e.visible)
+    .map(e => e.occurred_at.slice(0, 10))
+    .sort()
+    .reverse()[0] ?? null
+
+  const latestDayEvents = latestDay
+    ? events.filter(e => e.visible && e.occurred_at.slice(0, 10) === latestDay)
+    : []
+
+  // Un seul événement par film (le plus récent du jour), tous types confondus
+  const latestByFilm = new Map<string, FilmReleaseEvent>()
+  latestDayEvents
     .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at))
-    .forEach(e => { if (!eventMap.has(e.film_id)) eventMap.set(e.film_id, e) })
+    .forEach(e => { if (!latestByFilm.has(e.film_id)) latestByFilm.set(e.film_id, e) })
+
+  // eventMap pour les badges / bordures (removed exclus)
+  const eventMap = new Map<string, FilmReleaseEvent>()
+  latestByFilm.forEach((e, filmId) => {
+    if (e.event_type !== 'removed') eventMap.set(filmId, e)
+  })
+
+  // Données de la bannière — triées par type (added → date_changed → removed)
+  const TYPE_ORDER_BANNER: Record<string, number> = { added: 0, date_changed: 1, removed: 2 }
+  const uniqueLatestEvents = Array.from(latestByFilm.values())
+  const sortedBannerEvents = [...uniqueLatestEvents].sort(
+    (a, b) => (TYPE_ORDER_BANNER[a.event_type] ?? 9) - (TYPE_ORDER_BANNER[b.event_type] ?? 9)
+  )
+  const hasBanner = uniqueLatestEvents.length > 0
+
+  const BANNER_SECTIONS = [
+    { key: 'added' as const,        label: 'Ajouts',      dot: 'bg-emerald-500', text: 'text-emerald-400' },
+    { key: 'date_changed' as const, label: 'Modif',       dot: 'bg-gold',        text: 'text-gold'        },
+    { key: 'removed' as const,      label: 'Annulations', dot: 'bg-red-500',     text: 'text-red-400'     },
+  ] as const
+  const activeSections = BANNER_SECTIONS
+    .map(s => ({ ...s, events: sortedBannerEvents.filter(e => e.event_type === s.key) }))
+    .filter(s => s.events.length > 0)
 
   const now = new Date()
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
@@ -252,6 +345,46 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
 
   return (
     <div ref={containerRef} className="relative mt-4 pb-16 overflow-x-hidden">
+
+      {/* Bannière derniers mouvements */}
+      {hasBanner && latestDay && (
+        <div className="mb-6 mx-2">
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="font-display font-bold text-text text-[11px] tracking-wide">
+              Derniers Mouvements
+            </span>
+            <span className="text-muted font-body text-[10px]">({formatDayShort(latestDay)})</span>
+          </div>
+          <div className="flex items-start gap-0 overflow-x-auto pb-2">
+            {activeSections.map((section, idx) => (
+              <div
+                key={section.key}
+                className={`flex items-start gap-2 shrink-0 ${idx > 0 ? 'border-l border-[#2a4a7a]/50 pl-4 ml-4' : ''}`}
+              >
+                {/* Label de section vertical */}
+                <div className="flex flex-col items-center gap-1 pt-3 shrink-0">
+                  <span className={`w-1.5 h-1.5 rounded-full ${section.dot}`} />
+                  <span
+                    className={`text-[8.5px] font-bold uppercase tracking-wider ${section.text}`}
+                    style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                  >
+                    {section.label}
+                  </span>
+                </div>
+                {/* Cards */}
+                <div className="flex gap-2">
+                  {section.events.map(event => (
+                    <div key={event.id} className="w-44 shrink-0">
+                      <MovementBannerCard event={event as FilmReleaseEvent & { film?: Film }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Axe vertical */}
       <div
         className="tl-axis pointer-events-none absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#1e3260] to-transparent"
