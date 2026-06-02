@@ -8,6 +8,7 @@ const FR_MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
 
 interface MonthTabsProps {
   groups: WeekGroup[]
+  rightSlot?: React.ReactNode
 }
 
 function getUniqueMonths(groups: WeekGroup[]): { month: number; year: number; firstWeekStartDate: string }[] {
@@ -25,7 +26,7 @@ function getUniqueMonths(groups: WeekGroup[]): { month: number; year: number; fi
   return result
 }
 
-export function MonthTabs({ groups }: MonthTabsProps) {
+export function MonthTabs({ groups, rightSlot }: MonthTabsProps) {
   const months = getUniqueMonths(groups)
   const [activeStartDate, setActiveStartDate] = useState<string>(groups[0]?.startDate ?? '')
   const [navVisible, setNavVisible] = useState(true)
@@ -92,8 +93,8 @@ export function MonthTabs({ groups }: MonthTabsProps) {
           navVisible ? 'max-h-[60px]' : 'max-h-0'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 py-2">
-          <div ref={tabsContainerRef} className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-3">
+          <div ref={tabsContainerRef} className="flex-1 flex gap-2 overflow-x-auto scrollbar-none pb-1">
             {months.map(({ month, year, firstWeekStartDate }) => {
               const key = `${year}-${month}`
               const isActive = activeMonthKey === key
@@ -114,6 +115,7 @@ export function MonthTabs({ groups }: MonthTabsProps) {
               )
             })}
           </div>
+          {rightSlot && <div className="shrink-0">{rightSlot}</div>}
         </div>
       </div>
     </div>

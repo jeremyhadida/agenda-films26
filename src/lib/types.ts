@@ -20,6 +20,7 @@ export interface Film {
   projection_fmt: string | null   // '2D' | '3D' | 'IMAX' | '4DX'
   audio_mix: string | null        // 'Dolby Atmos' | 'DTS' | 'Stéréo'
   nationality: string | null
+  status: string | null
 }
 
 export interface FilmRelease {

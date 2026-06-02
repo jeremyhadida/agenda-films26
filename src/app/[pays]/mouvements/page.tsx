@@ -38,7 +38,7 @@ export default async function MouvementsPage({
 
   return (
     <>
-      <Header countries={countries} currentCountryId={pays} />
+      <Header currentCountryId={pays} />
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-display font-bold text-gold text-2xl">Mouvements</h1>

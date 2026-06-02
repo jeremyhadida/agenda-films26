@@ -39,7 +39,7 @@ export default async function FilmPage({
 
   return (
     <>
-      <Header countries={countries} currentCountryId={pays} />
+      <Header currentCountryId={pays} />
       <main className="pb-24 md:pb-8">
         <HeroSection film={film} />
 
