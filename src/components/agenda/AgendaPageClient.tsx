@@ -26,6 +26,18 @@ export function AgendaPageClient({ allGroups, events, paysId }: AgendaPageClient
 
   const filteredGroups = allGroups.filter(g => getIsoYear(g.startDate) === selectedYear)
 
+  // Pour l'année courante : démarrer la frise à la semaine en cours (pas de scroll nécessaire)
+  const todayUTC = new Date()
+  const dow = todayUTC.getUTCDay() || 7
+  const mondayUTC = new Date(Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()))
+  mondayUTC.setUTCDate(mondayUTC.getUTCDate() - dow + 1)
+  const currentMondayStr = mondayUTC.toISOString().split('T')[0]
+
+  const fromCurrentWeek = filteredGroups.filter(g => g.startDate >= currentMondayStr)
+  const displayGroups = (selectedYear === currentYear && fromCurrentWeek.length > 0)
+    ? fromCurrentWeek
+    : filteredGroups
+
   return (
     <>
       {availableYears.length > 1 && (
@@ -42,8 +54,8 @@ export function AgendaPageClient({ allGroups, events, paysId }: AgendaPageClient
           </select>
         </div>
       )}
-      <MonthTabs groups={filteredGroups} />
-      <AgendaTimeline groups={filteredGroups} events={events} />
+      <MonthTabs groups={displayGroups} />
+      <AgendaTimeline groups={displayGroups} events={events} />
     </>
   )
 }
