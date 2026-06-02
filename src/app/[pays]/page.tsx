@@ -5,8 +5,8 @@ import { groupFilmsByWeek, fillWeekGaps } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { MobileNav } from '@/components/layout/MobileNav'
-import { MonthTabs } from '@/components/agenda/MonthTabs'
-import { AgendaTimeline } from '@/components/agenda/AgendaTimeline'
+import { LastMovementsPanel } from '@/components/agenda/LastMovementsPanel'
+import { AgendaPageClient } from '@/components/agenda/AgendaPageClient'
 
 export const revalidate = 3600
 
@@ -52,8 +52,8 @@ export default async function AgendaPage({
       <main className="max-w-7xl mx-auto px-4 pb-24 md:pb-8">
         {allGroups.length > 0 ? (
           <>
-            <MonthTabs groups={allGroups} />
-            <AgendaTimeline groups={allGroups} events={events} paysId={pays} />
+            <LastMovementsPanel events={events} />
+            <AgendaPageClient allGroups={allGroups} events={events} paysId={pays} />
           </>
         ) : (
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
