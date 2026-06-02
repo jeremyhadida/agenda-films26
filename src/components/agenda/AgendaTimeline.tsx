@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -195,24 +195,6 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
   const now = new Date()
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   const currentWeek = getIsoWeek(todayStr)
-
-  // Scroll automatique vers la semaine courante (ou la prochaine disponible)
-  useEffect(() => {
-    const todayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
-    const dow = todayUTC.getUTCDay() || 7
-    const monday = new Date(todayUTC)
-    monday.setUTCDate(todayUTC.getUTCDate() - dow + 1)
-    const mondayStr = monday.toISOString().split('T')[0]
-
-    const target =
-      groups.find(g => g.startDate === mondayStr)?.startDate ??
-      groups.find(g => g.startDate >= mondayStr)?.startDate ??
-      groups[groups.length - 1]?.startDate
-
-    if (target) {
-      document.getElementById(`week-${target}`)?.scrollIntoView({ behavior: 'instant', block: 'start' })
-    }
-  }, [])
 
   useGSAP(() => {
     const container = containerRef.current
