@@ -5,6 +5,7 @@ import type { FilmReleaseEvent, WeekGroup } from '@/lib/types'
 import { getIsoYear } from '@/lib/utils'
 import { MonthTabs } from './MonthTabs'
 import { AgendaTimeline } from './AgendaTimeline'
+import { ScrollToCurrentWeek } from './ScrollToCurrentWeek'
 
 interface AgendaPageClientProps {
   allGroups: WeekGroup[]
@@ -25,19 +26,10 @@ export function AgendaPageClient({ allGroups, events, paysId, showAllWeeks }: Ag
 
   const [selectedYear, setSelectedYear] = useState(defaultYear)
 
-  const filteredGroups = allGroups.filter(g => getIsoYear(g.startDate) === selectedYear)
-
-  // Vue normale : démarrer à la semaine courante. Vue master (showAllWeeks) : tout l'historique.
-  const todayUTC = new Date()
-  const dow = todayUTC.getUTCDay() || 7
-  const mondayUTC = new Date(Date.UTC(todayUTC.getUTCFullYear(), todayUTC.getUTCMonth(), todayUTC.getUTCDate()))
-  mondayUTC.setUTCDate(mondayUTC.getUTCDate() - dow + 1)
-  const currentMondayStr = mondayUTC.toISOString().split('T')[0]
-
-  const fromCurrentWeek = filteredGroups.filter(g => g.startDate >= currentMondayStr)
-  const displayGroups = showAllWeeks
-    ? filteredGroups
-    : (selectedYear === currentYear && fromCurrentWeek.length > 0 ? fromCurrentWeek : filteredGroups)
+  // Toutes les semaines de l'année sélectionnée — les films passés restent dans le DOM
+  // pour que le scroll depuis LastMovementsPanel fonctionne même sur les sorties récentes.
+  // ScrollToCurrentWeek positionne la vue sur la semaine courante au chargement.
+  const displayGroups = allGroups.filter(g => getIsoYear(g.startDate) === selectedYear)
 
   const yearSelect = availableYears.length > 1 ? (
     <select
@@ -54,6 +46,9 @@ export function AgendaPageClient({ allGroups, events, paysId, showAllWeeks }: Ag
   return (
     <>
       <MonthTabs groups={displayGroups} rightSlot={yearSelect} />
+      {!showAllWeeks && (
+        <ScrollToCurrentWeek startDates={displayGroups.map(g => g.startDate)} />
+      )}
       <AgendaTimeline groups={displayGroups} events={events} />
     </>
   )
