@@ -1,6 +1,8 @@
 'use client'
 
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import gsap from 'gsap'
 import type { Film, FilmReleaseEvent } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
@@ -21,12 +23,25 @@ const BANNER_SECTIONS = [
   { key: 'removed' as const,      label: 'Annulations', dot: 'bg-red-500',     text: 'text-red-400'     },
 ] as const
 
-function MovementBannerCard({ event }: { event: FilmReleaseEvent & { film?: Film } }) {
+function scrollToFilm(filmId: string) {
+  const el = document.getElementById(`film-${filmId}`)
+  if (!el) return false
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  setTimeout(() => {
+    gsap.to(el, { opacity: 1, x: 0, duration: 0.25, overwrite: 'auto' })
+    el.classList.add('film-targeted')
+    setTimeout(() => el.classList.remove('film-targeted'), 2500)
+  }, 700)
+  return true
+}
+
+function MovementBannerCard({ event, paysId }: { event: FilmReleaseEvent & { film?: Film }; paysId: string }) {
+  const router = useRouter()
   const style = BANNER_EVENT_STYLES[event.event_type] ?? BANNER_EVENT_STYLES.added
 
   function handleClick() {
-    document.getElementById(`film-${event.film_id}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    const found = scrollToFilm(event.film_id)
+    if (!found) router.push(`/${paysId}/films/${event.film_id}`)
   }
 
   return (
@@ -67,9 +82,10 @@ function MovementBannerCard({ event }: { event: FilmReleaseEvent & { film?: Film
 
 interface LastMovementsPanelProps {
   events: FilmReleaseEvent[]
+  paysId: string
 }
 
-export function LastMovementsPanel({ events }: LastMovementsPanelProps) {
+export function LastMovementsPanel({ events, paysId }: LastMovementsPanelProps) {
   const latestDay = events
     .filter(e => e.visible)
     .map(e => e.occurred_at.slice(0, 10))
@@ -124,7 +140,7 @@ export function LastMovementsPanel({ events }: LastMovementsPanelProps) {
             <div className="flex gap-2">
               {section.events.map(event => (
                 <div key={event.id} className="w-44 shrink-0">
-                  <MovementBannerCard event={event as FilmReleaseEvent & { film?: Film }} />
+                  <MovementBannerCard event={event as FilmReleaseEvent & { film?: Film }} paysId={paysId} />
                 </div>
               ))}
             </div>

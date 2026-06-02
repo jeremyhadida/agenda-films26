@@ -48,7 +48,7 @@ export default async function MasterAgendaPage({
       <main className="max-w-7xl mx-auto px-4 pb-24 md:pb-8">
         {allGroups.length > 0 ? (
           <>
-            <LastMovementsPanel events={events} />
+            <LastMovementsPanel events={events} paysId={pays} />
             <AgendaPageClient
               allGroups={allGroups}
               events={events}

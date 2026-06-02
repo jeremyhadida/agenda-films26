@@ -83,3 +83,13 @@ body {
   background: #ffd700;
   animation: tl-glow-gold 2.5s ease-in-out infinite;
 }
+
+/* ── Film highlight (scroll-to depuis les mouvements) ── */
+@keyframes film-targeted {
+  0%, 20% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85)); }
+  100%     { filter: drop-shadow(0 0 0px  rgba(255, 215, 0, 0));    }
+}
+
+.film-targeted {
+  animation: film-targeted 2.5s ease-out forwards;
+}
