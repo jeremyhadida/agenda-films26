@@ -64,7 +64,7 @@ export default async function AgendaPage({
         )}
       </main>
       <Footer />
-      <MobileNav paysId={pays} events={events.slice(0, 15)} />
+      <MobileNav paysId={pays} />
     </>
   )
 }
