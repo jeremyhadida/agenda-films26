@@ -52,6 +52,20 @@ export default async function AgendaPage({
       <main className="max-w-7xl mx-auto px-4 pb-24 md:pb-8">
         {allGroups.length > 0 ? (
           <>
+            <div className="flex justify-end pt-4 pb-1">
+              <a
+                href={`/api/pdf/${pays}`}
+                download
+                className="inline-flex items-center gap-2 rounded border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-[var(--color-muted)] transition hover:bg-white/10 hover:text-[var(--color-text)]"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Exporter PDF
+              </a>
+            </div>
             <LastMovementsPanel events={events} paysId={pays} />
             <AgendaPageClient allGroups={allGroups} events={events} paysId={pays} />
           </>

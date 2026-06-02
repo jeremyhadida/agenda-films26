@@ -1,0 +1,459 @@
+import {
+  Document,
+  Page,
+  View,
+  Text,
+  StyleSheet,
+} from '@react-pdf/renderer'
+import type { Country, Film, FilmReleaseEvent } from '@/lib/types'
+import {
+  groupFilmsByMonth,
+  getLatestEventByFilm,
+  formatDateShort,
+  formatGenerationDate,
+  truncateCast,
+  getRecentMovements,
+} from './utils'
+
+type FilmWithDate = Film & { release_date: string }
+
+const BRAND = {
+  dark: '#0f172a',
+  darkLine: '#334155',
+  textPrimary: '#f8fafc',
+  textMuted: '#94a3b8',
+  green: '#dcfce7',
+  orange: '#fff7ed',
+  accent: '#6366f1',
+}
+
+const s = StyleSheet.create({
+  // Page de garde
+  coverPage: {
+    backgroundColor: BRAND.dark,
+    fontFamily: 'Helvetica',
+  },
+  coverBand: {
+    backgroundColor: BRAND.accent,
+    paddingVertical: 8,
+    paddingHorizontal: 40,
+  },
+  coverBandText: {
+    color: '#ffffff',
+    fontSize: 9,
+    letterSpacing: 3,
+    fontFamily: 'Helvetica-Bold',
+  },
+  coverBody: {
+    padding: 40,
+    flex: 1,
+  },
+  coverLabel: {
+    color: BRAND.textMuted,
+    fontSize: 10,
+    letterSpacing: 4,
+    marginBottom: 8,
+  },
+  coverCountry: {
+    color: BRAND.textPrimary,
+    fontSize: 36,
+    fontFamily: 'Helvetica-Bold',
+    marginBottom: 4,
+  },
+  coverRegion: {
+    color: BRAND.textMuted,
+    fontSize: 13,
+    marginBottom: 24,
+  },
+  coverDate: {
+    color: BRAND.textMuted,
+    fontSize: 10,
+    marginBottom: 36,
+  },
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: BRAND.darkLine,
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    color: BRAND.textMuted,
+    fontSize: 8,
+    letterSpacing: 3,
+    marginBottom: 12,
+    fontFamily: 'Helvetica-Bold',
+  },
+  movementRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  movementDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 10,
+  },
+  movementTitle: {
+    color: BRAND.textPrimary,
+    fontSize: 10,
+    flex: 1,
+  },
+  movementBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 3,
+  },
+  movementBadgeText: {
+    fontSize: 7,
+    fontFamily: 'Helvetica-Bold',
+  },
+  coverFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingHorizontal: 40,
+    paddingBottom: 40,
+  },
+  coverFooterLabel: {
+    color: BRAND.textMuted,
+    fontSize: 10,
+  },
+  coverFooterCount: {
+    color: BRAND.textPrimary,
+    fontSize: 28,
+    fontFamily: 'Helvetica-Bold',
+  },
+
+  // Page tableau
+  tablePage: {
+    fontFamily: 'Helvetica',
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 30,
+    paddingTop: 28,
+    paddingBottom: 40,
+  },
+  tablePageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  tablePageLabel: {
+    fontSize: 9,
+    color: '#64748b',
+    letterSpacing: 2,
+  },
+  tablePageCountry: {
+    fontSize: 9,
+    color: '#1e293b',
+    fontFamily: 'Helvetica-Bold',
+  },
+
+  // En-tête colonnes
+  tableHead: {
+    flexDirection: 'row',
+    backgroundColor: BRAND.dark,
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+  },
+  headCell: {
+    color: '#cbd5e1',
+    fontSize: 7,
+    letterSpacing: 1.5,
+    fontFamily: 'Helvetica-Bold',
+  },
+
+  // Séparateur de mois
+  monthSep: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: BRAND.accent,
+    marginTop: 6,
+  },
+  monthSepText: {
+    fontSize: 8.5,
+    color: '#334155',
+    fontFamily: 'Helvetica-Bold',
+    letterSpacing: 2,
+  },
+
+  // Lignes
+  row: {
+    flexDirection: 'row',
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e2e8f0',
+  },
+  rowAdded: { backgroundColor: BRAND.green },
+  rowChanged: { backgroundColor: BRAND.orange },
+  rowAlt: { backgroundColor: '#f8fafc' },
+
+  cell: {
+    fontSize: 8,
+    color: '#1e293b',
+    paddingRight: 6,
+  },
+  cellMuted: {
+    fontSize: 8,
+    color: '#475569',
+    paddingRight: 6,
+  },
+
+  // Largeurs colonnes (portrait A4, ~535pt utiles)
+  cDate: { width: 40 },
+  cTitle: { flex: 3 },
+  cStudio: { flex: 1.5 },
+  cGenre: { flex: 1 },
+  cDirector: { flex: 1.5 },
+  cCast: { flex: 2 },
+
+  // Légende
+  legend: {
+    flexDirection: 'row',
+    marginTop: 14,
+    gap: 14,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 2,
+  },
+  legendText: {
+    fontSize: 7,
+    color: '#64748b',
+  },
+
+  // Pagination
+  pageNum: {
+    position: 'absolute',
+    bottom: 18,
+    right: 30,
+    fontSize: 7,
+    color: '#94a3b8',
+  },
+})
+
+function CoverPage({
+  country,
+  generatedAt,
+  events,
+  totalFilms,
+}: {
+  country: Country
+  generatedAt: Date
+  events: FilmReleaseEvent[]
+  totalFilms: number
+}) {
+  const movements = getRecentMovements(events)
+  return (
+    <Page size="A4" style={s.coverPage}>
+      <View style={s.coverBand}>
+        <Text style={s.coverBandText}>FILMS 26 — AGENDA</Text>
+      </View>
+
+      <View style={s.coverBody}>
+        <Text style={s.coverLabel}>CALENDRIER EXPLOITANT</Text>
+        <Text style={s.coverCountry}>{country.name}</Text>
+        <Text style={s.coverRegion}>{country.region}</Text>
+        <Text style={s.coverDate}>Généré le {formatGenerationDate(generatedAt)}</Text>
+
+        <View style={s.divider} />
+
+        {movements.length > 0 && (
+          <View>
+            <Text style={s.sectionTitle}>DERNIERS MOUVEMENTS</Text>
+            {movements.map((ev, i) => {
+              const isAdded = ev.event_type === 'added'
+              return (
+                <View key={i} style={s.movementRow}>
+                  <View
+                    style={[
+                      s.movementDot,
+                      { backgroundColor: isAdded ? '#22c55e' : '#f97316' },
+                    ]}
+                  />
+                  <Text style={s.movementTitle}>
+                    {ev.film?.title ?? ev.film_id}
+                  </Text>
+                  <View
+                    style={[
+                      s.movementBadge,
+                      { backgroundColor: isAdded ? '#166534' : '#9a3412' },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        s.movementBadgeText,
+                        { color: isAdded ? '#dcfce7' : '#fff7ed' },
+                      ]}
+                    >
+                      {isAdded ? 'AJOUT' : 'REPORT'}
+                    </Text>
+                  </View>
+                </View>
+              )
+            })}
+          </View>
+        )}
+      </View>
+
+      <View style={s.coverFooter}>
+        <Text style={s.coverFooterLabel}>Films au programme</Text>
+        <Text style={s.coverFooterCount}>{totalFilms}</Text>
+      </View>
+    </Page>
+  )
+}
+
+function AgendaTablePage({
+  country,
+  films,
+  eventMap,
+}: {
+  country: Country
+  films: FilmWithDate[]
+  eventMap: Map<string, 'added' | 'date_changed'>
+}) {
+  const monthGroups = groupFilmsByMonth(films)
+
+  return (
+    <Page size="A4" style={s.tablePage}>
+      {/* En-tête répété sur chaque page */}
+      <View style={s.tablePageHeader} fixed>
+        <Text style={s.tablePageLabel}>CALENDRIER EXPLOITANT</Text>
+        <Text style={s.tablePageCountry}>{country.name}</Text>
+      </View>
+
+      {/* En-tête du tableau répété sur chaque page */}
+      <View style={s.tableHead} fixed>
+        <Text style={[s.headCell, s.cDate]}>DATE</Text>
+        <Text style={[s.headCell, s.cTitle]}>TITRE</Text>
+        <Text style={[s.headCell, s.cStudio]}>STUDIO</Text>
+        <Text style={[s.headCell, s.cGenre]}>GENRE</Text>
+        <Text style={[s.headCell, s.cDirector]}>RÉALISATEUR</Text>
+        <Text style={[s.headCell, s.cCast]}>CASTING</Text>
+      </View>
+
+      {/* Groupes par mois */}
+      {monthGroups.map((group) => (
+        <View key={group.month}>
+          <View style={s.monthSep}>
+            <Text style={s.monthSepText}>{group.month}</Text>
+          </View>
+
+          {group.films.map((film, idx) => {
+            const highlight = eventMap.get(film.id)
+            const rowVariant =
+              highlight === 'added'
+                ? s.rowAdded
+                : highlight === 'date_changed'
+                  ? s.rowChanged
+                  : idx % 2 !== 0
+                    ? s.rowAlt
+                    : {}
+            const genre = film.genre
+              ? film.genre.split(',')[0].trim()
+              : '—'
+
+            return (
+              <View key={film.id} style={[s.row, rowVariant]}>
+                <Text style={[s.cell, s.cDate]}>
+                  {formatDateShort(film.release_date)}
+                </Text>
+                <Text style={[s.cell, s.cTitle, { fontFamily: 'Helvetica-Bold' }]}>
+                  {film.title}
+                </Text>
+                <Text style={[s.cellMuted, s.cStudio]}>
+                  {film.studio ?? '—'}
+                </Text>
+                <Text style={[s.cellMuted, s.cGenre]}>{genre}</Text>
+                <Text style={[s.cellMuted, s.cDirector]}>
+                  {film.director ?? '—'}
+                </Text>
+                <Text style={[s.cellMuted, s.cCast]}>
+                  {truncateCast(film.cast_main)}
+                </Text>
+              </View>
+            )
+          })}
+        </View>
+      ))}
+
+      {/* Légende */}
+      <View style={s.legend}>
+        <View style={s.legendItem}>
+          <View
+            style={[
+              s.legendDot,
+              { backgroundColor: BRAND.green, borderWidth: 0.5, borderColor: '#16a34a' },
+            ]}
+          />
+          <Text style={s.legendText}>Ajout récent</Text>
+        </View>
+        <View style={s.legendItem}>
+          <View
+            style={[
+              s.legendDot,
+              { backgroundColor: BRAND.orange, borderWidth: 0.5, borderColor: '#ea580c' },
+            ]}
+          />
+          <Text style={s.legendText}>Modification de date</Text>
+        </View>
+      </View>
+
+      {/* Numéro de page */}
+      <Text
+        style={s.pageNum}
+        render={({ pageNumber, totalPages }) =>
+          `${pageNumber} / ${totalPages}`
+        }
+        fixed
+      />
+    </Page>
+  )
+}
+
+export function AgendaPdfDocument({
+  country,
+  films,
+  events,
+  generatedAt,
+}: {
+  country: Country
+  films: FilmWithDate[]
+  events: FilmReleaseEvent[]
+  generatedAt: Date
+}) {
+  const eventMap = getLatestEventByFilm(events)
+  const sortedFilms = [...films].sort((a, b) =>
+    a.release_date.localeCompare(b.release_date)
+  )
+
+  return (
+    <Document
+      title={`Agenda ${country.name} — Films 26`}
+      author="Films 26"
+      subject={`Calendrier exploitant ${country.name}`}
+    >
+      <CoverPage
+        country={country}
+        generatedAt={generatedAt}
+        events={events}
+        totalFilms={sortedFilms.length}
+      />
+      <AgendaTablePage
+        country={country}
+        films={sortedFilms}
+        eventMap={eventMap}
+      />
+    </Document>
+  )
+}
