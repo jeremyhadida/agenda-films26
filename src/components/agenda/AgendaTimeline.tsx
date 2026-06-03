@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import Link from 'next/link'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -55,6 +56,7 @@ interface FilmTimelineCardProps {
   film: Film & { release_date: string }
   event: FilmReleaseEvent | undefined
   side: 'left' | 'right'
+  paysId: string
 }
 
 function MetaChips({ film, genre, isLeft }: { film: Film; genre: string | undefined; isLeft: boolean }) {
@@ -80,7 +82,7 @@ function MetaChips({ film, genre, isLeft }: { film: Film; genre: string | undefi
   )
 }
 
-function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
+function FilmTimelineCard({ film, event, side, paysId }: FilmTimelineCardProps) {
   const genre  = film.genre?.split(',')[0]?.trim()
   const isLeft = side === 'left'
 
@@ -91,8 +93,9 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
       style={isLeft ? { marginRight: '0.75rem', opacity: 0 } : { marginLeft: '0.75rem', opacity: 0 }}
     >
       {/* Bordure gradient animée (conic-gradient aurora ou couleur unie) */}
-      <div
-        className={`tl-card-border-wrap relative rounded-lg ${borderClass(event)}`}
+      <Link
+        href={`/${paysId}/films/${film.id}`}
+        className={`tl-card-border-wrap relative rounded-lg block ${borderClass(event)}`}
         style={{ padding: '1.5px' }}
       >
         {/* Pastille événement — angle haut extérieur à la ligne centrale */}
@@ -155,7 +158,7 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
             </div>
           )}
         </div>
-      </div>
+      </Link>
     </div>
   )
 }
@@ -164,9 +167,10 @@ function FilmTimelineCard({ film, event, side }: FilmTimelineCardProps) {
 interface AgendaTimelineProps {
   groups: WeekGroup[]
   events: FilmReleaseEvent[]
+  paysId: string
 }
 
-export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
+export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Dernier jour de modification (granularité jour, heure ignorée)
@@ -327,7 +331,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
                   key={`${group.isoWeek}-${rowIdx}`}
                   className="tl-film-row grid grid-cols-[1fr_16px_1fr] items-center py-1.5 relative z-10 px-2 min-w-0"
                 >
-                  <FilmTimelineCard film={left} event={leftEvent} side="left" />
+                  <FilmTimelineCard film={left} event={leftEvent} side="left" paysId={paysId} />
 
                   <div
                     className={`tl-dot w-2.5 h-2.5 rounded-full border-[1.5px] justify-self-center flex-shrink-0 ${
@@ -336,7 +340,7 @@ export function AgendaTimeline({ groups, events }: AgendaTimelineProps) {
                   />
 
                   {right
-                    ? <FilmTimelineCard film={right} event={rightEvent} side="right" />
+                    ? <FilmTimelineCard film={right} event={rightEvent} side="right" paysId={paysId} />
                     : <div />
                   }
                 </div>

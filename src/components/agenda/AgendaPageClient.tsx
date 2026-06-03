@@ -53,7 +53,7 @@ export function AgendaPageClient({ allGroups, events, paysId, showAllWeeks }: Ag
   return (
     <>
       <MonthTabs groups={displayGroups} rightSlot={yearSelect} />
-      <AgendaTimeline groups={displayGroups} events={events} />
+      <AgendaTimeline groups={displayGroups} events={events} paysId={paysId} />
     </>
   )
 }
