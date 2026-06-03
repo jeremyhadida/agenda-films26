@@ -302,7 +302,7 @@ function CoverPage({
                   <View style={[s.movementDot, { backgroundColor: colors.dot }]} />
                   <View style={s.movementInfo}>
                     <Text style={s.movementTitle}>
-                      {(ev.film?.title ?? ev.film_id).toUpperCase()}
+                      {(ev.film?.title_vf ?? ev.film?.title ?? ev.film_id).toUpperCase()}
                     </Text>
                     <View style={s.movementDates}>
                       {isAdded && ev.new_date && (
@@ -403,7 +403,7 @@ function AgendaTablePage({
                   {formatDateShort(film.release_date)}
                 </Text>
                 <Text style={[s.cell, s.cTitle, { fontFamily: 'Helvetica-Bold' }]}>
-                  {film.title.toUpperCase()}
+                  {(film.title_vf ?? film.title).toUpperCase()}
                 </Text>
                 <Text style={[s.cellMuted, s.cStudio]}>
                   {film.studio ?? '—'}

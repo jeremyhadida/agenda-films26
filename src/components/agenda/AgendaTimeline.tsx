@@ -120,7 +120,7 @@ function FilmTimelineCard({ film, event, side, paysId }: FilmTimelineCardProps) 
           {/* Desktop : titre + méta sur la même ligne */}
           <div className={`hidden md:flex items-start gap-2 ${isLeft ? 'flex-row-reverse' : ''}`}>
             <p className="font-display font-bold text-text text-[11px] leading-snug flex-1 min-w-0">
-              {film.title}
+              {(film.title_vf ?? film.title).toUpperCase()}
             </p>
             <div className={`shrink-0 flex flex-col gap-0.5 pt-px ${isLeft ? 'items-end' : 'items-start'}`}>
               <MetaChips film={film} genre={genre} isLeft={isLeft} />
@@ -129,7 +129,7 @@ function FilmTimelineCard({ film, event, side, paysId }: FilmTimelineCardProps) 
 
           {/* Mobile : titre seul */}
           <p className="md:hidden font-display font-bold text-text text-[11px] leading-snug line-clamp-2 min-h-[2rem]">
-            {film.title}
+            {(film.title_vf ?? film.title).toUpperCase()}
           </p>
 
           {/* Réalisateur */}

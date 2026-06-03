@@ -21,7 +21,7 @@ export const getActiveCountries = unstable_cache(
 )
 
 const FILMS_SELECT = `
-  id, title, studio, director, cast_main, synopsis, genre,
+  id, title, title_vf, studio, director, cast_main, synopsis, genre,
   poster_url, trailer_url, material_url, duration_min,
   projection_fmt, audio_mix, nationality, status
 `
@@ -80,7 +80,7 @@ export const getMovementsByCountry = unstable_cache(
       .from('film_release_events')
       .select(`
         id, film_id, country_id, event_type, old_date, new_date, visible, occurred_at,
-        films ( id, title, poster_url, genre, status )
+        films ( id, title, title_vf, poster_url, genre, status )
       `)
       .eq('country_id', countryId)
       .eq('visible', true)

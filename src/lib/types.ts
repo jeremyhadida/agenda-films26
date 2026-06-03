@@ -7,6 +7,7 @@ export interface Country {
 export interface Film {
   id: string      // slug ex: 'neon-phantoms-2024'
   title: string
+  title_vf: string | null
   studio: string | null
   release_date: string | null
   director: string | null
