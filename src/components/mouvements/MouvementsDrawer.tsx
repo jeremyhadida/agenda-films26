@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import type { FilmReleaseEvent, Film } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
@@ -67,30 +66,22 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
               {events.map(event => {
                 const meta = EVENT_LABELS[event.event_type] ?? EVENT_LABELS.added
                 return (
-                  <Link
+                  <button
                     key={event.id}
-                    href={`/${paysId}/films/${event.film_id}`}
-                    onClick={onClose}
-                    className="flex gap-3 px-4 py-3 hover:bg-surface-card/40 transition-colors"
+                    onClick={() => {
+                      onClose()
+                      setTimeout(() => {
+                        document.getElementById(`film-${event.film_id}`)
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                      }, 300)
+                    }}
+                    className="flex gap-3 px-4 py-3 hover:bg-surface-card/40 transition-colors w-full text-left"
                   >
-                    <div className="w-10 h-14 rounded-md overflow-hidden shrink-0 bg-surface relative">
-                      {event.film?.poster_url ? (
-                        <Image
-                          src={event.film.poster_url}
-                          alt={event.film.title ?? ''}
-                          fill
-                          className="object-cover"
-                          sizes="40px"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted text-sm">🎬</div>
-                      )}
-                    </div>
                     <div className="flex-1 min-w-0 py-0.5">
                       <span className={`text-[10px] font-body font-semibold uppercase tracking-wide ${meta.color}`}>
                         {meta.label}
                       </span>
-                      <p className="font-display font-semibold text-text text-xs leading-snug truncate mt-0.5">
+                      <p className="font-display font-semibold text-text text-xs leading-snug mt-0.5">
                         {event.film?.title ?? event.film_id}
                       </p>
                       <p className="text-muted text-[10px] font-body mt-0.5">
@@ -104,7 +95,7 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
                     <span className="text-muted text-[10px] font-body self-start pt-1 shrink-0">
                       {formatDate(event.occurred_at.split('T')[0])}
                     </span>
-                  </Link>
+                  </button>
                 )
               })}
             </div>

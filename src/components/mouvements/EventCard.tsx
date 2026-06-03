@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { FilmReleaseEvent, Film } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
@@ -27,11 +28,14 @@ const EVENT_STYLES: Record<string, { label: string; bar: string; text: string; b
   },
 }
 
-export function EventCard({ event }: EventCardProps) {
+export function EventCard({ event, paysId }: EventCardProps) {
   const style = EVENT_STYLES[event.event_type] ?? EVENT_STYLES.added
 
   return (
-    <div className={`flex gap-4 p-4 rounded-lg ${style.bg}`}>
+    <Link
+      href={`/${paysId}#film-${event.film_id}`}
+      className={`flex gap-4 p-4 rounded-lg hover:scale-[1.01] transition-transform ${style.bg}`}
+    >
       <div className="flex-1 min-w-0">
         <p className="font-display font-semibold text-text text-sm mb-1">
           {event.film?.title ?? event.film_id}
@@ -52,6 +56,6 @@ export function EventCard({ event }: EventCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
