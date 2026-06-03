@@ -23,13 +23,19 @@ export async function GET(
   }
 
   const today = new Date()
+  const dow = today.getUTCDay() || 7
+  const monday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))
+  monday.setUTCDate(monday.getUTCDate() - dow + 1)
+  const currentMondayStr = monday.toISOString().split('T')[0]
+  const filmsFromNow = films.filter(f => f.release_date >= currentMondayStr)
+
   const pad = (n: number) => String(n).padStart(2, '0')
   const dateLabel = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`
   const filename = `agenda-${pays}-${dateLabel}.pdf`
 
   const docElement = createElement(AgendaPdfDocument, {
     country,
-    films,
+    films: filmsFromNow,
     events,
     generatedAt: today,
   })

@@ -229,7 +229,7 @@ const s = StyleSheet.create({
   },
 
   // Largeurs colonnes (portrait A4, ~535pt utiles)
-  cDate: { width: 40 },
+  cDate: { width: 58 },
   cTitle: { flex: 3 },
   cStudio: { flex: 1.5 },
   cGenre: { flex: 1 },
