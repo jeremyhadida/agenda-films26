@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Film, FilmReleaseEvent, WeekGroup } from '@/lib/types'
-import { formatDuration, formatDateShort, getIsoWeek, formatMonthFull } from '@/lib/utils'
+import { formatDuration, formatDateShort, getIsoWeek, formatMonthFull, getReleaseDay } from '@/lib/utils'
 import { StudioBadge } from './StudioBadge'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -289,7 +289,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
               <div className="tl-week-node flex items-center gap-3 py-3 relative z-10 px-4">
                 <div className="flex-1 h-px bg-[#2a4a7a]/30" />
                 <div className="rounded-full px-3 py-0.5 text-[8.5px] font-body tracking-wider border border-[#2a3a5a]/20 text-muted/25 whitespace-nowrap">
-                  S{group.isoWeek} · {formatDateShort(group.startDate)}
+                  S{group.isoWeek} · {formatDateShort(getReleaseDay(paysId, group.startDate))}
                 </div>
                 <div className="flex-1 h-px bg-[#2a4a7a]/30" />
               </div>
@@ -314,7 +314,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
                   ? 'bg-gold/15 border border-gold/70 text-gold shadow-[0_0_20px_rgba(255,215,0,0.25)]'
                   : 'bg-surface-low border border-[#2a4a7a] text-muted'
               }`}>
-                S{group.isoWeek} · {formatDateShort(group.startDate)}
+                S{group.isoWeek} · {formatDateShort(getReleaseDay(paysId, group.startDate))}
                 {isCurrent && (
                   <span className="ml-1.5 text-gold/70 font-normal text-[9.5px]">— en cours</span>
                 )}

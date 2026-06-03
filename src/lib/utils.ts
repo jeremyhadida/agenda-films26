@@ -99,6 +99,21 @@ export function formatWeekDateRange(startDate: string): string {
   }
 }
 
+const WEDNESDAY_COUNTRIES = new Set(['MA', 'TN'])
+const THURSDAY_COUNTRIES  = new Set(['DJ'])
+
+/**
+ * Returns the ISO date of the release day for a given country and ISO week Monday.
+ * MA/TN → mercredi (+2), DJ → jeudi (+3), autres → vendredi (+4).
+ */
+export function getReleaseDay(countryId: string, mondayStr: string): string {
+  const id = countryId.toUpperCase()
+  const offset = WEDNESDAY_COUNTRIES.has(id) ? 2 : THURSDAY_COUNTRIES.has(id) ? 3 : 4
+  const d = new Date(mondayStr + 'T00:00:00Z')
+  d.setUTCDate(d.getUTCDate() + offset)
+  return d.toISOString().split('T')[0]
+}
+
 /**
  * Groups a list of films (with release_date) by ISO week, sorted chronologically.
  */
