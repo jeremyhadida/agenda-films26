@@ -36,7 +36,7 @@ export const getAgendaByCountry = unstable_cache(
     if (error) throw error
     return (data ?? [])
       .map((r: any) => ({ ...r.films, release_date: r.release_date }))
-      .filter((f: any) => f.status === 'validé')
+      .filter((f: any) => f.status === 'validated')
   },
   ['agenda-by-country'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
@@ -52,7 +52,7 @@ export const getAgendaByCountryMaster = unstable_cache(
     if (error) throw error
     return (data ?? [])
       .map((r: any) => ({ ...r.films, release_date: r.release_date }))
-      .filter((f: any) => f.status !== 'annulé')
+      .filter((f: any) => f.status !== 'cancelled')
   },
   ['agenda-master-by-country'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
