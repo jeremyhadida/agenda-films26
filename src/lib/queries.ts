@@ -50,7 +50,9 @@ export const getAgendaByCountryMaster = unstable_cache(
       .eq('country_id', countryId)
       .order('release_date', { ascending: true })
     if (error) throw error
-    return (data ?? []).map((r: any) => ({ ...r.films, release_date: r.release_date }))
+    return (data ?? [])
+      .map((r: any) => ({ ...r.films, release_date: r.release_date }))
+      .filter((f: any) => f.status !== 'annulé')
   },
   ['agenda-master-by-country'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
