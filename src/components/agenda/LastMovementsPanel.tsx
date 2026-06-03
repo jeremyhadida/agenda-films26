@@ -1,7 +1,6 @@
 'use client'
 
-import Image from 'next/image'
-import type { Film, FilmReleaseEvent } from '@/lib/types'
+import type { FilmReleaseEvent } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
 function formatDayShort(isoDate: string): string {
@@ -21,7 +20,7 @@ const BANNER_SECTIONS = [
   { key: 'removed' as const,      label: 'Annulations', dot: 'bg-red-500',     text: 'text-red-400'     },
 ] as const
 
-function MovementBannerCard({ event }: { event: FilmReleaseEvent & { film?: Film } }) {
+function MovementBannerCard({ event }: { event: FilmReleaseEvent }) {
   const style = BANNER_EVENT_STYLES[event.event_type] ?? BANNER_EVENT_STYLES.added
 
   function handleClick() {
@@ -34,18 +33,11 @@ function MovementBannerCard({ event }: { event: FilmReleaseEvent & { film?: Film
       onClick={handleClick}
       className={`flex gap-3 p-3 rounded-lg w-full text-left cursor-pointer hover:scale-[1.01] transition-transform ${style.bg}`}
     >
-      <div className="w-8 h-11 rounded overflow-hidden shrink-0 bg-surface-low relative">
-        {event.film?.poster_url ? (
-          <Image src={event.film.poster_url} alt="" fill className="object-cover" sizes="32px" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted text-[10px]">🎬</div>
-        )}
-      </div>
       <div className="flex-1 min-w-0">
-        <p className="font-display font-semibold text-text text-xs truncate mb-0.5">
+        <p className="font-display font-semibold text-text text-xs mb-0.5">
           {event.film?.title ?? event.film_id}
         </p>
-        <div className="text-[10px] font-body text-muted whitespace-nowrap overflow-hidden">
+        <div className="text-[10px] font-body text-muted">
           {event.event_type === 'added' && event.new_date && (
             <span>Sortie : <span className="text-text">{formatDate(event.new_date)}</span></span>
           )}
@@ -124,7 +116,7 @@ export function LastMovementsPanel({ events }: LastMovementsPanelProps) {
             <div className="flex gap-2">
               {section.events.map(event => (
                 <div key={event.id} className="w-44 shrink-0">
-                  <MovementBannerCard event={event as FilmReleaseEvent & { film?: Film }} />
+                  <MovementBannerCard event={event} />
                 </div>
               ))}
             </div>
