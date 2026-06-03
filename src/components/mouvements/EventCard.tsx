@@ -1,5 +1,3 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import type { FilmReleaseEvent, Film } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
@@ -29,29 +27,13 @@ const EVENT_STYLES: Record<string, { label: string; bar: string; text: string; b
   },
 }
 
-export function EventCard({ event, paysId }: EventCardProps) {
+export function EventCard({ event }: EventCardProps) {
   const style = EVENT_STYLES[event.event_type] ?? EVENT_STYLES.added
 
   return (
-    <Link
-      href={`/${paysId}/films/${event.film_id}`}
-      className={`flex gap-4 p-4 rounded-lg hover:scale-[1.01] transition-transform ${style.bg}`}
-    >
-      <div className="w-10 h-14 rounded-md overflow-hidden shrink-0 bg-surface-low relative">
-        {event.film?.poster_url ? (
-          <Image
-            src={event.film.poster_url}
-            alt={event.film.title ?? ''}
-            fill
-            className="object-cover"
-            sizes="40px"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted text-sm">🎬</div>
-        )}
-      </div>
+    <div className={`flex gap-4 p-4 rounded-lg ${style.bg}`}>
       <div className="flex-1 min-w-0">
-        <p className="font-display font-semibold text-text text-sm truncate mb-1">
+        <p className="font-display font-semibold text-text text-sm mb-1">
           {event.film?.title ?? event.film_id}
         </p>
         <div className="text-xs font-body text-muted">
@@ -70,6 +52,6 @@ export function EventCard({ event, paysId }: EventCardProps) {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
