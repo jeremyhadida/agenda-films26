@@ -89,7 +89,7 @@ function FilmTimelineCard({ film, event, side, paysId }: FilmTimelineCardProps) 
   return (
     <div
       id={`film-${film.id}`}
-      className={`tl-card-${side} relative min-w-0`}
+      className={`tl-card-${side} relative min-w-0 scroll-mt-36`}
       style={isLeft ? { marginRight: '0.75rem', opacity: 0 } : { marginLeft: '0.75rem', opacity: 0 }}
     >
       {/* Bordure gradient animée (conic-gradient aurora ou couleur unie) */}

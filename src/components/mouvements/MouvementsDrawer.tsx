@@ -72,7 +72,7 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
                       onClose()
                       setTimeout(() => {
                         document.getElementById(`film-${event.film_id}`)
-                          ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                       }, 300)
                     }}
                     className="flex gap-3 px-4 py-3 hover:bg-surface-card/40 transition-colors w-full text-left"

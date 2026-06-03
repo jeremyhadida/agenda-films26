@@ -25,7 +25,7 @@ function MovementBannerCard({ event }: { event: FilmReleaseEvent }) {
 
   function handleClick() {
     document.getElementById(`film-${event.film_id}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
