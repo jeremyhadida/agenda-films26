@@ -4,6 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
+  Link,
 } from '@react-pdf/renderer'
 import type { Country, Film, FilmReleaseEvent } from '@/lib/types'
 import {
@@ -22,9 +23,13 @@ const BRAND = {
   darkLine: '#334155',
   textPrimary: '#f8fafc',
   textMuted: '#94a3b8',
-  green: '#dcfce7',
-  orange: '#fff7ed',
   accent: '#6366f1',
+}
+
+const EVENT_COLORS = {
+  added:        { dot: '#22c55e', badgeBg: '#166534', badgeText: '#dcfce7', label: 'AJOUT' },
+  date_changed: { dot: '#ffd700', badgeBg: '#713f12', badgeText: '#fef08a', label: 'MODIFIÉ' },
+  removed:      { dot: '#ef4444', badgeBg: '#7f1d1d', badgeText: '#fecaca', label: 'ANNULÉ' },
 }
 
 const s = StyleSheet.create({
@@ -138,6 +143,12 @@ const s = StyleSheet.create({
     color: BRAND.textMuted,
     fontSize: 8,
   },
+  onlineLink: {
+    color: '#6366f1',
+    fontSize: 9,
+    marginTop: 32,
+    textDecoration: 'underline',
+  },
 
   // Page tableau
   tablePage: {
@@ -202,8 +213,8 @@ const s = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#e2e8f0',
   },
-  rowAdded: { backgroundColor: BRAND.green },
-  rowChanged: { backgroundColor: BRAND.orange },
+  rowAdded:   { backgroundColor: '#dcfce7' },
+  rowChanged: { backgroundColor: '#fefce8' },
   rowAlt: { backgroundColor: '#f8fafc' },
 
   cell: {
@@ -283,53 +294,34 @@ function CoverPage({
           <View>
             <Text style={s.sectionTitle}>DERNIERS MOUVEMENTS</Text>
             {movements.map((ev, i) => {
+              const colors = EVENT_COLORS[ev.event_type as keyof typeof EVENT_COLORS] ?? EVENT_COLORS.added
+              const isRemoved = ev.event_type === 'removed'
               const isAdded = ev.event_type === 'added'
               return (
                 <View key={i} style={s.movementRow}>
-                  <View
-                    style={[
-                      s.movementDot,
-                      { backgroundColor: isAdded ? '#22c55e' : '#f97316' },
-                    ]}
-                  />
+                  <View style={[s.movementDot, { backgroundColor: colors.dot }]} />
                   <View style={s.movementInfo}>
                     <Text style={s.movementTitle}>
                       {(ev.film?.title ?? ev.film_id).toUpperCase()}
                     </Text>
                     <View style={s.movementDates}>
                       {isAdded && ev.new_date && (
-                        <Text style={s.movementDateNew}>
-                          {formatDateShort(ev.new_date)}
-                        </Text>
+                        <Text style={s.movementDateNew}>{formatDateShort(ev.new_date)}</Text>
                       )}
                       {!isAdded && ev.old_date && (
-                        <Text style={s.movementDateOld}>
-                          {formatDateShort(ev.old_date)}
-                        </Text>
+                        <Text style={s.movementDateOld}>{formatDateShort(ev.old_date)}</Text>
                       )}
-                      {!isAdded && ev.new_date && (
+                      {!isAdded && !isRemoved && ev.new_date && (
                         <>
                           <Text style={s.movementDateNew}>→</Text>
-                          <Text style={s.movementDateNew}>
-                            {formatDateShort(ev.new_date)}
-                          </Text>
+                          <Text style={s.movementDateNew}>{formatDateShort(ev.new_date)}</Text>
                         </>
                       )}
                     </View>
                   </View>
-                  <View
-                    style={[
-                      s.movementBadge,
-                      { backgroundColor: isAdded ? '#166534' : '#9a3412' },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        s.movementBadgeText,
-                        { color: isAdded ? '#dcfce7' : '#fff7ed' },
-                      ]}
-                    >
-                      {isAdded ? 'AJOUT' : 'REPORT'}
+                  <View style={[s.movementBadge, { backgroundColor: colors.badgeBg }]}>
+                    <Text style={[s.movementBadgeText, { color: colors.badgeText }]}>
+                      {colors.label}
                     </Text>
                   </View>
                 </View>
@@ -337,17 +329,19 @@ function CoverPage({
             })}
 
             <View style={s.coverLegend}>
-              <View style={s.coverLegendItem}>
-                <View style={[s.coverLegendDot, { backgroundColor: '#22c55e' }]} />
-                <Text style={s.coverLegendText}>Ajout</Text>
-              </View>
-              <View style={s.coverLegendItem}>
-                <View style={[s.coverLegendDot, { backgroundColor: '#f97316' }]} />
-                <Text style={s.coverLegendText}>Report de date</Text>
-              </View>
+              {Object.values(EVENT_COLORS).map(c => (
+                <View key={c.label} style={s.coverLegendItem}>
+                  <View style={[s.coverLegendDot, { backgroundColor: c.dot }]} />
+                  <Text style={s.coverLegendText}>{c.label}</Text>
+                </View>
+              ))}
             </View>
           </View>
         )}
+
+        <Link src={`https://agenda-f26.vercel.app/${country.id}`} style={s.onlineLink}>
+          Voir en ligne → agenda-f26.vercel.app/{country.id}
+        </Link>
       </View>
     </Page>
   )
@@ -433,7 +427,7 @@ function AgendaTablePage({
           <View
             style={[
               s.legendDot,
-              { backgroundColor: BRAND.green, borderWidth: 0.5, borderColor: '#16a34a' },
+              { backgroundColor: '#dcfce7', borderWidth: 0.5, borderColor: '#16a34a' },
             ]}
           />
           <Text style={s.legendText}>Ajout récent</Text>
@@ -442,7 +436,7 @@ function AgendaTablePage({
           <View
             style={[
               s.legendDot,
-              { backgroundColor: BRAND.orange, borderWidth: 0.5, borderColor: '#ea580c' },
+              { backgroundColor: '#fefce8', borderWidth: 0.5, borderColor: '#ca8a04' },
             ]}
           />
           <Text style={s.legendText}>Modification de date</Text>

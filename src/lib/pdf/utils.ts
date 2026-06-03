@@ -45,7 +45,7 @@ export function getLatestEventByFilm(
 
 export function formatDateShort(dateStr: string): string {
   const d = new Date(dateStr)
-  return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+  return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`
 }
 
 export function formatGenerationDate(date: Date): string {
@@ -61,7 +61,7 @@ export function truncateCast(cast: string | null, limit = 2): string {
 }
 
 export function getRecentMovements(events: FilmReleaseEvent[]): FilmReleaseEvent[] {
-  const visible = events.filter(e => e.visible && e.event_type !== 'removed')
+  const visible = events.filter(e => e.visible)
   if (visible.length === 0) return []
   const mostRecentDay = visible[0].occurred_at.slice(0, 10)
   return visible.filter(e => e.occurred_at.slice(0, 10) === mostRecentDay).slice(0, 12)
