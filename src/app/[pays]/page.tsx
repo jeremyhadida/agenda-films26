@@ -67,7 +67,7 @@ export default async function AgendaPage({
                 Exporter PDF
               </a>
             </div>
-            <LastMovementsPanel events={events} paysId={pays} />
+            <LastMovementsPanel events={events} />
             <AgendaPageClient allGroups={allGroups} events={events} paysId={pays} />
           </>
         ) : (

@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import gsap from 'gsap'
 import type { FilmReleaseEvent, Film } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 
@@ -21,25 +19,6 @@ const EVENT_LABELS: Record<string, { label: string; color: string }> = {
 }
 
 export function MouvementsDrawer({ isOpen, onClose, events, paysId }: MouvementsDrawerProps) {
-  const router = useRouter()
-
-  function handleFilmClick(event: FilmReleaseEvent & { film: Film }) {
-    onClose()
-    setTimeout(() => {
-      const el = document.getElementById(`film-${event.film_id}`)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        setTimeout(() => {
-          gsap.to(el, { opacity: 1, x: 0, duration: 0.25, overwrite: 'auto' })
-          el.classList.add('film-targeted')
-          setTimeout(() => el.classList.remove('film-targeted'), 2500)
-        }, 700)
-      } else {
-        router.push(`/${paysId}/films/${event.film_id}`)
-      }
-    }, 320)
-  }
-
   return (
     <>
       {/* Overlay */}
@@ -88,11 +67,11 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
               {events.map(event => {
                 const meta = EVENT_LABELS[event.event_type] ?? EVENT_LABELS.added
                 return (
-                  <button
+                  <Link
                     key={event.id}
-                    type="button"
-                    onClick={() => handleFilmClick(event)}
-                    className="flex gap-3 px-4 py-3 hover:bg-surface-card/40 transition-colors w-full text-left"
+                    href={`/${paysId}/films/${event.film_id}`}
+                    onClick={onClose}
+                    className="flex gap-3 px-4 py-3 hover:bg-surface-card/40 transition-colors"
                   >
                     <div className="w-10 h-14 rounded-md overflow-hidden shrink-0 bg-surface relative">
                       {event.film?.poster_url ? (
@@ -125,7 +104,7 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
                     <span className="text-muted text-[10px] font-body self-start pt-1 shrink-0">
                       {formatDate(event.occurred_at.split('T')[0])}
                     </span>
-                  </button>
+                  </Link>
                 )
               })}
             </div>
