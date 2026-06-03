@@ -60,11 +60,6 @@ const s = StyleSheet.create({
     fontFamily: 'Helvetica-Bold',
     marginBottom: 4,
   },
-  coverRegion: {
-    color: BRAND.textMuted,
-    fontSize: 13,
-    marginBottom: 24,
-  },
   coverDate: {
     color: BRAND.textMuted,
     fontSize: 10,
@@ -93,10 +88,27 @@ const s = StyleSheet.create({
     borderRadius: 3,
     marginRight: 10,
   },
+  movementInfo: {
+    flex: 1,
+  },
   movementTitle: {
     color: BRAND.textPrimary,
     fontSize: 10,
-    flex: 1,
+  },
+  movementDates: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 1,
+    gap: 4,
+  },
+  movementDateOld: {
+    color: BRAND.textMuted,
+    fontSize: 8,
+    textDecoration: 'line-through',
+  },
+  movementDateNew: {
+    color: BRAND.textPrimary,
+    fontSize: 8,
   },
   movementBadge: {
     paddingHorizontal: 6,
@@ -107,21 +119,24 @@ const s = StyleSheet.create({
     fontSize: 7,
     fontFamily: 'Helvetica-Bold',
   },
-  coverFooter: {
+  coverLegend: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingHorizontal: 40,
-    paddingBottom: 40,
+    gap: 16,
+    marginTop: 20,
   },
-  coverFooterLabel: {
+  coverLegendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  coverLegendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  coverLegendText: {
     color: BRAND.textMuted,
-    fontSize: 10,
-  },
-  coverFooterCount: {
-    color: BRAND.textPrimary,
-    fontSize: 28,
-    fontFamily: 'Helvetica-Bold',
+    fontSize: 8,
   },
 
   // Page tableau
@@ -245,12 +260,10 @@ function CoverPage({
   country,
   generatedAt,
   events,
-  totalFilms,
 }: {
   country: Country
   generatedAt: Date
   events: FilmReleaseEvent[]
-  totalFilms: number
 }) {
   const movements = getRecentMovements(events)
   return (
@@ -261,8 +274,7 @@ function CoverPage({
 
       <View style={s.coverBody}>
         <Text style={s.coverLabel}>CALENDRIER EXPLOITANT</Text>
-        <Text style={s.coverCountry}>{country.name}</Text>
-        <Text style={s.coverRegion}>{country.region}</Text>
+        <Text style={s.coverCountry}>{country.name.toUpperCase()}</Text>
         <Text style={s.coverDate}>Généré le {formatGenerationDate(generatedAt)}</Text>
 
         <View style={s.divider} />
@@ -280,9 +292,31 @@ function CoverPage({
                       { backgroundColor: isAdded ? '#22c55e' : '#f97316' },
                     ]}
                   />
-                  <Text style={s.movementTitle}>
-                    {ev.film?.title ?? ev.film_id}
-                  </Text>
+                  <View style={s.movementInfo}>
+                    <Text style={s.movementTitle}>
+                      {(ev.film?.title ?? ev.film_id).toUpperCase()}
+                    </Text>
+                    <View style={s.movementDates}>
+                      {isAdded && ev.new_date && (
+                        <Text style={s.movementDateNew}>
+                          {formatDateShort(ev.new_date)}
+                        </Text>
+                      )}
+                      {!isAdded && ev.old_date && (
+                        <Text style={s.movementDateOld}>
+                          {formatDateShort(ev.old_date)}
+                        </Text>
+                      )}
+                      {!isAdded && ev.new_date && (
+                        <>
+                          <Text style={s.movementDateNew}>→</Text>
+                          <Text style={s.movementDateNew}>
+                            {formatDateShort(ev.new_date)}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  </View>
                   <View
                     style={[
                       s.movementBadge,
@@ -301,13 +335,19 @@ function CoverPage({
                 </View>
               )
             })}
+
+            <View style={s.coverLegend}>
+              <View style={s.coverLegendItem}>
+                <View style={[s.coverLegendDot, { backgroundColor: '#22c55e' }]} />
+                <Text style={s.coverLegendText}>Ajout</Text>
+              </View>
+              <View style={s.coverLegendItem}>
+                <View style={[s.coverLegendDot, { backgroundColor: '#f97316' }]} />
+                <Text style={s.coverLegendText}>Report de date</Text>
+              </View>
+            </View>
           </View>
         )}
-      </View>
-
-      <View style={s.coverFooter}>
-        <Text style={s.coverFooterLabel}>Films au programme</Text>
-        <Text style={s.coverFooterCount}>{totalFilms}</Text>
       </View>
     </Page>
   )
@@ -369,7 +409,7 @@ function AgendaTablePage({
                   {formatDateShort(film.release_date)}
                 </Text>
                 <Text style={[s.cell, s.cTitle, { fontFamily: 'Helvetica-Bold' }]}>
-                  {film.title}
+                  {film.title.toUpperCase()}
                 </Text>
                 <Text style={[s.cellMuted, s.cStudio]}>
                   {film.studio ?? '—'}
@@ -447,7 +487,6 @@ export function AgendaPdfDocument({
         country={country}
         generatedAt={generatedAt}
         events={events}
-        totalFilms={sortedFilms.length}
       />
       <AgendaTablePage
         country={country}
