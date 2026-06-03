@@ -36,7 +36,7 @@ export const getAgendaByCountry = unstable_cache(
     if (error) throw error
     return (data ?? [])
       .map((r: any) => ({ ...r.films, release_date: r.release_date }))
-      .filter((f: any) => !HIDDEN_STATUSES.includes(f.status))
+      .filter((f: any) => f.status === 'validé')
   },
   ['agenda-by-country'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
