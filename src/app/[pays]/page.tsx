@@ -56,6 +56,7 @@ export default async function AgendaPage({
               <a
                 href={`/api/pdf/${pays}`}
                 download
+                title={`Télécharger le calendrier PDF — ${country!.name}`}
                 className="inline-flex items-center gap-2 rounded border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-[var(--color-muted)] transition hover:bg-white/10 hover:text-[var(--color-text)]"
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
