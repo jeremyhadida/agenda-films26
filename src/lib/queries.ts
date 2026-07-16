@@ -2,7 +2,8 @@ import { unstable_cache } from 'next/cache'
 import { supabase } from './supabase'
 import type { Country, Film, FilmReleaseEvent } from './types'
 
-const HIDDEN_STATUSES = ['nego', 'concurrence', 'annulé']
+const AGENDA_STATUSES = ['validated', 'nego']
+const HIDDEN_STATUSES = ['concurrence', 'cancelled']
 
 const REVALIDATE = process.env.NODE_ENV === 'development' ? false : 3600
 const REVALIDATE_MOUVEMENTS = process.env.NODE_ENV === 'development' ? false : 1800
@@ -36,7 +37,7 @@ export const getAgendaByCountry = unstable_cache(
     if (error) throw error
     return (data ?? [])
       .map((r: any) => ({ ...r.films, release_date: r.release_date }))
-      .filter((f: any) => f.status === 'validated')
+      .filter((f: any) => AGENDA_STATUSES.includes(f.status))
   },
   ['agenda-by-country'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
