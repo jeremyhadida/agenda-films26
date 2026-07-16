@@ -1,18 +1,20 @@
 import Image from 'next/image'
 import type { Film } from '@/lib/types'
-import { formatDate, formatDuration } from '@/lib/utils'
+import { filmTitle, formatDate, formatDuration } from '@/lib/utils'
 
 interface HeroSectionProps {
   film: Film & { release_date: string }
 }
 
 export function HeroSection({ film }: HeroSectionProps) {
+  const title = filmTitle(film)
+
   return (
     <div className="relative w-full h-[50vh] md:h-[60vh] overflow-hidden">
       {film.poster_url ? (
         <Image
           src={film.poster_url}
-          alt={film.title}
+          alt={title}
           fill
           className="object-cover"
           priority
@@ -42,7 +44,7 @@ export function HeroSection({ film }: HeroSectionProps) {
         </div>
 
         <h1 className="font-display font-bold text-text text-4xl md:text-6xl leading-tight mb-2 tracking-tight">
-          {film.title}
+          {title.toUpperCase()}
         </h1>
 
         <div className="flex flex-wrap items-center gap-3 text-muted text-sm font-body">

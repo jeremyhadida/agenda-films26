@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getActiveCountries, getFilmBySlug } from '@/lib/queries'
+import { filmTitle } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { BottomNav } from '@/components/layout/BottomNav'
@@ -19,7 +20,7 @@ export async function generateMetadata({
   const { pays, slug } = await params
   const film = await getFilmBySlug(slug, pays)
   return {
-    title: film ? `${film.title} — Films 26` : 'Films 26',
+    title: film ? `${filmTitle(film)} — Films 26` : 'Films 26',
     description: film?.synopsis ?? undefined,
   }
 }

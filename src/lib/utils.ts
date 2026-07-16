@@ -1,6 +1,13 @@
 import type { Film, WeekGroup } from './types'
 
 /**
+ * Titre à afficher : VF si disponible, sinon titre original.
+ */
+export function filmTitle(film: Pick<Film, 'title' | 'title_vf'>): string {
+  return film.title_vf ?? film.title
+}
+
+/**
  * Returns the ISO week number (1–53) for an ISO date string.
  */
 export function getIsoWeek(dateStr: string): number {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import type { FilmReleaseEvent, Film } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { filmTitle, formatDate } from '@/lib/utils'
 
 interface MouvementsDrawerProps {
   isOpen: boolean
@@ -82,7 +82,7 @@ export function MouvementsDrawer({ isOpen, onClose, events, paysId }: Mouvements
                         {meta.label}
                       </span>
                       <p className="font-display font-semibold text-text text-xs leading-snug mt-0.5">
-                        {event.film?.title ?? event.film_id}
+                        {(event.film ? filmTitle(event.film) : event.film_id).toUpperCase()}
                       </p>
                       <p className="text-muted text-[10px] font-body mt-0.5">
                         {event.event_type === 'added' && event.new_date && formatDate(event.new_date)}

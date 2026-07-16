@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Film, FilmReleaseEvent, WeekGroup } from '@/lib/types'
-import { formatDuration, formatDateShort, getIsoWeek, formatMonthFull, getReleaseDay } from '@/lib/utils'
+import { filmTitle, formatDuration, formatDateShort, getIsoWeek, formatMonthFull, getReleaseDay } from '@/lib/utils'
 import { StudioBadge } from './StudioBadge'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -120,7 +120,7 @@ function FilmTimelineCard({ film, event, side, paysId }: FilmTimelineCardProps) 
           {/* Desktop : titre + méta sur la même ligne */}
           <div className={`hidden md:flex items-start gap-2 ${isLeft ? 'flex-row-reverse' : ''}`}>
             <p className="font-display font-bold text-text text-[11px] leading-snug flex-1 min-w-0">
-              {(film.title_vf ?? film.title).toUpperCase()}
+              {filmTitle(film).toUpperCase()}
             </p>
             <div className={`shrink-0 flex flex-col gap-0.5 pt-px ${isLeft ? 'items-end' : 'items-start'}`}>
               <MetaChips film={film} genre={genre} isLeft={isLeft} />
@@ -129,7 +129,7 @@ function FilmTimelineCard({ film, event, side, paysId }: FilmTimelineCardProps) 
 
           {/* Mobile : titre seul */}
           <p className="md:hidden font-display font-bold text-text text-[11px] leading-snug line-clamp-2 min-h-[2rem]">
-            {(film.title_vf ?? film.title).toUpperCase()}
+            {filmTitle(film).toUpperCase()}
           </p>
 
           {/* Réalisateur */}
@@ -255,7 +255,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
   }, { scope: containerRef })
 
   return (
-    <div ref={containerRef} className="relative mt-4 pb-16 overflow-x-hidden">
+    <div ref={containerRef} className="relative mt-4 pb-16">
 
       {/* Axe vertical */}
       <div

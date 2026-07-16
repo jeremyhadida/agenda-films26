@@ -1,7 +1,7 @@
 'use client'
 
 import type { FilmReleaseEvent } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { filmTitle, formatDate } from '@/lib/utils'
 
 function formatDayShort(isoDate: string): string {
   const [y, m, d] = isoDate.split('-')
@@ -35,7 +35,7 @@ function MovementBannerCard({ event }: { event: FilmReleaseEvent }) {
     >
       <div className="flex-1 min-w-0">
         <p className="font-display font-semibold text-text text-xs mb-0.5">
-          {event.film?.title ?? event.film_id}
+          {(event.film ? filmTitle(event.film) : event.film_id).toUpperCase()}
         </p>
         <div className="text-[10px] font-body text-muted">
           {event.event_type === 'added' && event.new_date && (

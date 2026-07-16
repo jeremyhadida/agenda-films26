@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { FilmReleaseEvent, Film } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { filmTitle, formatDate } from '@/lib/utils'
 
 interface EventCardProps {
   event: FilmReleaseEvent & { film: Film }
@@ -38,7 +38,7 @@ export function EventCard({ event, paysId }: EventCardProps) {
     >
       <div className="flex-1 min-w-0">
         <p className="font-display font-semibold text-text text-sm mb-1">
-          {event.film?.title ?? event.film_id}
+          {(event.film ? filmTitle(event.film) : event.film_id).toUpperCase()}
         </p>
         <div className="text-xs font-body text-muted">
           {event.event_type === 'added' && event.new_date && (

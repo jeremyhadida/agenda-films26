@@ -1,6 +1,6 @@
-import type { FilmReleaseEvent } from '@/lib/types'
+import type { Film, FilmReleaseEvent } from '@/lib/types'
 
-export type FilmWithDate = { id: string; release_date: string; [key: string]: any }
+export type FilmWithDate = Film & { release_date: string }
 export type MonthGroup = { month: string; films: FilmWithDate[] }
 
 const MONTHS_FR = [
