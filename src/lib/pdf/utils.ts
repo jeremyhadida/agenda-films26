@@ -64,5 +64,13 @@ export function getRecentMovements(events: FilmReleaseEvent[]): FilmReleaseEvent
   const visible = events.filter(e => e.visible)
   if (visible.length === 0) return []
   const mostRecentDay = visible[0].occurred_at.slice(0, 10)
-  return visible.filter(e => e.occurred_at.slice(0, 10) === mostRecentDay).slice(0, 12)
+  const dayEvents = visible.filter(e => e.occurred_at.slice(0, 10) === mostRecentDay)
+
+  // Un seul événement par film (le plus récent) : un titre est soit ajouté, soit modifié, jamais les deux.
+  const latestByFilm = new Map<string, FilmReleaseEvent>()
+  for (const e of dayEvents) {
+    if (!latestByFilm.has(e.film_id)) latestByFilm.set(e.film_id, e)
+  }
+
+  return Array.from(latestByFilm.values()).slice(0, 12)
 }
