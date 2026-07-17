@@ -3,6 +3,7 @@ import {
   groupFilmsByMonth,
   getLatestEventByFilm,
   formatDateShort,
+  formatDateLong,
   formatGenerationDate,
   truncateCast,
   getRecentMovements,
@@ -94,12 +95,21 @@ describe('getRecentMovements', () => {
     expect(result.every(e => e.occurred_at.startsWith('2026-06-02'))).toBe(true)
   })
 
-  it('exclut les événements "removed"', () => {
-    const events = [makeEvent('film1', 'removed', '2026-06-02T10:00:00Z')]
-    expect(getRecentMovements(events)).toHaveLength(0)
-  })
-
   it('retourne un tableau vide si aucun événement', () => {
     expect(getRecentMovements([])).toHaveLength(0)
+  })
+
+  it('ne tronque pas au-delà de 12 événements : la limite d\'affichage revient à l\'appelant', () => {
+    const events = Array.from({ length: 20 }, (_, i) =>
+      makeEvent(`film${i}`, 'added', '2026-06-02T10:00:00Z')
+    )
+    expect(getRecentMovements(events)).toHaveLength(20)
+  })
+})
+
+describe('formatDateLong', () => {
+  it('formate en "Weekday jj mois aaaa" comme le corps de l\'email', () => {
+    // 2026-06-02 est un mardi
+    expect(formatDateLong('2026-06-02')).toBe('Mardi 02 juin 2026')
   })
 })

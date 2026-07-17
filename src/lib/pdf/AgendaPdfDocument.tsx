@@ -12,11 +12,16 @@ import {
   groupFilmsByMonth,
   getLatestEventByFilm,
   formatDateShort,
+  formatDateLong,
   formatGenerationDate,
   truncateCast,
   getRecentMovements,
   type FilmWithDate,
 } from './utils'
+
+// Nombre max de mouvements affichés sur la page de garde (espace limité) —
+// au-delà, un compteur "+N autres" est affiché plutôt que de tronquer en silence.
+const MAX_COVER_MOVEMENTS = 12
 
 const BRAND = {
   dark: '#0f172a',
@@ -123,6 +128,12 @@ const s = StyleSheet.create({
   movementBadgeText: {
     fontSize: 7,
     fontFamily: 'Helvetica-Bold',
+  },
+  movementMoreText: {
+    color: BRAND.textMuted,
+    fontSize: 8,
+    fontStyle: 'italic',
+    marginTop: 4,
   },
   coverLegend: {
     flexDirection: 'row',
@@ -276,7 +287,9 @@ function CoverPage({
   generatedAt: Date
   events: FilmReleaseEvent[]
 }) {
-  const movements = getRecentMovements(events)
+  const allMovements = getRecentMovements(events)
+  const movements = allMovements.slice(0, MAX_COVER_MOVEMENTS)
+  const hiddenMovementsCount = allMovements.length - movements.length
   return (
     <Page size="A4" style={s.coverPage}>
       <View style={s.coverBand}>
@@ -306,15 +319,15 @@ function CoverPage({
                     </Text>
                     <View style={s.movementDates}>
                       {isAdded && ev.new_date && (
-                        <Text style={s.movementDateNew}>{formatDateShort(ev.new_date)}</Text>
+                        <Text style={s.movementDateNew}>{formatDateLong(ev.new_date)}</Text>
                       )}
                       {!isAdded && ev.old_date && (
-                        <Text style={s.movementDateOld}>{formatDateShort(ev.old_date)}</Text>
+                        <Text style={s.movementDateOld}>{formatDateLong(ev.old_date)}</Text>
                       )}
                       {!isAdded && !isRemoved && ev.new_date && (
                         <>
                           <Text style={s.movementDateNew}>→</Text>
-                          <Text style={s.movementDateNew}>{formatDateShort(ev.new_date)}</Text>
+                          <Text style={s.movementDateNew}>{formatDateLong(ev.new_date)}</Text>
                         </>
                       )}
                     </View>
@@ -327,6 +340,12 @@ function CoverPage({
                 </View>
               )
             })}
+
+            {hiddenMovementsCount > 0 && (
+              <Text style={s.movementMoreText}>
+                + {hiddenMovementsCount} autre{hiddenMovementsCount > 1 ? 's' : ''} mouvement{hiddenMovementsCount > 1 ? 's' : ''} ce jour-là — voir la liste complète en ligne
+              </Text>
+            )}
 
             <View style={s.coverLegend}>
               {Object.values(EVENT_COLORS).map(c => (
@@ -466,7 +485,11 @@ export function AgendaPdfDocument({
   events: FilmReleaseEvent[]
   generatedAt: Date
 }) {
-  const eventMap = getLatestEventByFilm(events)
+  // Restreint au jour le plus récent pour rester cohérent avec l'encart
+  // "DERNIERS MOUVEMENTS" de la page de garde : une ligne n'est surlignée
+  // que si son événement y apparaît aussi (sinon désynchronisation visible,
+  // ex. lignes jaunes sans correspondance dans la liste des mouvements récents).
+  const eventMap = getLatestEventByFilm(getRecentMovements(events))
   const sortedFilms = [...films].sort((a, b) =>
     a.release_date.localeCompare(b.release_date)
   )

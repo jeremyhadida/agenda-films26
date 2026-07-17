@@ -48,6 +48,17 @@ export function formatDateShort(dateStr: string): string {
   return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`
 }
 
+const WEEKDAYS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+
+// Aligné sur le format du corps de l'email (send-mailing) : "Vendredi 02 février 2025".
+export function formatDateLong(dateStr: string): string {
+  const d = new Date(dateStr)
+  const weekday = WEEKDAYS_FR[d.getUTCDay()]
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const month = MONTHS_FR_LOWER[d.getUTCMonth()]
+  return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${day} ${month} ${d.getUTCFullYear()}`
+}
+
 export function formatGenerationDate(date: Date): string {
   return `${date.getDate()} ${MONTHS_FR_LOWER[date.getMonth()]} ${date.getFullYear()}`
 }
@@ -72,5 +83,7 @@ export function getRecentMovements(events: FilmReleaseEvent[]): FilmReleaseEvent
     if (!latestByFilm.has(e.film_id)) latestByFilm.set(e.film_id, e)
   }
 
-  return Array.from(latestByFilm.values()).slice(0, 12)
+  // Liste complète du jour, non tronquée : l'appelant décide de l'affichage
+  // (le corps de l'email affiche tout, la page de garde du PDF cape et l'indique).
+  return Array.from(latestByFilm.values())
 }
