@@ -7,7 +7,7 @@ import {
   Link,
 } from '@react-pdf/renderer'
 import type { Country, FilmReleaseEvent } from '@/lib/types'
-import { filmTitle } from '@/lib/utils'
+import { filmTitle, sortMovementsByCategoryAndDate } from '@/lib/utils'
 import {
   groupFilmsByMonth,
   getLatestEventByFilm,
@@ -287,7 +287,7 @@ function CoverPage({
   generatedAt: Date
   events: FilmReleaseEvent[]
 }) {
-  const allMovements = getRecentMovements(events)
+  const allMovements = sortMovementsByCategoryAndDate(getRecentMovements(events))
   const movements = allMovements.slice(0, MAX_COVER_MOVEMENTS)
   const hiddenMovementsCount = allMovements.length - movements.length
   return (
@@ -359,7 +359,7 @@ function CoverPage({
         )}
 
         <Link src={`https://agenda-f26.vercel.app/${country.id}`} style={s.onlineLink}>
-          Voir en ligne → agenda-f26.vercel.app/{country.id}
+          Voir le line-up complet → agenda-f26.vercel.app/{country.id}
         </Link>
       </View>
     </Page>

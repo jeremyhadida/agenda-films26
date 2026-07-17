@@ -1,7 +1,7 @@
 'use client'
 
 import type { FilmReleaseEvent } from '@/lib/types'
-import { filmTitle, formatDate } from '@/lib/utils'
+import { filmTitle, formatDate, sortMovementsByCategoryAndDate } from '@/lib/utils'
 
 function formatDayShort(isoDate: string): string {
   const [y, m, d] = isoDate.split('-')
@@ -79,10 +79,7 @@ export function LastMovementsPanel({ events }: LastMovementsPanelProps) {
     .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at))
     .forEach(e => { if (!latestByFilm.has(e.film_id)) latestByFilm.set(e.film_id, e) })
 
-  const TYPE_ORDER: Record<string, number> = { added: 0, date_changed: 1, removed: 2 }
-  const sortedEvents = Array.from(latestByFilm.values()).sort(
-    (a, b) => (TYPE_ORDER[a.event_type] ?? 9) - (TYPE_ORDER[b.event_type] ?? 9)
-  )
+  const sortedEvents = sortMovementsByCategoryAndDate(Array.from(latestByFilm.values()))
 
   const activeSections = BANNER_SECTIONS
     .map(s => ({ ...s, events: sortedEvents.filter(e => e.event_type === s.key) }))

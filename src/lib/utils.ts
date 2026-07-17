@@ -1,10 +1,38 @@
-import type { Film, WeekGroup } from './types'
+import type { Film, FilmReleaseEvent, WeekGroup } from './types'
 
 /**
  * Titre à afficher : VF si disponible, sinon titre original.
  */
 export function filmTitle(film: Pick<Film, 'title' | 'title_vf'>): string {
   return film.title_vf ?? film.title
+}
+
+const MOVEMENT_TYPE_ORDER: Record<FilmReleaseEvent['event_type'], number> = {
+  added: 0,
+  date_changed: 1,
+  removed: 2,
+}
+
+function getMovementReleaseDate(event: FilmReleaseEvent): string | null {
+  return event.event_type === 'removed' ? event.old_date : (event.new_date ?? event.old_date)
+}
+
+/**
+ * Trie les mouvements par catégorie (ajouts, modifs, annulations) puis, au
+ * sein de chaque catégorie, par date de sortie croissante (plus proche → plus lointaine).
+ */
+export function sortMovementsByCategoryAndDate(events: FilmReleaseEvent[]): FilmReleaseEvent[] {
+  return [...events].sort((a, b) => {
+    const typeDiff = MOVEMENT_TYPE_ORDER[a.event_type] - MOVEMENT_TYPE_ORDER[b.event_type]
+    if (typeDiff !== 0) return typeDiff
+
+    const dateA = getMovementReleaseDate(a)
+    const dateB = getMovementReleaseDate(b)
+    if (!dateA && !dateB) return 0
+    if (!dateA) return 1
+    if (!dateB) return -1
+    return dateA.localeCompare(dateB)
+  })
 }
 
 /**
