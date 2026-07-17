@@ -3,7 +3,6 @@ import { supabase } from './supabase'
 import type { Country, Film, FilmReleaseEvent } from './types'
 
 const AGENDA_STATUSES = ['validated', 'nego']
-const HIDDEN_STATUSES = ['concurrence', 'cancelled']
 
 const REVALIDATE = process.env.NODE_ENV === 'development' ? false : 3600
 const REVALIDATE_MOUVEMENTS = process.env.NODE_ENV === 'development' ? false : 1800
@@ -75,14 +74,16 @@ export const getFilmBySlug = unstable_cache(
   { revalidate: REVALIDATE, tags: ['films'] }
 )
 
+const MOVEMENTS_SELECT = `
+  id, film_id, country_id, event_type, old_date, new_date, visible, occurred_at,
+  films ( id, title, title_vf, poster_url, genre, status )
+`
+
 export const getMovementsByCountry = unstable_cache(
   async (countryId: string): Promise<(FilmReleaseEvent & { film: Film })[]> => {
     const { data, error } = await supabase
       .from('film_release_events')
-      .select(`
-        id, film_id, country_id, event_type, old_date, new_date, visible, occurred_at,
-        films ( id, title, title_vf, poster_url, genre, status )
-      `)
+      .select(MOVEMENTS_SELECT)
       .eq('country_id', countryId)
       .eq('visible', true)
       .order('occurred_at', { ascending: false })
@@ -90,8 +91,26 @@ export const getMovementsByCountry = unstable_cache(
     if (error) throw error
     return (data ?? [])
       .map((e: any) => ({ ...e, film: e.films }))
-      .filter((e: any) => !HIDDEN_STATUSES.includes(e.film?.status))
+      .filter((e: any) => AGENDA_STATUSES.includes(e.film?.status))
   },
   ['mouvements-by-country'],
+  { revalidate: REVALIDATE_MOUVEMENTS, tags: ['mouvements'] }
+)
+
+export const getMovementsByCountryMaster = unstable_cache(
+  async (countryId: string): Promise<(FilmReleaseEvent & { film: Film })[]> => {
+    const { data, error } = await supabase
+      .from('film_release_events')
+      .select(MOVEMENTS_SELECT)
+      .eq('country_id', countryId)
+      .eq('visible', true)
+      .order('occurred_at', { ascending: false })
+      .limit(50)
+    if (error) throw error
+    return (data ?? [])
+      .map((e: any) => ({ ...e, film: e.films }))
+      .filter((e: any) => e.film?.status !== 'cancelled')
+  },
+  ['mouvements-master-by-country'],
   { revalidate: REVALIDATE_MOUVEMENTS, tags: ['mouvements'] }
 )

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getActiveCountries, getAgendaByCountryMaster, getMovementsByCountry } from '@/lib/queries'
+import { getActiveCountries, getAgendaByCountryMaster, getMovementsByCountryMaster } from '@/lib/queries'
 import { groupFilmsByWeek, fillWeekGaps } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
@@ -33,7 +33,7 @@ export default async function MasterAgendaPage({
   const [countries, films, events] = await Promise.all([
     getActiveCountries(),
     getAgendaByCountryMaster(pays),
-    getMovementsByCountry(pays),
+    getMovementsByCountryMaster(pays),
   ])
 
   const country = countries.find(c => c.id === pays)

@@ -134,6 +134,25 @@ film_id (→ films.id), country_id (→ countries.id), release_date
 ```
 L'existence d'une ligne = film publié dans ce pays.
 
+### Statuts de film (`films.status`)
+
+Valeurs exactes en base (contrainte CHECK côté back-office `antigravity-forecast`, migration `011_brouillon_status.sql`) — **en anglais**, ne pas confondre avec leurs libellés français :
+
+| Valeur en base   | Libellé FR      | Visible agenda public (`/[pays]`) | Visible `/master/[pays]` |
+|-------------------|-----------------|:---:|:---:|
+| `brouillon`        | Brouillon        | ❌ | ✅ |
+| `nego`              | Négo             | ✅ | ✅ |
+| `validated`         | Validé           | ✅ | ✅ |
+| `competition`       | Concurrence       | ❌ | ✅ |
+| `cancelled`         | Annulé           | ❌ | ❌ |
+
+⚠️ Piège déjà rencontré : `competition` (base) ≠ `concurrence` (label FR) — un filtre codé en dur sur la chaîne `'concurrence'` ne matche jamais rien. Toujours filtrer sur les valeurs anglaises de la colonne `status`.
+
+Logique de filtrage, centralisée dans `src/lib/queries.ts` :
+- **Agenda public + encart Mouvements + PDF exploitant** : liste blanche `AGENDA_STATUSES = ['validated', 'nego']` (`getAgendaByCountry`, `getMovementsByCountry`).
+- **`/master/[pays]`** (interne) : tout sauf `cancelled` (`getAgendaByCountryMaster`, `getMovementsByCountryMaster`).
+- **Newsletter Brevo** (repo `antigravity-forecast`, `DiffusionDrawer.tsx`) : même liste blanche `['validated', 'nego']`, appliquée sur le statut lu depuis `MOCK_FILMS[film_id].status` avant construction du payload envoyé à l'Edge Function `send-mailing`.
+
 ### `film_release_events`
 ```
 id, film_id, country_id,
@@ -163,7 +182,8 @@ id (code ISO), name, region
 | `getActiveCountries()` | — | `Country[]` | 3600s |
 | `getAgendaByCountry(countryId)` | code pays | `(Film & { release_date })[]` | 3600s |
 | `getFilmBySlug(slug, countryId)` | slug, code pays | `Film & { release_date }` \| null | 3600s |
-| `getMovementsByCountry(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50) | 1800s |
+| `getMovementsByCountry(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50, validated/nego) | 1800s |
+| `getMovementsByCountryMaster(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50, tout sauf cancelled) | 1800s |
 
 ### `src/lib/utils.ts`
 | Fonction | Usage |
