@@ -3,9 +3,14 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 // Instancié à la première utilisation (pas au chargement du module) pour ne
 // pas casser la collecte des données de page au build si les env vars ne
 // sont pas encore résolues à ce moment-là.
-let client: SupabaseClient | undefined
+// Le second générique fixe le nom de schéma à forecast_agenda — sans lui,
+// TypeScript retombe sur le défaut "public" du type SupabaseClient et
+// rejette l'objet retourné par createClient({ db: { schema: 'forecast_agenda' } }).
+type ForecastAgendaClient = SupabaseClient<any, 'forecast_agenda'>
 
-function getSupabase(): SupabaseClient {
+let client: ForecastAgendaClient | undefined
+
+function getSupabase(): ForecastAgendaClient {
   if (!client) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -22,7 +27,7 @@ function getSupabase(): SupabaseClient {
   return client
 }
 
-export const supabase = new Proxy({} as SupabaseClient, {
+export const supabase = new Proxy({} as ForecastAgendaClient, {
   get(_target, prop, receiver) {
     return Reflect.get(getSupabase(), prop, receiver)
   },
