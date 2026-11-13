@@ -254,7 +254,12 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
         },
       })
     })
-  }, { scope: containerRef })
+    // Les ScrollTriggers sont calculés sur le DOM courant : après un
+    // changement d'année, recalculer les positions du nouveau contenu.
+    ScrollTrigger.refresh()
+    // Rejouer quand la liste affichée change (changement d'année) : sinon les
+    // nouvelles cartes gardent leur opacity: 0 initiale et restent invisibles.
+  }, { scope: containerRef, dependencies: [groups], revertOnUpdate: true })
 
   return (
     <div ref={containerRef} className="relative mt-4 pb-16">
@@ -306,7 +311,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
         }
 
         return (
-          <div key={group.isoWeek} id={`week-${group.startDate}`} className="scroll-mt-28">
+          <div key={group.startDate} id={`week-${group.startDate}`} className="scroll-mt-28">
             {monthSeparator}
 
             <div className="tl-week-node flex items-center gap-3 py-4 relative z-10 px-4">
@@ -330,7 +335,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
 
               return (
                 <div
-                  key={`${group.isoWeek}-${rowIdx}`}
+                  key={`${group.startDate}-${rowIdx}`}
                   className="tl-film-row grid grid-cols-[1fr_16px_1fr] items-center py-1.5 relative z-10 px-2 min-w-0"
                 >
                   <FilmTimelineCard film={left} event={leftEvent} side="left" paysId={paysId} />
