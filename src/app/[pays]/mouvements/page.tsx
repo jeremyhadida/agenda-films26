@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { EventFeed } from '@/components/mouvements/EventFeed'
 
-export const revalidate = 1800
+export const revalidate = 300 // aligné sur REVALIDATE (src/lib/queries.ts)
 
 export async function generateMetadata({
   params,

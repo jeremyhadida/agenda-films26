@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { Film, FilmReleaseEvent, WeekGroup } from '@/lib/types'
-import { filmTitle, formatDuration, formatDateShort, getIsoWeek, formatMonthFull, getReleaseDay } from '@/lib/utils'
+import { filmTitle, formatDuration, formatDateShort, getIsoWeek, getIsoYear, getWeekMonday, formatMonthFull, getReleaseDay } from '@/lib/utils'
 import { StudioBadge } from './StudioBadge'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -198,7 +198,9 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
 
   const now = new Date()
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-  const currentWeek = getIsoWeek(todayStr)
+  // Lundi de la semaine courante — comparer la date (et pas seulement le n° de
+  // semaine ISO) évite de marquer "en cours" la même semaine d'une autre année.
+  const currentMonday = getWeekMonday(getIsoYear(todayStr), getIsoWeek(todayStr))
 
   useGSAP(() => {
     const container = containerRef.current
@@ -264,7 +266,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
       />
 
       {groups.map((group, i) => {
-        const isCurrent = group.isoWeek === currentWeek
+        const isCurrent = group.startDate === currentMonday
         const films = group.films
 
         const prevGroup = i > 0 ? groups[i - 1] : null
@@ -284,7 +286,7 @@ export function AgendaTimeline({ groups, events, paysId }: AgendaTimelineProps) 
         // Semaine vide
         if (films.length === 0) {
           return (
-            <div key={`${group.isoWeek}-empty`} id={`week-${group.startDate}`} className="scroll-mt-28">
+            <div key={`${group.startDate}-empty`} id={`week-${group.startDate}`} className="scroll-mt-28">
               {monthSeparator}
               <div className="tl-week-node flex items-center gap-3 py-3 relative z-10 px-4">
                 <div className="flex-1 h-px bg-[#2a4a7a]/30" />

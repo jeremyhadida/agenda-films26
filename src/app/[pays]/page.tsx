@@ -8,7 +8,7 @@ import { MobileNav } from '@/components/layout/MobileNav'
 import { LastMovementsPanel } from '@/components/agenda/LastMovementsPanel'
 import { AgendaPageClient } from '@/components/agenda/AgendaPageClient'
 
-export const revalidate = 3600
+export const revalidate = 300 // aligné sur REVALIDATE (src/lib/queries.ts)
 
 export async function generateStaticParams() {
   const countries = await getActiveCountries()

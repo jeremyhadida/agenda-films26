@@ -80,9 +80,9 @@ font-body:    Inter
 | Route | Description | Cache |
 |-------|-------------|-------|
 | `/` | Accueil — liste des pays par région | `force-static` |
-| `/[pays]` | Agenda hebdomadaire — sections par semaine ISO, cartes films | ISR 3600s |
-| `/[pays]/films/[slug]` | Fiche détail film — hero immersif, synopsis, casting, infos techniques | ISR 3600s |
-| `/[pays]/mouvements` | Feed des événements récents (visible = true) | ISR 1800s |
+| `/[pays]` | Agenda hebdomadaire — sections par semaine ISO, cartes films | ISR 300s |
+| `/[pays]/films/[slug]` | Fiche détail film — hero immersif, synopsis, casting, infos techniques | ISR 300s |
+| `/[pays]/mouvements` | Feed des événements récents (visible = true) | ISR 300s |
 
 ---
 
@@ -179,11 +179,11 @@ id (code ISO), name, region
 ### `src/lib/queries.ts`
 | Fonction | Paramètres | Retour | Revalidate |
 |----------|-----------|--------|-----------|
-| `getActiveCountries()` | — | `Country[]` | 3600s |
-| `getAgendaByCountry(countryId)` | code pays | `(Film & { release_date })[]` | 3600s |
-| `getFilmBySlug(slug, countryId)` | slug, code pays | `Film & { release_date }` \| null | 3600s |
-| `getMovementsByCountry(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50, validated/nego) | 1800s |
-| `getMovementsByCountryMaster(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50, tout sauf cancelled) | 1800s |
+| `getActiveCountries()` | — | `Country[]` | 300s |
+| `getAgendaByCountry(countryId)` | code pays | `(Film & { release_date })[]` | 300s |
+| `getFilmBySlug(slug, countryId)` | slug, code pays | `Film & { release_date }` \| null | 300s |
+| `getMovementsByCountry(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50, validated/nego) | 300s |
+| `getMovementsByCountryMaster(countryId)` | code pays | `FilmReleaseEvent[]` (limit 50, tout sauf cancelled) | 300s |
 
 ### `src/lib/utils.ts`
 | Fonction | Usage |
@@ -219,7 +219,7 @@ id (code ISO), name, region
 - Navigation mobile (BottomNav + drawer mouvements)
 - Responsive desktop (5 colonnes) / mobile (liste horizontale)
 - Design system Marquee Pro
-- Caching ISR (1h agenda, 30 min mouvements)
+- Caching ISR unifié 5 min (agenda + mouvements, `REVALIDATE` dans `queries.ts`) — ne jamais mettre `false` (= cache indéfini)
 
 ### Incomplet
 - `public/logos/` vide — les logos studios affichent un fallback texte

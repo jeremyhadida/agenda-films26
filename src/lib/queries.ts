@@ -4,8 +4,13 @@ import type { Country, Film, FilmReleaseEvent } from './types'
 
 const AGENDA_STATUSES = ['validated', 'nego']
 
-const REVALIDATE = process.env.NODE_ENV === 'development' ? false : 3600
-const REVALIDATE_MOUVEMENTS = process.env.NODE_ENV === 'development' ? false : 1800
+// Une seule durée de cache pour TOUTES les requêtes : agenda et mouvements
+// doivent être rafraîchis ensemble, sinon le bandeau "Derniers mouvements"
+// annonce des films (ex. sorties 2027) absents de la frise agenda.
+// ⚠️ Ne jamais passer `false` : pour unstable_cache, false = cache INDÉFINI
+// (persisté dans .next/cache), ce qui figeait les données en dev.
+// Garder en phase avec `export const revalidate` des pages (valeur littérale).
+const REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 300
 
 export const getActiveCountries = unstable_cache(
   async (): Promise<Country[]> => {
@@ -16,7 +21,7 @@ export const getActiveCountries = unstable_cache(
     if (error) throw error
     return (data ?? []).map(({ film_releases: _, ...c }) => c) as Country[]
   },
-  ['active-countries'],
+  ['active-countries-v2'],
   { revalidate: REVALIDATE }
 )
 
@@ -38,7 +43,7 @@ export const getAgendaByCountry = unstable_cache(
       .map((r: any) => ({ ...r.films, release_date: r.release_date }))
       .filter((f: any) => AGENDA_STATUSES.includes(f.status))
   },
-  ['agenda-by-country'],
+  ['agenda-by-country-v2'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
 )
 
@@ -54,7 +59,7 @@ export const getAgendaByCountryMaster = unstable_cache(
       .map((r: any) => ({ ...r.films, release_date: r.release_date }))
       .filter((f: any) => f.status !== 'cancelled')
   },
-  ['agenda-master-by-country'],
+  ['agenda-master-by-country-v2'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
 )
 
@@ -70,7 +75,7 @@ export const getFilmBySlug = unstable_cache(
     if (!data) return null
     return { ...(data as any).films, release_date: (data as any).release_date }
   },
-  ['film-by-slug'],
+  ['film-by-slug-v2'],
   { revalidate: REVALIDATE, tags: ['films'] }
 )
 
@@ -93,8 +98,8 @@ export const getMovementsByCountry = unstable_cache(
       .map((e: any) => ({ ...e, film: e.films }))
       .filter((e: any) => AGENDA_STATUSES.includes(e.film?.status))
   },
-  ['mouvements-by-country'],
-  { revalidate: REVALIDATE_MOUVEMENTS, tags: ['mouvements'] }
+  ['mouvements-by-country-v2'],
+  { revalidate: REVALIDATE, tags: ['mouvements'] }
 )
 
 export const getMovementsByCountryMaster = unstable_cache(
@@ -111,6 +116,6 @@ export const getMovementsByCountryMaster = unstable_cache(
       .map((e: any) => ({ ...e, film: e.films }))
       .filter((e: any) => e.film?.status !== 'cancelled')
   },
-  ['mouvements-master-by-country'],
-  { revalidate: REVALIDATE_MOUVEMENTS, tags: ['mouvements'] }
+  ['mouvements-master-by-country-v2'],
+  { revalidate: REVALIDATE, tags: ['mouvements'] }
 )

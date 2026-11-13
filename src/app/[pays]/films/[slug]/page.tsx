@@ -10,7 +10,7 @@ import { HeroSection } from '@/components/film/HeroSection'
 import { TechInfo } from '@/components/film/TechInfo'
 import { CastGrid } from '@/components/film/CastGrid'
 
-export const revalidate = 3600
+export const revalidate = 300 // aligné sur REVALIDATE (src/lib/queries.ts)
 
 export async function generateMetadata({
   params,

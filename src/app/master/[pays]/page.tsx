@@ -9,7 +9,7 @@ import { LastMovementsPanel } from '@/components/agenda/LastMovementsPanel'
 import { AgendaPageClient } from '@/components/agenda/AgendaPageClient'
 import { PasswordGate } from '@/components/PasswordGate'
 
-export const revalidate = 3600
+export const revalidate = 300 // aligné sur REVALIDATE (src/lib/queries.ts)
 
 export async function generateMetadata({
   params,
