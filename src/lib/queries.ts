@@ -12,15 +12,20 @@ const AGENDA_STATUSES = ['validated', 'nego']
 // Garder en phase avec `export const revalidate` des pages (valeur littérale).
 const REVALIDATE = process.env.NODE_ENV === 'development' ? 1 : 300
 
+// Versions « fetch* » : lisent la base directement, sans cache. Réservées à la route PDF
+// (jointe à la newsletter juste après une modification de dates : elle doit être à jour).
+// Les pages publiques, elles, passent par les versions en cache ci-dessous (5 min).
+export async function fetchActiveCountries(): Promise<Country[]> {
+  const { data, error } = await supabase
+    .from('countries')
+    .select('id, name, region, film_releases!inner(film_id)')
+    .order('name')
+  if (error) throw error
+  return (data ?? []).map(({ film_releases: _, ...c }) => c) as Country[]
+}
+
 export const getActiveCountries = unstable_cache(
-  async (): Promise<Country[]> => {
-    const { data, error } = await supabase
-      .from('countries')
-      .select('id, name, region, film_releases!inner(film_id)')
-      .order('name')
-    if (error) throw error
-    return (data ?? []).map(({ film_releases: _, ...c }) => c) as Country[]
-  },
+  fetchActiveCountries,
   ['active-countries-v2'],
   { revalidate: REVALIDATE }
 )
@@ -31,18 +36,20 @@ const FILMS_SELECT = `
   projection_fmt, audio_mix, nationality, status
 `
 
+export async function fetchAgendaByCountry(countryId: string): Promise<(Film & { release_date: string })[]> {
+  const { data, error } = await supabase
+    .from('film_releases')
+    .select(`release_date, films ( ${FILMS_SELECT} )`)
+    .eq('country_id', countryId)
+    .order('release_date', { ascending: true })
+  if (error) throw error
+  return (data ?? [])
+    .map((r: any) => ({ ...r.films, release_date: r.release_date }))
+    .filter((f: any) => AGENDA_STATUSES.includes(f.status))
+}
+
 export const getAgendaByCountry = unstable_cache(
-  async (countryId: string): Promise<(Film & { release_date: string })[]> => {
-    const { data, error } = await supabase
-      .from('film_releases')
-      .select(`release_date, films ( ${FILMS_SELECT} )`)
-      .eq('country_id', countryId)
-      .order('release_date', { ascending: true })
-    if (error) throw error
-    return (data ?? [])
-      .map((r: any) => ({ ...r.films, release_date: r.release_date }))
-      .filter((f: any) => AGENDA_STATUSES.includes(f.status))
-  },
+  fetchAgendaByCountry,
   ['agenda-by-country-v2'],
   { revalidate: REVALIDATE, tags: ['agenda'] }
 )
@@ -84,20 +91,22 @@ const MOVEMENTS_SELECT = `
   films ( id, title, title_vf, poster_url, genre, status )
 `
 
+export async function fetchMovementsByCountry(countryId: string): Promise<(FilmReleaseEvent & { film: Film })[]> {
+  const { data, error } = await supabase
+    .from('film_release_events')
+    .select(MOVEMENTS_SELECT)
+    .eq('country_id', countryId)
+    .eq('visible', true)
+    .order('occurred_at', { ascending: false })
+    .limit(50)
+  if (error) throw error
+  return (data ?? [])
+    .map((e: any) => ({ ...e, film: e.films }))
+    .filter((e: any) => AGENDA_STATUSES.includes(e.film?.status))
+}
+
 export const getMovementsByCountry = unstable_cache(
-  async (countryId: string): Promise<(FilmReleaseEvent & { film: Film })[]> => {
-    const { data, error } = await supabase
-      .from('film_release_events')
-      .select(MOVEMENTS_SELECT)
-      .eq('country_id', countryId)
-      .eq('visible', true)
-      .order('occurred_at', { ascending: false })
-      .limit(50)
-    if (error) throw error
-    return (data ?? [])
-      .map((e: any) => ({ ...e, film: e.films }))
-      .filter((e: any) => AGENDA_STATUSES.includes(e.film?.status))
-  },
+  fetchMovementsByCountry,
   ['mouvements-by-country-v2'],
   { revalidate: REVALIDATE, tags: ['mouvements'] }
 )

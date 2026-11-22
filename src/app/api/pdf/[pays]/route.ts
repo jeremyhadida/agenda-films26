@@ -1,6 +1,8 @@
 import { renderToStream } from '@react-pdf/renderer'
 import { createElement } from 'react'
-import { getAgendaByCountry, getActiveCountries, getMovementsByCountry } from '@/lib/queries'
+// Lecture directe de la base (jamais le cache de 5 min des pages) : le PDF est joint à une
+// newsletter envoyée juste après une modification de dates.
+import { fetchAgendaByCountry, fetchActiveCountries, fetchMovementsByCountry } from '@/lib/queries'
 import { AgendaPdfDocument } from '@/lib/pdf/AgendaPdfDocument'
 
 export const dynamic = 'force-dynamic'
@@ -12,9 +14,9 @@ export async function GET(
   const { pays } = await params
 
   const [films, events, countries] = await Promise.all([
-    getAgendaByCountry(pays),
-    getMovementsByCountry(pays),
-    getActiveCountries(),
+    fetchAgendaByCountry(pays),
+    fetchMovementsByCountry(pays),
+    fetchActiveCountries(),
   ])
 
   const country = countries.find(c => c.id === pays)
