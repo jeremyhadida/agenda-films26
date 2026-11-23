@@ -8,14 +8,17 @@ import { AgendaPdfDocument } from '@/lib/pdf/AgendaPdfDocument'
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ pays: string }> }
 ) {
   const { pays } = await params
+  // ?nouveaux=1 : appel de la newsletter. Le PDF n'affiche alors que les mouvements pas encore
+  // envoyés (comme le corps du mail). Le téléchargement public, sans paramètre, reste inchangé.
+  const onlyUnsent = new URL(request.url).searchParams.get('nouveaux') === '1'
 
   const [films, events, countries] = await Promise.all([
     fetchAgendaByCountry(pays),
-    fetchMovementsByCountry(pays),
+    onlyUnsent ? fetchMovementsByCountry(pays, { onlyUnsent: true }) : fetchMovementsByCountry(pays),
     fetchActiveCountries(),
   ])
 

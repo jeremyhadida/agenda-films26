@@ -91,12 +91,20 @@ const MOVEMENTS_SELECT = `
   films ( id, title, title_vf, poster_url, genre, status )
 `
 
-export async function fetchMovementsByCountry(countryId: string): Promise<(FilmReleaseEvent & { film: Film })[]> {
-  const { data, error } = await supabase
+// onlyUnsent : ne garde que les mouvements pas encore envoyés par newsletter (send_id vide,
+// colonne tenue par le Forecast tool). Sert au PDF joint au mail : il doit refléter le corps
+// du mail, donc ne rien afficher quand tout a déjà été envoyé.
+export async function fetchMovementsByCountry(
+  countryId: string,
+  options: { onlyUnsent?: boolean } = {},
+): Promise<(FilmReleaseEvent & { film: Film })[]> {
+  let query = supabase
     .from('film_release_events')
     .select(MOVEMENTS_SELECT)
     .eq('country_id', countryId)
     .eq('visible', true)
+  if (options.onlyUnsent) query = query.is('send_id', null)
+  const { data, error } = await query
     .order('occurred_at', { ascending: false })
     .limit(50)
   if (error) throw error

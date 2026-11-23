@@ -34,6 +34,16 @@ describe('GET /api/pdf/[pays]', () => {
     expect(cached.getActiveCountries).not.toHaveBeenCalled()
   })
 
+  it("avec ?nouveaux=1 (appel de la newsletter), ne montre que les mouvements pas encore envoyés", async () => {
+    await GET(new Request('http://x/api/pdf/ma?nouveaux=1'), { params: Promise.resolve({ pays: 'ma' }) })
+    expect(fresh.fetchMovementsByCountry).toHaveBeenCalledWith('ma', { onlyUnsent: true })
+  })
+
+  it('sans paramètre (téléchargement public), garde tous les mouvements visibles', async () => {
+    await GET(new Request('http://x/api/pdf/ma'), { params: Promise.resolve({ pays: 'ma' }) })
+    expect(fresh.fetchMovementsByCountry).toHaveBeenCalledWith('ma')
+  })
+
   it('répond 404 pour un pays inconnu', async () => {
     const res = await GET(new Request('http://x/api/pdf/zz'), { params: Promise.resolve({ pays: 'zz' }) })
     expect(res.status).toBe(404)
