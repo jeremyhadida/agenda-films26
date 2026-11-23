@@ -95,7 +95,7 @@ export function MonthTabs({ groups, rightSlot }: MonthTabsProps) {
       >
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-3">
           <div ref={tabsContainerRef} className="flex-1 flex gap-2 overflow-x-auto scrollbar-none pb-1">
-            {months.map(({ month, year, firstWeekStartDate }) => {
+            {months.map(({ month, year, firstWeekStartDate }, idx) => {
               const key = `${year}-${month}`
               const isActive = activeMonthKey === key
               return (
@@ -111,6 +111,7 @@ export function MonthTabs({ groups, rightSlot }: MonthTabsProps) {
                   }`}
                 >
                   {FR_MONTHS[month]}
+                  {idx > 0 && months[idx - 1].year !== year && ` ${year}`}
                 </button>
               )
             })}
