@@ -102,11 +102,12 @@ export async function fetchMovementsByCountry(
     .from('film_release_events')
     .select(MOVEMENTS_SELECT)
     .eq('country_id', countryId)
-    .eq('visible', true)
-  if (options.onlyUnsent) query = query.is('send_id', null)
+  // Mode « en attente » : on charge aussi les masqués (un film dont un mouvement est masqué est
+  // exclu en entier, comme dans le mail) et plus de lignes (plusieurs jours cumulés).
+  query = options.onlyUnsent ? query.is('send_id', null) : query.eq('visible', true)
   const { data, error } = await query
     .order('occurred_at', { ascending: false })
-    .limit(50)
+    .limit(options.onlyUnsent ? 500 : 50)
   if (error) throw error
   return (data ?? [])
     .map((e: any) => ({ ...e, film: e.films }))

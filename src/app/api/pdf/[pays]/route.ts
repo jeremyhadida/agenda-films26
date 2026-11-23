@@ -3,6 +3,7 @@ import { createElement } from 'react'
 // Lecture directe de la base (jamais le cache de 5 min des pages) : le PDF est joint à une
 // newsletter envoyée juste après une modification de dates.
 import { fetchAgendaByCountry, fetchActiveCountries, fetchMovementsByCountry } from '@/lib/queries'
+import { netPendingMovements } from '@/lib/pdf/utils'
 import { AgendaPdfDocument } from '@/lib/pdf/AgendaPdfDocument'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +19,9 @@ export async function GET(
 
   const [films, events, countries] = await Promise.all([
     fetchAgendaByCountry(pays),
-    onlyUnsent ? fetchMovementsByCountry(pays, { onlyUnsent: true }) : fetchMovementsByCountry(pays),
+    onlyUnsent
+      ? fetchMovementsByCountry(pays, { onlyUnsent: true }).then(netPendingMovements)
+      : fetchMovementsByCountry(pays),
     fetchActiveCountries(),
   ])
 
@@ -42,6 +45,7 @@ export async function GET(
     country,
     films: filmsFromNow,
     events,
+    movementsMode: onlyUnsent ? 'pending' as const : 'recent' as const,
     generatedAt: today,
   })
 

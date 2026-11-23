@@ -2,7 +2,7 @@
 // il doit refléter la base à l'instant de la requête, pas le cache de 5 minutes des pages.
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { cached, fresh } = vi.hoisted(() => ({ cached: {
+const { cached, fresh, renderToStream } = vi.hoisted(() => ({ renderToStream: vi.fn(async (_el: unknown) => new ReadableStream()), cached: {
   getAgendaByCountry: vi.fn(async () => []),
   getMovementsByCountry: vi.fn(async () => []),
   getActiveCountries: vi.fn(async () => []),
@@ -14,9 +14,7 @@ const { cached, fresh } = vi.hoisted(() => ({ cached: {
 
 vi.mock('@/lib/queries', () => ({ ...cached, ...fresh }))
 vi.mock('@/lib/pdf/AgendaPdfDocument', () => ({ AgendaPdfDocument: () => null }))
-vi.mock('@react-pdf/renderer', () => ({
-  renderToStream: vi.fn(async () => new ReadableStream()),
-}))
+vi.mock('@react-pdf/renderer', () => ({ renderToStream }))
 
 import { GET } from './route'
 
@@ -37,11 +35,15 @@ describe('GET /api/pdf/[pays]', () => {
   it("avec ?nouveaux=1 (appel de la newsletter), ne montre que les mouvements pas encore envoyés", async () => {
     await GET(new Request('http://x/api/pdf/ma?nouveaux=1'), { params: Promise.resolve({ pays: 'ma' }) })
     expect(fresh.fetchMovementsByCountry).toHaveBeenCalledWith('ma', { onlyUnsent: true })
+    const element = renderToStream.mock.calls[0][0] as { props: { movementsMode: string } }
+    expect(element.props.movementsMode).toBe('pending')
   })
 
   it('sans paramètre (téléchargement public), garde tous les mouvements visibles', async () => {
     await GET(new Request('http://x/api/pdf/ma'), { params: Promise.resolve({ pays: 'ma' }) })
     expect(fresh.fetchMovementsByCountry).toHaveBeenCalledWith('ma')
+    const element = renderToStream.mock.calls[0][0] as { props: { movementsMode: string } }
+    expect(element.props.movementsMode).toBe('recent')
   })
 
   it('répond 404 pour un pays inconnu', async () => {

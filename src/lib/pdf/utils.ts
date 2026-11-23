@@ -43,6 +43,38 @@ export function getLatestEventByFilm(
   return map
 }
 
+/**
+ * Mouvements « en attente d'envoi » d'un pays, réduits à leur effet net par film : même règle
+ * que le corps du mail (Forecast tool, lib/diffusion.ts). Ajout puis retrait = rien ; date
+ * changée puis rétablie = rien ; un film dont un mouvement est masqué est exclu en entier.
+ * Cumule tous les jours en attente. Résultat trié du plus récent au plus ancien.
+ */
+export function netPendingMovements<T extends FilmReleaseEvent>(events: T[]): T[] {
+  const byFilm = new Map<string, T[]>()
+  for (const e of events) {
+    const list = byFilm.get(e.film_id)
+    if (list) list.push(e)
+    else byFilm.set(e.film_id, [e])
+  }
+
+  const result: T[] = []
+  for (const list of byFilm.values()) {
+    if (list.some(e => !e.visible)) continue
+    const sorted = list.slice().sort((a, b) => a.occurred_at.localeCompare(b.occurred_at))
+    const first = sorted[0]
+    const last = sorted[sorted.length - 1]
+    const before = first.event_type === 'added' ? null : first.old_date
+    let current: string | null = before
+    for (const e of sorted) current = e.event_type === 'removed' ? null : e.new_date
+
+    if (before === null && current === null) continue
+    if (before === null) result.push({ ...last, event_type: 'added', old_date: null, new_date: current })
+    else if (current === null) result.push({ ...last, event_type: 'removed', old_date: before, new_date: null })
+    else if (before !== current) result.push({ ...last, event_type: 'date_changed', old_date: before, new_date: current })
+  }
+  return result.sort((a, b) => b.occurred_at.localeCompare(a.occurred_at))
+}
+
 export function formatDateShort(dateStr: string): string {
   const d = new Date(dateStr)
   return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`

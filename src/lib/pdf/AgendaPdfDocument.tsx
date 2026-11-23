@@ -278,16 +278,27 @@ const s = StyleSheet.create({
   },
 })
 
+// 'recent' : mouvements visibles du jour le plus récent (téléchargement public).
+// 'pending' : mouvements en attente d'envoi, déjà réduits à leur effet net, tous jours cumulés
+// (PDF joint à la newsletter : même contenu que le corps du mail).
+export type MovementsMode = 'recent' | 'pending'
+
+function selectMovements(events: FilmReleaseEvent[], mode: MovementsMode): FilmReleaseEvent[] {
+  return mode === 'pending' ? events.filter(e => e.visible) : getRecentMovements(events)
+}
+
 function CoverPage({
   country,
   generatedAt,
   events,
+  movementsMode,
 }: {
   country: Country
   generatedAt: Date
   events: FilmReleaseEvent[]
+  movementsMode: MovementsMode
 }) {
-  const allMovements = sortMovementsByCategoryAndDate(getRecentMovements(events))
+  const allMovements = sortMovementsByCategoryAndDate(selectMovements(events, movementsMode))
   const movements = allMovements.slice(0, MAX_COVER_MOVEMENTS)
   const hiddenMovementsCount = allMovements.length - movements.length
   return (
@@ -343,7 +354,7 @@ function CoverPage({
 
             {hiddenMovementsCount > 0 && (
               <Text style={s.movementMoreText}>
-                + {hiddenMovementsCount} autre{hiddenMovementsCount > 1 ? 's' : ''} mouvement{hiddenMovementsCount > 1 ? 's' : ''} ce jour-là — voir la liste complète en ligne
+                + {hiddenMovementsCount} autre{hiddenMovementsCount > 1 ? 's' : ''} mouvement{hiddenMovementsCount > 1 ? 's' : ''}{movementsMode === 'pending' ? ' — voir la liste complète dans l’email' : ' ce jour-là — voir la liste complète en ligne'}
               </Text>
             )}
 
@@ -479,17 +490,19 @@ export function AgendaPdfDocument({
   films,
   events,
   generatedAt,
+  movementsMode = 'recent',
 }: {
   country: Country
   films: FilmWithDate[]
   events: FilmReleaseEvent[]
   generatedAt: Date
+  movementsMode?: MovementsMode
 }) {
   // Restreint au jour le plus récent pour rester cohérent avec l'encart
   // "DERNIERS MOUVEMENTS" de la page de garde : une ligne n'est surlignée
   // que si son événement y apparaît aussi (sinon désynchronisation visible,
   // ex. lignes jaunes sans correspondance dans la liste des mouvements récents).
-  const eventMap = getLatestEventByFilm(getRecentMovements(events))
+  const eventMap = getLatestEventByFilm(selectMovements(events, movementsMode))
   const sortedFilms = [...films].sort((a, b) =>
     a.release_date.localeCompare(b.release_date)
   )
@@ -504,6 +517,7 @@ export function AgendaPdfDocument({
         country={country}
         generatedAt={generatedAt}
         events={events}
+        movementsMode={movementsMode}
       />
       <AgendaTablePage
         country={country}

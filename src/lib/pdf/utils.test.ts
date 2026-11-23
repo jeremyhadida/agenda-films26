@@ -7,6 +7,7 @@ import {
   formatGenerationDate,
   truncateCast,
   getRecentMovements,
+  netPendingMovements,
 } from './utils'
 
 const makeFilm = (id: string, release_date: string) =>
@@ -111,5 +112,63 @@ describe('formatDateLong', () => {
   it('formate en "Weekday jj mois aaaa" comme le corps de l\'email', () => {
     // 2026-06-02 est un mardi
     expect(formatDateLong('2026-06-02')).toBe('Mardi 02 juin 2026')
+  })
+})
+
+// netPendingMovements : doit donner le même résultat que le corps du mail (Forecast tool,
+// lib/diffusion.ts : effet net par film, mouvement masqué = film exclu).
+describe('netPendingMovements', () => {
+  const ev = (film_id: string, event_type: 'added' | 'date_changed' | 'removed',
+    old_date: string | null, new_date: string | null, occurred_at: string, visible = true) =>
+    ({ id: `${film_id}-${occurred_at}`, film_id, country_id: 'ma', event_type, old_date, new_date, visible, occurred_at } as any)
+
+  it('cumule les mouvements de plusieurs jours (pas seulement le plus récent)', () => {
+    const r = netPendingMovements([
+      ev('a', 'added', null, '2026-12-11', '2026-11-22T10:00:00Z'),
+      ev('b', 'added', null, '2026-12-18', '2026-11-23T10:00:00Z'),
+    ])
+    expect(r.map(e => e.film_id).sort()).toEqual(['a', 'b'])
+  })
+
+  it('ajout puis changement de date donne un ajout à la dernière date', () => {
+    const r = netPendingMovements([
+      ev('a', 'added', null, '2026-12-11', '2026-11-22T10:00:00Z'),
+      ev('a', 'date_changed', '2026-12-11', '2026-12-18', '2026-11-23T10:00:00Z'),
+    ])
+    expect(r).toHaveLength(1)
+    expect(r[0]).toMatchObject({ event_type: 'added', old_date: null, new_date: '2026-12-18' })
+  })
+
+  it('ajout puis retrait ne donne rien', () => {
+    expect(netPendingMovements([
+      ev('a', 'added', null, '2026-12-11', '2026-11-22T10:00:00Z'),
+      ev('a', 'removed', '2026-12-11', null, '2026-11-22T11:00:00Z'),
+    ])).toEqual([])
+  })
+
+  it('une date changée puis rétablie ne donne rien', () => {
+    expect(netPendingMovements([
+      ev('a', 'date_changed', '2026-12-11', '2026-12-18', '2026-11-22T10:00:00Z'),
+      ev('a', 'date_changed', '2026-12-18', '2026-12-11', '2026-11-22T11:00:00Z'),
+    ])).toEqual([])
+  })
+
+  it('retrait puis ajout à une autre date donne une modification', () => {
+    const r = netPendingMovements([
+      ev('a', 'removed', '2026-12-11', null, '2026-11-22T10:00:00Z'),
+      ev('a', 'added', null, '2026-12-18', '2026-11-22T11:00:00Z'),
+    ])
+    expect(r[0]).toMatchObject({ event_type: 'date_changed', old_date: '2026-12-11', new_date: '2026-12-18' })
+  })
+
+  it('un mouvement masqué exclut tout le film (comme le mail)', () => {
+    expect(netPendingMovements([
+      ev('a', 'added', null, '2026-12-11', '2026-11-22T10:00:00Z'),
+      ev('a', 'removed', '2026-12-11', null, '2026-11-22T11:00:00Z', false),
+    ])).toEqual([])
+  })
+
+  it('liste vide sans événement', () => {
+    expect(netPendingMovements([])).toEqual([])
   })
 })

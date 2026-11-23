@@ -28,4 +28,16 @@ describe('fetchMovementsByCountry', () => {
     await fetchMovementsByCountry('ma', { onlyUnsent: true })
     expect(calls).toContain('is:["send_id",null]')
   })
+
+  it('avec onlyUnsent, charge aussi les masqués (pour exclure leur film) et plus de 50 lignes', async () => {
+    await fetchMovementsByCountry('ma', { onlyUnsent: true })
+    expect(calls).not.toContain('eq:["visible",true]')
+    expect(calls).toContain('limit:[500]')
+  })
+
+  it('par défaut, ne charge que les visibles, 50 lignes', async () => {
+    await fetchMovementsByCountry('ma')
+    expect(calls).toContain('eq:["visible",true]')
+    expect(calls).toContain('limit:[50]')
+  })
 })
